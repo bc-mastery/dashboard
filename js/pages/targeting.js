@@ -1,6 +1,6 @@
 // /js/pages/targeting.js
 
-import { APPS_SCRIPT_URL, token, nocacheFlag, ACCESS } from "../core/config.js";
+import { APPS_SCRIPT_URL, token, nocacheFlag, ACCESS, IMAGES } from "../core/config.js";
 import { state } from "../core/state.js";
 import { inferAccess, esc, parseAreas, toDownloadLink } from "../core/utils.js";
 import { detectMode, setABCMap } from "../core/abcMap.js";
@@ -108,9 +108,9 @@ function paintTargeting(api, allowFull = false) {
         </div>
         <div class="bfMap">
           <div class="abc-wrap"
-               data-mode="${esc(mode)}"
-               data-areas="${areas.map(String).map(esc).join("|")}"
-               data-overlay="">
+               data-mode="${mode}"
+               data-areas="${areas.map(String).join("|")}"
+               data-overlay="${IMAGES.abcFrame}">
             <div class="donut"></div>
             <img class="overlay" alt="ABC overlay">
           </div>
@@ -163,8 +163,9 @@ function paintTargeting(api, allowFull = false) {
       .split("|")
       .map((s) => s.trim())
       .filter(Boolean);
-    // Use default overlay from abcMap if needed; here we just pass blank to keep previous default
-    const overlayPath = container.dataset.overlay || "ABC_map_frame.PNG";
+
+    // Always use the configured, case-correct path (with version param if present)
+    const overlayPath = container.dataset.overlay || IMAGES.abcFrame;
     setABCMap({ container, mode: m, areas: a, overlayPath });
   });
 }
