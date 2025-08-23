@@ -1,7 +1,7 @@
 // /js/pages/targeting.js
 
 import { APPS_SCRIPT_URL, token, nocacheFlag, ACCESS, IMAGES } from "../core/config.js";
-import { state } from "../core/state.js";
+import { state, setCurrentTab } from "../core/state.js";
 import { inferAccess, esc, parseAreas, toDownloadLink } from "../core/utils.js";
 import { detectMode, setABCMap } from "../core/abcMap.js";
 import {
@@ -12,51 +12,48 @@ import {
   clearUpgradeBlock,
 } from "../core/ui.js";
 import { finalBlockContent } from "../components/blocks.js";
-import { fetchPdfLinks } from "../services/pdf.js";
 
 /* ------------------------------ main render ------------------------------ */
 export async function renderTargetingTab() {
-  // mark current tab + clear upgrade block right away
-  state.currentTab = "targeting";
-  import { setCurrentTab } from "../core/state.js";
-setCurrentTab("targeting");
+  setCurrentTab("targeting");
+  document.body.setAttribute("data-current-tab", "targeting");
   clearUpgradeBlock();
 
   const contentDiv = document.getElementById("content");
   if (!contentDiv) return;
-
-  // Clear old content immediately to avoid showing the previous tab's block
-  contentDiv.innerHTML = `<div class="card"><p class="muted">Loading Targeting Strategy…</p></div>`;
-  const blockTabs = document.getElementById("blockTabs");
-  if (blockTabs) blockTabs.querySelectorAll(".blockBtn").forEach((el) => el.remove());
 
   if (!token) {
     contentDiv.innerHTML = `<div class="card"><p class="muted">No token provided in URL.</p></div>`;
     return;
   }
 
-  // Guard against stale async work
-  const renderId = (state._renderId = (state._renderId || 0) + 1);
+  contentDiv.innerHTML = `<div class="card"><p class="muted">Loading Targeting Strategy…</p></div>`;
 
   try {
     const url = `${APPS_SCRIPT_URL}?token=${encodeURIComponent(token)}${nocacheFlag ? "&nocache=1" : ""}`;
-    const r = await fetch(url, { cache: nocacheFlag ? "no-store" : "default" });
+    const r = await fetch(url);
     const api = await r.json();
-
-    // If another tab started rendering, stop here
-    if (renderId !== state._renderId || state.currentTab !== "targeting") return;
 
     if (!api || !api.ok) {
       contentDiv.innerHTML = `<div class="card"><p class="muted">${(api && api.message) || "No data found."}</p></div>`;
       return;
     }
 
-    // Cache + access
+    // cache + access
     state.lastApiByTab.targeting = { ...api, data: { ...api.data } };
     const d = api.data || {};
     state.lastAccess = inferAccess(d);
 
-    // Pre-fill direct PDF link (from T_STRATEGY_OUTPUT)
+    // header brand
+    const brandEl = document.getElementById("brandName");
+    if (brandEl) {
+      const full = String(d.Brand || "");
+      const short = full.length > 80 ? full.slice(0, 80) : full;
+      brandEl.textContent = short;
+      brandEl.title = full;
+    }
+
+    // PDF link from T_STRATEGY_OUTPUT
     const view = d.T_STRATEGY_OUTPUT || "";
     if (view) {
       state.dynamicPdfLinks.targeting = toDownloadLink(view);
@@ -65,40 +62,27 @@ setCurrentTab("targeting");
 
     const allowFull = !!d.TS_PAID || !!d["4PBS_PAID"];
 
-    // Paint page
+    // paint page
     paintTargeting(api, allowFull);
 
-    // Secondary chips row
+    // chips + CTA refresh
     const blockTabsRow = document.getElementById("blockTabsRow");
     if (blockTabsRow) blockTabsRow.style.display = "block";
     populateBlockTabsFromPage();
+    updateFloatingCTA("targeting");
 
-    // Fetch dynamic PDF links from Apps Script "pdf" mode
-    try {
-      await fetchPdfLinks("targeting");
-      // Still on this tab?
-      if (renderId === state._renderId && state.currentTab === "targeting") {
-        updateFloatingCTA("targeting");
-      }
-    } catch {
-      /* ignore */
-    }
-
-    // Insert upgrade block if preview-only (guarded by tab)
+    // upgrade block only for preview users
     maybeInsertUniversalUpgradeBlock({
       tab: "targeting",
       isPreviewOnly: !allowFull,
       content: finalBlockContent.targeting,
     });
 
-    // Floating call button for GS-only users
+    // floating call button for GS-only users
     toggleFloatingCallBtn(state.lastAccess === ACCESS.GS_ONLY);
   } catch (err) {
     console.error(err);
-    // Only show if still on this render
-    if (renderId === state._renderId && state.currentTab === "targeting") {
-      contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${err?.message || err}</p></div>`;
-    }
+    contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || err)}</p></div>`;
   }
 }
 
@@ -108,14 +92,6 @@ function paintTargeting(api, allowFull = false) {
   if (!contentDiv) return;
 
   const d = (api && api.data) || {};
-  const brandEl = document.getElementById("brandName");
-  if (brandEl) {
-    const full = String(d.Brand || "");
-    const short = full.length > 80 ? full.slice(0, 80) : full;
-    brandEl.textContent = short;
-    brandEl.title = full;
-  }
-
   const areas = parseAreas(d.D_AREA);
   const mode = detectMode(areas);
 
@@ -178,7 +154,7 @@ function paintTargeting(api, allowFull = false) {
 
   contentDiv.innerHTML = html;
 
-  // Hydrate any ABC maps present (use canonical overlay path)
+  // Activate ABC map
   document.querySelectorAll(".abc-wrap").forEach((container) => {
     const m = (container.dataset.mode || "B2B").toUpperCase();
     const a = (container.dataset.areas || "")
@@ -189,7 +165,3 @@ function paintTargeting(api, allowFull = false) {
     setABCMap({ container, mode: m, areas: a, overlayPath });
   });
 }
-
-// (Optional) also export default for flexibility
-export default renderTargetingTab;
-
