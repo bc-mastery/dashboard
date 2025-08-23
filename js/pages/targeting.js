@@ -9,12 +9,17 @@ import {
   toggleFloatingCallBtn,
   maybeInsertUniversalUpgradeBlock,
   updateFloatingCTA,
+  clearUpgradeBlock,               // ← NEW
 } from "../core/ui.js";
 import { finalBlockContent } from "../components/blocks.js";
 import { fetchPdfLinks } from "../services/pdf.js";
 
 /* ------------------------------ main render ------------------------------ */
 export async function renderTargetingTab() {
+  // Mark active tab + clear any stale upgrade block immediately
+  document.body.setAttribute("data-current-tab", "targeting");  // ← NEW
+  clearUpgradeBlock();                                          // ← NEW
+
   const contentDiv = document.getElementById("content");
   if (!contentDiv) return;
 
@@ -53,21 +58,21 @@ export async function renderTargetingTab() {
     // Paint page
     paintTargeting(api, allowFull);
 
-    // Show the secondary chips row and populate chips from sections
+    // Chips row and CTA refresh
     const blockTabsRow = document.getElementById("blockTabsRow");
     if (blockTabsRow) blockTabsRow.style.display = "block";
     populateBlockTabsFromPage();
 
-    // Optionally fetch dynamic PDF links from the Apps Script "pdf" mode, then refresh CTA
     try {
       await fetchPdfLinks("targeting");
       updateFloatingCTA("targeting");
     } catch (_) {
-      // ignore PDF fetch errors silently
+      /* ignore */
     }
 
-    // Insert upgrade block for preview users
+    // Insert upgrade block only if preview; guard by tab name to avoid stale async writes
     maybeInsertUniversalUpgradeBlock({
+      tab: "targeting",                     // ← NEW (prevents stale insert from other tabs)
       isPreviewOnly: !allowFull,
       content: finalBlockContent.targeting,
     });
@@ -108,11 +113,11 @@ function paintTargeting(api, allowFull = false) {
         </div>
         <div class="bfMap">
           <div class="abc-wrap"
-               data-mode="${mode}"
-               data-areas="${areas.map(String).join("|")}"
-               data-overlay="${IMAGES.abcFrame}">
+               data-mode="${esc(mode)}"
+               data-areas="${areas.map(String).map(esc).join("|")}"
+               data-overlay="${esc(IMAGES.abcFrame)}">           <!-- ← ensure dataset has the overlay -->
             <div class="donut"></div>
-            <img class="overlay" alt="ABC overlay">
+            <img class="overlay" src="${IMAGES.abcFrame}" alt="ABC overlay"> <!-- ← paint immediately -->
           </div>
         </div>
       </div>
@@ -156,15 +161,13 @@ function paintTargeting(api, allowFull = false) {
 
   contentDiv.innerHTML = html;
 
-  // Hydrate any ABC maps present
+  // Hydrate any ABC maps present (use the same canonical overlay path)
   document.querySelectorAll(".abc-wrap").forEach((container) => {
     const m = (container.dataset.mode || "B2B").toUpperCase();
     const a = (container.dataset.areas || "")
       .split("|")
       .map((s) => s.trim())
       .filter(Boolean);
-
-    // Always use the configured, case-correct path (with version param if present)
     const overlayPath = container.dataset.overlay || IMAGES.abcFrame;
     setABCMap({ container, mode: m, areas: a, overlayPath });
   });
