@@ -8,7 +8,7 @@
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Rokkitt:wght@900&display=swap" rel="stylesheet">
 
-  <!-- (Optional) Google Charts loader; our code also lazy-loads if this isn't present -->
+  <!-- (Optional) Google Charts loader; our code also lazy-loads if this isn't present) -->
   <script src="https://www.gstatic.com/charts/loader.js"></script>
 
   <style>
@@ -194,7 +194,7 @@
     /* Upgrade Block */
     .upgradeBlock .sectionTitle { margin-bottom:8px; }
     .upgradeBlock p { margin:8px 0; }
-    .upgrade-ctaRow { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; padding-bottom:6px; }
+    .upgrade-ctaRow { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
     .btn { display:inline-flex; align-items:center; justify-content:center; border-radius:10px; padding:8px 12px; font-size:13px; font-weight:600; text-decoration:none; cursor:pointer; border:2px solid transparent; transition: transform .05s, box-shadow .2s, background .2s, border-color .2s, color .2s; box-shadow:0 2px 6px rgba(0,0,0,.06); }
     .btn:active { transform: translateY(1px); }
     .btn-primary { background:var(--bc-green); color:var(--bc-white); border-color:var(--bc-green); }
@@ -216,10 +216,40 @@
     .floatingCallBtn img { width: 22px; height: 22px; display: block; }
     .floatingCallBtn[aria-hidden="false"] { display: inline-flex; }
     .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+    /* ===================== Growth Scan components ===================== */
+    /* Block #1 hero layout: LEFT donut, RIGHT copy */
+    .gsHeroGrid{
+      display:grid;
+      grid-template-columns: 340px 1fr;
+      gap:22px;
+      align-items:center;
+    }
+    .donutViz{ display:flex; align-items:center; justify-content:center; }
+    .donutChart{ width:100%; max-width:340px; aspect-ratio:1/1; }
+    @media (max-width: 740px){
+      .gsHeroGrid{ grid-template-columns: 1fr; }
+      .donutChart{ max-width: 380px; margin: 0 auto; }
+    }
+    .gsLeadTitle{ font-family:'Rokkitt', serif; font-weight:900; color:#30BA80; font-size:22px; margin:6px 0 10px; }
+    .gsLead p{ margin:6px 0; }
+    .gsHighlightGreen{ color:#30BA80; font-weight:700; }
+    .gsHighlightRed{ color:#FF0040; font-weight:700; }
+
+    /* Block #2: 4-Pillar Snapshot bars (capsule with ticks) */
+    .gsBars { display: grid; gap: 12px; }
+    .gsRow { display:grid; grid-template-columns: 150px 1fr 56px; gap:12px; align-items:center; }
+    .gsLabel span{ font-weight:700; color:var(--bc-dark); letter-spacing:.2px; }
+    .gsPct{ text-align:right; font-weight:700; color:var(--bc-dark); }
+    @media (max-width: 560px){ .gsRow{ grid-template-columns: 120px 1fr 48px; } }
+    .gsBar.v2 { position: relative; height: 16px; border-radius: 999px; }
+    .gsBar.v2 .gsTrack { position:absolute; inset:0; background:rgba(2,77,79,0.08); border-radius: inherit; z-index:0; }
+    .gsBar.v2 .gsFill  { position:absolute; inset:0 auto 0 0; width:0; background:var(--bc-green); border-radius:inherit; transition: width 420ms cubic-bezier(.22,.61,.36,1); box-shadow: inset 0 1px 0 rgba(255,255,255,.4); z-index:2; }
+    .gsBar.v2 .gsTicks { position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:1; background: repeating-linear-gradient( to right, transparent 0, transparent calc(10% - 1px), rgba(2,77,79,0.14) calc(10% - 1px), rgba(2,77,79,0.14) 10% ); }
+    /* ================================================================ */
   </style>
 </head>
 
-<!-- data attributes used by JS -->
 <body
   data-stripe-4pbs="https://stripe.link/REPLACE_WITH_4PBS"
   data-calendly-url="https://calendly.com/REPLACE_WITH_YOUR_LINK"
@@ -343,7 +373,4 @@
   <!-- ES modules entrypoint (replaces the old app.js) -->
   <script type="module" src="./js/main.js"></script>
 </body>
-
 </html>
-
-
