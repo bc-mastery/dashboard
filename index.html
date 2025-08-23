@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Strategy Dashboard</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Rokkitt:wght@900&display=swap" rel="stylesheet">
+
+  <!-- (Optional) Google Charts loader; our code also lazy-loads if this isn't present -->
+  <script src="https://www.gstatic.com/charts/loader.js"></script>
+
+  <style>
+    :root{
+      --bc-green:#30BA80; --bc-dark:#333333; --bc-teal:#024D4F;
+      --bc-mint:#B4FDE5; --bc-white:#FFFFFF; --bc-red:#D34B4B;
+
+      /* Header sizing controls */
+      --headerBarH: 60px;
+      --headerTabsH: 40px;
+      --headerH: calc(var(--headerBarH) + var(--headerTabsH) + 44px);
+    }
+
+    .preserve { white-space: pre-line; }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-size: 15px;
+      line-height: 1.5;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--bc-dark);
+      background: linear-gradient(to left, var(--bc-teal) 0%, var(--bc-green) 50%, var(--bc-green) 100%);
+    }
+
+    .wrap{ max-width:1100px; margin:0 auto; padding:0 20px; }
+
+    .siteHeader{
+      position: fixed; inset: 0 0 auto 0; z-index: 1000;
+      background: transparent; color: var(--bc-white);
+    }
+
+    .siteHeader .panel{
+      background: linear-gradient(to left, rgba(2,77,79,0.96) 0%, rgba(48,186,128,0.96) 50%, rgba(48,186,128,0.96) 100%);
+      -webkit-backdrop-filter: saturate(140%) blur(18px);
+      backdrop-filter: saturate(140%) blur(18px);
+      box-shadow: 0 10px 26px rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,0.18);
+      border-bottom-left-radius: 14px;
+      border-bottom-right-radius: 14px;
+      padding-bottom: 0px !important;
+    }
+
+    .bar{
+      height: var(--headerBarH);
+      display:grid; grid-template-columns: 1fr auto 1fr; align-items:center; gap:16px;
+      padding-bottom: 0px;
+    }
+    .titleBlock{ display:flex; align-items:center; gap:12px; }
+    .titleBlock img{ width:36px; height:36px; object-fit:contain; }
+    .pageTitle{
+      font-family: 'Rokkitt', serif; font-weight: 900; letter-spacing:.3px;
+      font-size: 28px; line-height:1; color: var(--bc-white);
+      text-shadow: 0 2px 0 rgba(0,0,0,.12); margin:0;
+    }
+    .headerLogo img{ height: 36px; opacity:.99; }
+    .brandName{
+      justify-self:end; font-weight:700; font-size:20px; color:var(--bc-white);
+      text-shadow: 0 2px 0 rgba(0,0,0,.12); width:30ch; max-width:30ch;
+      text-align:right; white-space:normal; overflow:hidden; display:-webkit-box;
+      -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-height:1.25;
+    }
+
+    .tabsRow { display:flex; flex-direction:column; gap:6px; padding-top:2px; padding-bottom:0; }
+
+    .tabBtn {
+      appearance: none; border: 2px solid #ddd; cursor: pointer; background: var(--bc-white); color: var(--bc-teal);
+      padding: 6px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; letter-spacing: 0.2px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), 0 4px 8px rgba(0,0,0,0.15), 0 1px 0 rgba(0,0,0,0.04);
+      transition: transform 0.05s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s;
+    }
+    .tabBtn:hover { background:#e0e0e0; }
+    .tabBtn:active { transform:translateY(1px); background:#d5d5d5; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2), 0 1px 1px rgba(0,0,0,0.08); }
+    #tabs .tabBtn.active { background:var(--bc-white); border:2px solid var(--bc-teal); font-weight:600; }
+
+    .main{ padding-top: calc(var(--headerH) + 10px); padding-bottom: 18px; max-width:1100px; margin:0 auto; padding-left:20px; padding-right:20px; }
+
+    .card{
+      background:var(--bc-white); border-radius:14px; padding:22px 22px 8px;
+      box-shadow:0 20px 40px rgba(0,0,0,.18); border:1px solid rgba(2,77,79,.1); margin-bottom:18px;
+    }
+
+    .sectionTitle{ font-family:'Rokkitt', serif; font-weight:900; color:var(--bc-green); font-size:22px; margin:6px 0 14px; }
+    .subtitle{ font-weight:700; color:#024D4F; }
+    .muted{ color:#4b4b4b; }
+
+    .bfGrid{ display:grid; grid-template-columns: 1fr auto; align-items:start; gap:22px; }
+    .bfText, .bfMap, .abc-wrap{ align-self:start; }
+    .bfTitle{ font-family:'Rokkitt', serif; font-weight:900; color:#30BA80; font-size:22px; margin:6px 0 14px; }
+    .bfSub{ font-weight:700; color:#024D4F; }
+    .bfDesc{ color:#333333; font-weight:400; }
+
+    .abc-wrap{
+      position:relative; width:min(28.5vw, 315px); max-width:100%; aspect-ratio:1/1; margin-left:22px;
+    }
+    .abc-wrap .overlay{ position:absolute; inset:0; width:100%; height:100%; object-fit:contain; pointer-events:none; z-index:2; }
+    .abc-wrap .donut{
+      position:absolute; inset:0; background: conic-gradient(from -90deg, transparent 0 360deg);
+      --outer-radius: 44%;
+      -webkit-mask: radial-gradient(circle at 50% 50%, #000 0 var(--outer-radius), transparent calc(var(--outer-radius) + 1px) 100%);
+              mask: radial-gradient(circle at 50% 50%, #000 0 var(--outer-radius), transparent calc(var(--outer-radius) + 1px) 100%);
+      z-index:1; transition: background 200ms ease;
+    }
+
+    @media (max-width: 680px){
+      .abc-wrap{ width:min(70vw, 380px); }
+      .abc-wrap .donut{ --outer-radius: 43.5%; }
+    }
+
+    /* Secondary tabs row (chips + CTA) */
+    #blockTabsRow { min-height:42px; display:flex; align-items:center; flex-wrap:wrap; padding-top:2px; padding-bottom:0; gap:6px; visibility:visible; }
+    #blockTabs{ display:flex; flex-wrap:wrap; gap:4px; justify-content:flex-start; }
+
+    .blockBtn {
+      font-size:10px; padding:4px 8px; background: var(--bc-mint); color: var(--bc-teal);
+      border:2px solid transparent; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,.06);
+      cursor:pointer; transition:border-color 0.2s;
+    }
+    .blockBtn.active { border:2px solid var(--bc-teal); }
+    .blockBtn:hover { background:#b4fde5; }
+
+    .floatingCTA {
+      position: fixed; top: calc(var(--headerBarH) + 4px); right: 8px; z-index: 1100;
+      display:flex; align-items:center; justify-content:center; height:20px; padding:0 10px;
+      border:2px solid #30BA80; border-radius:12px; background:#333333; color:var(--bc-white);
+      font-size:12px; font-weight:600; letter-spacing:0.2px; cursor:pointer; text-decoration:none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), 0 4px 8px rgba(0,0,0,0.15), 0 1px 0 rgba(0,0,0,0.04);
+      transition: transform 0.05s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s;
+    }
+    .floatingCTA:hover { background:#B4FDE5; color:#333333; }
+    .floatingCTA:active { transform: translateY(1px); background:#d5d5d5; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2), 0 1px 1px rgba(0,0,0,0.08); }
+    .download-icon { width:12px; height:12px; margin-right:6px; flex-shrink:0; display:inline-block; }
+
+    #blockTabsRow .floatingCTA {
+      position: static !important; top:auto; right:auto; display:inline-flex !important; align-items:center; gap:6px;
+      padding: 4px 10px; font-size:10px; line-height:1; border-radius:10px; height:auto; margin-left:6px;
+    }
+
+    .scrollTarget { scroll-margin-top: calc(var(--headerH) + 11px); }
+
+    /* Footer layout */
+    body { display:flex; min-height:100vh; flex-direction:column; }
+    .main { flex:1; }
+
+    .siteFooter.footerCard { position:relative; padding:22px; margin-top:18px; margin-bottom:18px; overflow:hidden; border:none; }
+    .siteFooter.footerCard::before {
+      content:""; position:absolute; inset:0;
+      background: linear-gradient(to top, rgba(2,77,79,0.10), rgba(48,186,128,0.10)),
+                  url("./assets/images/backgrounds/tab-prefooter.jpg") center / cover no-repeat;
+      opacity:0.28; pointer-events:none; border-radius:inherit; z-index:0;
+    }
+    .siteFooter.footerCard > * { position:relative; z-index:1; }
+
+    .footer-inner { display:grid; grid-template-columns: 1.2fr 1fr 1.2fr; gap:20px; align-items:start; }
+    .footer-left { display:flex; flex-direction:column; align-items:flex-start; gap:10px; }
+    .footer-logo { height:36px; width:auto; object-fit:contain; }
+    .footer-company { font-size:14px; line-height:1.4; color:var(--bc-dark); }
+    .footer-company .company-name { font-weight:600; color:var(--bc-teal); }
+    .footer-company a { color:var(--bc-teal); text-decoration:none; }
+    .footer-company a:hover { text-decoration:underline; }
+
+    .footer-heading { margin:0 0 6px; font-family:'Rokkitt', serif; font-weight:900; font-size:16px; color:var(--bc-green); }
+    .footer-middle a { position:relative; color:var(--bc-dark); font-size:14px; text-decoration:none; }
+    .footer-middle a::after { content:""; position:absolute; left:0; bottom:-2px; width:100%; height:1px; background:currentColor; opacity:.75; transition: height 180ms, opacity 180ms; }
+    .footer-middle a:hover::after, .footer-middle a:focus::after { height:2px; opacity:1; }
+    @media (prefers-reduced-motion: reduce) { .footer-middle a::after { transition:none; } }
+
+    .badge-text { font-size:12px; color:var(--bc-dark); margin-bottom:8px; }
+    .badge-logos { display:flex; gap:10px; align-items:center; margin:0 0 16px; }
+    .badge-logos img { height:48px; object-fit:contain; }
+
+    .siteFooter a:focus { outline:2px solid var(--bc-mint); outline-offset:2px; }
+
+    @media (max-width: 900px) { .footer-inner { grid-template-columns: 1fr 1fr; } .footer-right { grid-column: 1 / -1; } }
+    @media (max-width: 640px) { .footer-inner { grid-template-columns: 1fr; } }
+
+    /* Equal-width primary tabs */
+    :root{ --primaryTabW: 128px; --primaryTabH: 28px; }
+    #tabs{ display:flex; gap:6px; flex-wrap:wrap; }
+    #tabs .tabBtn{ display:inline-flex; align-items:center; justify-content:center; flex:0 0 var(--primaryTabW); width:var(--primaryTabW); height:var(--primaryTabH); padding:0 12px; line-height:1; font-size:13px; text-align:center; }
+    @media (max-width: 520px){ #tabs .tabBtn{ flex:0 0 var(--primaryTabW); width:var(--primaryTabW); } }
+
+    /* Upgrade Block */
+    .upgradeBlock .sectionTitle { margin-bottom:8px; }
+    .upgradeBlock p { margin:8px 0; }
+    .upgrade-ctaRow { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; padding-bottom:6px; }
+    .btn { display:inline-flex; align-items:center; justify-content:center; border-radius:10px; padding:8px 12px; font-size:13px; font-weight:600; text-decoration:none; cursor:pointer; border:2px solid transparent; transition: transform .05s, box-shadow .2s, background .2s, border-color .2s, color .2s; box-shadow:0 2px 6px rgba(0,0,0,.06); }
+    .btn:active { transform: translateY(1px); }
+    .btn-primary { background:var(--bc-green); color:var(--bc-white); border-color:var(--bc-green); }
+    .btn-primary:hover { background:#24a771; }
+    .btn-outline { background:var(--bc-white); color:var(--bc-teal); border-color:var(--bc-teal); }
+    .btn-outline:hover { background:#f0fbf8; }
+
+    /* Floating Calendly button */
+    .floatingCallBtn {
+      position: fixed; right: 14px; bottom: 18px; z-index: 1100;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: var(--bc-green); color: var(--bc-white);
+      display: none; align-items: center; justify-content: center;
+      box-shadow: 0 10px 26px rgba(0,0,0,.18);
+      border: 2px solid rgba(255,255,255,0.85);
+      text-decoration: none;
+    }
+    .floatingCallBtn:hover { filter: brightness(0.95); }
+    .floatingCallBtn img { width: 22px; height: 22px; display: block; }
+    .floatingCallBtn[aria-hidden="false"] { display: inline-flex; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+  </style>
+</head>
+
+<!-- data attributes used by JS -->
+<body
+  data-stripe-4pbs="https://stripe.link/REPLACE_WITH_4PBS"
+  data-calendly-url="https://calendly.com/REPLACE_WITH_YOUR_LINK"
+>
+  <header class="siteHeader">
+    <div class="panel">
+      <div class="wrap">
+        <div class="bar">
+          <div class="titleBlock">
+            <!-- Initial icon will be replaced by JS based on tab -->
+            <img id="pageIcon" src="./assets/icons/Icon_gs_white.png" alt="Section icon">
+            <div id="pageTitle" class="pageTitle">Growth Scan</div>
+          </div>
+          <div class="headerLogo">
+            <img src="./assets/logos/bc/business-canvas-logo.svg" alt="Business Canvas">
+          </div>
+          <div id="brandName" class="brandName"></div>
+        </div>
+
+        <div class="tabsRow">
+          <!-- Primary tabs -->
+          <div class="tabs" id="tabs">
+            <button class="tabBtn" data-tab="growth">Growth Scan</button>
+            <button class="tabBtn" data-tab="targeting">TARGETING</button>
+            <button class="tabBtn" data-tab="offer">OFFER</button>
+            <button class="tabBtn" data-tab="marketing">MARKETING</button>
+            <button class="tabBtn" data-tab="sales">SALES</button>
+            <!-- Optional future tabs:
+            <button class="tabBtn" data-tab="mentoring">MENTORING</button>
+            <button class="tabBtn" data-tab="knowledge">KNOWLEDGE</button>
+            -->
+          </div>
+
+          <!-- Secondary tabs row (chips + CTA on the right) -->
+          <div class="tabs" id="blockTabsRow">
+            <div id="blockTabs">
+              <!-- CTA sits in the same flex row as the chips -->
+              <a id="downloadBtn" class="floatingCTA ctaDocked" target="_self" href="#">
+                <img src="./assets/icons/Icon_download.png" class="download-icon" alt="">
+                <span id="downloadText">Download PDF</span>
+              </a>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+    <div id="content"></div>
+
+    <!-- Universal Upgrade Block template (inserted by JS when needed) -->
+    <template id="universalUpgradeBlock">
+      <section class="card upgradeBlock" role="region" aria-labelledby="upgradeBlockTitle">
+        <h3 class="sectionTitle" id="upgradeBlockTitle">Extend your strategy when you’re ready</h3>
+        <p class="muted">
+          You’re viewing a preview layer. The complete 4-Pillar Business Strategy connects Targeting, Offer, Marketing, and Sales into a cohesive, behavior-aligned plan—so each decision supports measurable outcomes.
+        </p>
+        <p class="muted">
+          If you’d like to see the full picture and export ready-to-use documents, you can continue in two ways:
+        </p>
+        <div class="upgrade-ctaRow">
+          <a class="btn btn-primary" id="cta-4pbs" href="#" target="_self" rel="noopener">Get the 4-Pillar Business Strategy</a>
+          <a class="btn btn-outline" id="cta-call" href="#" target="_blank" rel="noopener">Book a strategic call</a>
+        </div>
+      </section>
+    </template>
+
+    <!-- Footer as a card block -->
+    <footer class="card footerCard siteFooter" role="contentinfo">
+      <div class="footer-inner">
+        <!-- Left: Logo above company info -->
+        <div class="footer-left">
+          <img src="./assets/logos/bc/business-canvas-logo.svg" alt="Business Canvas" class="footer-logo">
+          <div class="footer-company">
+            <div class="company-name">Business Canvas Ltd.</div>
+            <a href="https://businesscanvas.io" target="_blank" rel="noopener">businesscanvas.io</a><br>
+            <a href="mailto:bc@businesscanvas.io">bc@businesscanvas.io</a>
+          </div>
+        </div>
+
+        <!-- Middle: Resources -->
+        <div class="footer-middle">
+          <h4 class="footer-heading">Services</h4>
+          <a href="https://www.businesscanvas.io/4-pillar-business-strategy" target="_blank" rel="noopener">
+            4-Pillar Business Strategy
+          </a><br>
+          <a href="https://www.businesscanvas.io/private-business-accelerator" target="_blank" rel="noopener">
+            Private Business Accelerator
+          </a>
+        </div>
+
+        <!-- Right: Credibility text + logos (order as requested) -->
+        <div class="footer-right">
+          <div class="badge-text">
+            The Business Canvas method is used in EDIH business development projects.
+          </div>
+          <div class="badge-logos">
+            <img src="./assets/logos/edih/edih-logo.svg" alt="EDIH logo" loading="lazy">
+          </div>
+
+          <div class="badge-text">
+            Award-winning strategic method used across 3 continents.
+          </div>
+          <div class="badge-logos">
+            <img src="./assets/logos/awards/stevie-awards.svg" alt="Stevie Awards Gold" loading="lazy">
+          </div>
+        </div>
+      </div>
+    </footer>
+
+  </main>
+
+  <!-- Floating Calendly button (hidden by default; toggled by JS) -->
+  <a id="floatingCallBtn" class="floatingCallBtn" href="#" target="_blank" rel="noopener" aria-hidden="true" aria-label="Book a strategic call">
+    <img src="./assets/icons/Icon_calendar.png" alt="">
+    <span class="sr-only">Book a strategic call</span>
+  </a>
+
+  <!-- ES modules entrypoint (replaces the old app.js) -->
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
