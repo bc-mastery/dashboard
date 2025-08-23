@@ -1,3 +1,5 @@
+// /js/core/config.js
+
 // URL params
 export const params = new URLSearchParams(window.location.search);
 export const token = params.get("token") || "";
@@ -34,6 +36,17 @@ export const TAB_ICONS = {
   sales:      `${PATHS.icons}Icon_sales.png`,
   mentoring:  `${PATHS.icons}Icon_sales.png`,     // placeholder
   knowledge:  `${PATHS.icons}Icon_marketing.png`, // placeholder
+};
+
+// Used by ui.js for the CTA icon swap
+export const UI_ICONS = {
+  download: `${PATHS.icons}Icon_download.png`,
+  lock:     `${PATHS.icons}Icon_lock.png`,
+};
+
+// Used by components/blocks.js for the ABC overlay frame
+export const IMAGES = {
+  abcFrame: `${PATHS.images}abc/ABC_map_frame.png`,
 };
 
 // Access enum
