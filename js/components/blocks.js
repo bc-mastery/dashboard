@@ -1,6 +1,6 @@
 // /js/components/blocks.js
 import { esc } from "../core/utils.js";
-import { PATHS } from "../core/config.js";
+import { IMAGES } from "../core/config.js";
 import { detectMode, setABCMap } from "../core/abcMap.js";
 
 /* --------------------------- Contextual upgrade copy --------------------------- */
@@ -48,9 +48,8 @@ export function buildFirstBlockHTML({
   areas,
   overlay, // optional custom overlay path
 }) {
-  // EXACT path + casing (Cloudflare is case-sensitive)
-  const defaultOverlay = `${PATHS.images}ABC_map_frame.PNG`;
-  const overlayPath = overlay || defaultOverlay;
+  // Single source of truth for the overlay path (case-sensitive)
+  const overlayPath = overlay || IMAGES.abcFrame;
 
   const areaList = Array.isArray(areas) ? areas : [];
   const mode = detectMode(areaList);
@@ -89,10 +88,7 @@ export function hydrateABCMaps() {
       .map((s) => s.trim())
       .filter(Boolean);
 
-    // Same exact fallback path & casing
-    const fallback = `${PATHS.images}ABC_map_frame.PNG`;
-    const overlayPath = container.dataset.overlay || fallback;
-
+    const overlayPath = container.dataset.overlay || IMAGES.abcFrame;
     setABCMap({ container, mode: m, areas: a, overlayPath });
   });
 }
