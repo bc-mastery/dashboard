@@ -9,8 +9,14 @@ export const nocacheFlag = params.get("nocache") === "1";
 export const APPS_SCRIPT_URL =
   "https://script.google.com/macros/s/AKfycbwSSewkiyRw1QaCZCCoT4U9CawClXEE9sH53Mz7DICuJ79gon6Z1V3s8q0iFOiy5iAt/exec";
 
-// === Asset base paths (relative) ===
-export const ASSET_BASE = "./assets/";
+/**
+ * Asset paths
+ * Use ROOT-ABSOLUTE paths so they work on Cloudflare Pages regardless of the page URL.
+ * Add a tiny cache-buster to images to avoid stale CDN versions when you change files.
+ */
+export const ASSET_BASE = "/assets/";
+export const ASSET_VER = "2"; // bump to force refresh, e.g. "3"
+
 export const PATHS = {
   icons:  `${ASSET_BASE}icons/`,
   logos:  `${ASSET_BASE}logos/`,
@@ -29,25 +35,25 @@ export const TAB_TITLES = {
 };
 
 export const TAB_ICONS = {
-  growth:     `${PATHS.icons}Icon_gs_white.png`,
-  targeting:  `${PATHS.icons}Icon_targeting.png`,
-  offer:      `${PATHS.icons}Icon_offer.png`,
-  marketing:  `${PATHS.icons}Icon_marketing.png`,
-  sales:      `${PATHS.icons}Icon_sales.png`,
-  mentoring:  `${PATHS.icons}Icon_sales.png`,     // placeholder
-  knowledge:  `${PATHS.icons}Icon_marketing.png`, // placeholder
+  growth:     `${PATHS.icons}Icon_gs_white.png?v=${ASSET_VER}`,
+  targeting:  `${PATHS.icons}Icon_targeting.png?v=${ASSET_VER}`,
+  offer:      `${PATHS.icons}Icon_offer.png?v=${ASSET_VER}`,
+  marketing:  `${PATHS.icons}Icon_marketing.png?v=${ASSET_VER}`,
+  sales:      `${PATHS.icons}Icon_sales.png?v=${ASSET_VER}`,
+  mentoring:  `${PATHS.icons}Icon_sales.png?v=${ASSET_VER}`,     // placeholder
+  knowledge:  `${PATHS.icons}Icon_marketing.png?v=${ASSET_VER}`, // placeholder
 };
 
 // Used by ui.js for the CTA icon swap
 export const UI_ICONS = {
-  download: `${PATHS.icons}Icon_download.png`,
-  lock:     `${PATHS.icons}Icon_lock.png`,
+  download: `${PATHS.icons}Icon_download.png?v=${ASSET_VER}`,
+  lock:     `${PATHS.icons}Icon_lock.png?v=${ASSET_VER}`,
 };
 
 // Used by components/blocks.js for the ABC overlay frame
 // IMPORTANT: filename + casing must match your repo exactly.
 export const IMAGES = {
-  abcFrame: `${PATHS.images}ABC_map_frame.PNG`,
+  abcFrame: `${PATHS.images}ABC_map_frame.PNG?v=${ASSET_VER}`,
 };
 
 // Access enum
