@@ -6,9 +6,9 @@ import { state } from "./state.js";
 /* --------------------------- Header title + icon --------------------------- */
 export function setTitleAndIcon(tab) {
   const titleEl = document.getElementById("pageTitle");
-  const iconEl = document.getElementById("pageIcon");
+  const iconEl  = document.getElementById("pageIcon");
   if (titleEl) titleEl.textContent = TAB_TITLES[tab] || "Strategy Dashboard";
-  if (iconEl) iconEl.src = TAB_ICONS[tab] || TAB_ICONS.growth;
+  if (iconEl)  iconEl.src         = TAB_ICONS[tab]   || TAB_ICONS.growth;
 
   document.querySelectorAll(".tabBtn").forEach((btn) => {
     const isPrimary = !btn.classList.contains("blockBtn");
@@ -25,43 +25,18 @@ export function setTitleAndIcon(tab) {
   });
 }
 
-/* ------------------ Universal Upgrade block insert/update ------------------ */
+/* ------------------ Universal Upgrade block (always replace) --------------- */
 export function maybeInsertUniversalUpgradeBlock({ isPreviewOnly, content }) {
-  const footer = document.querySelector(".siteFooter");
+  const footer   = document.querySelector(".siteFooter");
   const existing = document.querySelector(".upgradeBlock");
 
-  // If this tab should NOT show the upgrade block, remove any existing one.
-  if (!isPreviewOnly) {
-    if (existing) existing.remove();
-    return;
-  }
+  // Always start clean to avoid stale content between tabs
+  if (existing) existing.remove();
 
-  // Pull CTA URLs from <body> attributes
-  const stripe4pbs = document.body.getAttribute("data-stripe-4pbs");
-  const calendly   = document.body.getAttribute("data-calendly-url");
+  if (!isPreviewOnly || !footer) return;
 
-  // If a block already exists, update its content + links and stop.
-  if (existing) {
-    const titleEl =
-      existing.querySelector(".upgradeTitle") ||
-      existing.querySelector("#upgradeBlockTitle");
-    const textEl =
-      existing.querySelector(".upgradeText") ||
-      existing.querySelector(".upgradeBlock p.muted");
-
-    if (titleEl && content?.title) titleEl.textContent = content.title;
-    if (textEl && content?.text)   textEl.textContent  = content.text;
-
-    const a4pbs = existing.querySelector("#cta-4pbs");
-    const acall = existing.querySelector("#cta-call");
-    if (a4pbs && stripe4pbs) a4pbs.setAttribute("href", stripe4pbs);
-    if (acall && calendly)   acall.setAttribute("href", calendly);
-    return;
-  }
-
-  // Otherwise create it from the template and insert before the footer.
   const tpl = document.getElementById("universalUpgradeBlock");
-  if (!tpl || !footer) return;
+  if (!tpl) return;
 
   const node = tpl.content.cloneNode(true);
 
@@ -75,7 +50,9 @@ export function maybeInsertUniversalUpgradeBlock({ isPreviewOnly, content }) {
   if (titleEl && content?.title) titleEl.textContent = content.title;
   if (textEl && content?.text)   textEl.textContent  = content.text;
 
-  // Wire CTA links
+  // Wire CTA links from <body> data attributes
+  const stripe4pbs = document.body.getAttribute("data-stripe-4pbs");
+  const calendly   = document.body.getAttribute("data-calendly-url");
   const a4pbs = node.querySelector("#cta-4pbs");
   const acall = node.querySelector("#cta-call");
   if (a4pbs && stripe4pbs) a4pbs.setAttribute("href", stripe4pbs);
