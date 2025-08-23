@@ -82,8 +82,14 @@ export function setABCMap({ container, mode = "B2B", areas = [], overlayPath } =
   const ANG = mode === "B2B" ? B2B_ANGLES : B2C_ANGLES;
   const COL = mode === "B2B" ? B2B_COLORS : B2C_COLORS;
 
-  // Normalize to canonical keys present in the map (case-insensitive)
-  const canonical = areas.map((name) => ciLookup(ANG, name)).filter(Boolean);
+  // Normalize + dedupe
+  const canonical = Array.from(
+    new Set(
+      (areas || [])
+        .map((name) => ciLookup(ANG, name))
+        .filter(Boolean)
+    )
+  );
 
   // Build segment ranges in ascending order
   const ranges = canonical
@@ -103,7 +109,13 @@ export function setABCMap({ container, mode = "B2B", areas = [], overlayPath } =
 
   donut.style.background = `conic-gradient(from ${ANGLE_START}deg, ${stops.join(",")})`;
 
-  if (overlay && overlayPath) {
+  // Set overlay if provided (blocks.js already pre-resolves the correct path)
+  if (overlay && overlayPath && overlay.src !== overlayPath) {
     overlay.src = overlayPath;
+
+    // Helpful console if path is wrong
+    overlay.onerror = () => {
+      console.error("ABC overlay not found at:", overlayPath);
+    };
   }
 }
