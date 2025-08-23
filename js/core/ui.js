@@ -25,24 +25,45 @@ export function setTitleAndIcon(tab) {
   });
 }
 
-/* ---------------------- Universal Upgrade block insert --------------------- */
+/* ------------------ Universal Upgrade block insert/update ------------------ */
 export function maybeInsertUniversalUpgradeBlock({ isPreviewOnly, content }) {
-  if (!isPreviewOnly) return;
-  if (document.querySelector(".upgradeBlock")) return; // avoid duplicates
-
-  const tpl = document.getElementById("universalUpgradeBlock");
   const footer = document.querySelector(".siteFooter");
+  const existing = document.querySelector(".upgradeBlock");
+
+  // If this tab should NOT show the upgrade block, remove any existing one.
+  if (!isPreviewOnly) {
+    if (existing) existing.remove();
+    return;
+  }
+
+  // Pull CTA URLs from <body> attributes
+  const stripe4pbs = document.body.getAttribute("data-stripe-4pbs");
+  const calendly   = document.body.getAttribute("data-calendly-url");
+
+  // If a block already exists, update its content + links and stop.
+  if (existing) {
+    const titleEl =
+      existing.querySelector(".upgradeTitle") ||
+      existing.querySelector("#upgradeBlockTitle");
+    const textEl =
+      existing.querySelector(".upgradeText") ||
+      existing.querySelector(".upgradeBlock p.muted");
+
+    if (titleEl && content?.title) titleEl.textContent = content.title;
+    if (textEl && content?.text)   textEl.textContent  = content.text;
+
+    const a4pbs = existing.querySelector("#cta-4pbs");
+    const acall = existing.querySelector("#cta-call");
+    if (a4pbs && stripe4pbs) a4pbs.setAttribute("href", stripe4pbs);
+    if (acall && calendly)   acall.setAttribute("href", calendly);
+    return;
+  }
+
+  // Otherwise create it from the template and insert before the footer.
+  const tpl = document.getElementById("universalUpgradeBlock");
   if (!tpl || !footer) return;
 
   const node = tpl.content.cloneNode(true);
-
-  // Wire CTA links from <body> data attributes
-  const stripe4pbs = document.body.getAttribute("data-stripe-4pbs");
-  const calendly = document.body.getAttribute("data-calendly-url");
-  const a4pbs = node.querySelector("#cta-4pbs");
-  const acall = node.querySelector("#cta-call");
-  if (a4pbs && stripe4pbs) a4pbs.setAttribute("href", stripe4pbs);
-  if (acall && calendly) acall.setAttribute("href", calendly);
 
   // Optional: override title/text if provided
   const titleEl =
@@ -52,7 +73,13 @@ export function maybeInsertUniversalUpgradeBlock({ isPreviewOnly, content }) {
     node.querySelector(".upgradeText") ||
     node.querySelector(".upgradeBlock p.muted");
   if (titleEl && content?.title) titleEl.textContent = content.title;
-  if (textEl && content?.text) textEl.textContent = content.text;
+  if (textEl && content?.text)   textEl.textContent  = content.text;
+
+  // Wire CTA links
+  const a4pbs = node.querySelector("#cta-4pbs");
+  const acall = node.querySelector("#cta-call");
+  if (a4pbs && stripe4pbs) a4pbs.setAttribute("href", stripe4pbs);
+  if (acall && calendly)   acall.setAttribute("href", calendly);
 
   footer.parentNode.insertBefore(node, footer);
 }
