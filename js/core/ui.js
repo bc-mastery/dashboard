@@ -88,11 +88,22 @@ export function toggleFloatingCallBtn(show) {
 /* ---------------------- Download CTA: access + visibility ------------------ */
 export function enforceDownloadProtection() {
   const cta = document.getElementById("downloadBtn");
-  const chips = document.querySelectorAll("#blockTabs .blockBtn").length;
-  const minTabs = getMinTabsRequiredForDownload();
   if (!cta) return;
 
+  // Always show on Growth, per requirements
+  const tab = state.currentTab || document.body.getAttribute("data-current-tab") || "";
+  if (tab === "growth") {
+    cta.style.display = "inline-flex";
+    cta.style.pointerEvents = "auto";
+    cta.style.opacity = "1";
+    return;
+  }
+
+  // Default rule for other tabs
+  const chips = document.querySelectorAll("#blockTabs .blockBtn").length;
+  const minTabs = getMinTabsRequiredForDownload();
   const allowed = chips >= minTabs;
+
   cta.style.display = allowed ? "inline-flex" : "none";
   cta.style.pointerEvents = allowed ? "auto" : "none";
   cta.style.opacity = allowed ? "1" : "0.6";
@@ -104,8 +115,14 @@ export function updateFloatingCTA(tab) {
 
   const labelSpan = btn.querySelector("#downloadText");
   const icon = btn.querySelector(".download-icon");
-  const pdf = state.dynamicPdfLinks[tab];
+  let pdf = state.dynamicPdfLinks[tab];
   const d = (state.lastApiByTab[tab] && state.lastApiByTab[tab].data) || {};
+
+  // For Growth, auto-populate from GS_OUTPUT if not cached yet
+  if (tab === "growth" && !pdf && d && d.GS_OUTPUT) {
+    pdf = toDownloadLink(d.GS_OUTPUT);
+    state.dynamicPdfLinks.growth = pdf;
+  }
 
   // Access logic per tab
   let hasAccess = false;
@@ -231,12 +248,27 @@ export function initDownloadButtonIsolation() {
         offer: "O_STRATEGY_OUTPUT",
         marketing: "M_STRATEGY_OUTPUT",
         sales: "S_STRATEGY_OUTPUT",
-        growth: "GROWTH_STRATEGY_OUTPUT",
+        // Growth uses GS_OUTPUT (NC); keep a fallback to the old key if present
+        growth: "GS_OUTPUT",
         mentoring: "MENTORING_STRATEGY_OUTPUT",
         knowledge: "KNOWLEDGE_STRATEGY_OUTPUT",
       };
-      const field = fieldMap[tab];
-      const raw = field ? data[field] : "";
+
+      // Fallback for any legacy/alternate key names
+      const fallbacks = {
+        growth: ["GS_OUTPUT", "GROWTH_STRATEGY_OUTPUT"],
+        knowledge: ["KNOWLEDGE_OUTPUT", "K_MASTER_PDF", "KNOWLEDGE_PDF", "KNOWLEDGE_STRATEGY_OUTPUT"],
+      };
+
+      const primaryField = fieldMap[tab];
+      let raw = primaryField ? data[primaryField] : "";
+
+      if (!raw && fallbacks[tab]) {
+        for (const k of fallbacks[tab]) {
+          if (data[k]) { raw = data[k]; break; }
+        }
+      }
+
       if (raw) {
         link = toDownloadLink(raw);
         state.dynamicPdfLinks[tab] = link;
