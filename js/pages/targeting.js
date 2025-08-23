@@ -18,7 +18,8 @@ import { fetchPdfLinks } from "../services/pdf.js";
 export async function renderTargetingTab() {
   // mark current tab + clear upgrade block right away
   state.currentTab = "targeting";
-  document.body.setAttribute("data-current-tab", "targeting");
+  import { setCurrentTab } from "../core/state.js";
+setCurrentTab("targeting");
   clearUpgradeBlock();
 
   const contentDiv = document.getElementById("content");
@@ -191,3 +192,4 @@ function paintTargeting(api, allowFull = false) {
 
 // (Optional) also export default for flexibility
 export default renderTargetingTab;
+
