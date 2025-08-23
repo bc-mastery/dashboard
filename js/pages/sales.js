@@ -122,3 +122,4 @@ function paintSales(api, allowFull = false) {
   contentDiv.innerHTML = html;
   hydrateABCMaps();
 }
+
