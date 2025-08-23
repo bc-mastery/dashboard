@@ -1,6 +1,6 @@
 // /js/components/blocks.js
 import { esc } from "../core/utils.js";
-import { IMAGES } from "../core/config.js";
+import { PATHS } from "../core/config.js";
 import { detectMode, setABCMap } from "../core/abcMap.js";
 
 /* --------------------------- Contextual upgrade copy --------------------------- */
@@ -46,8 +46,12 @@ export function buildFirstBlockHTML({
   subtitleValue,
   descText,
   areas,
-  overlay = IMAGES.abcFrame, // ← uses ./assets/images/ABC_map_frame.png via config
+  overlay, // optional custom overlay path
 }) {
+  // EXACT path + casing (Cloudflare is case-sensitive)
+  const defaultOverlay = `${PATHS.images}ABC_map_frame.PNG`;
+  const overlayPath = overlay || defaultOverlay;
+
   const areaList = Array.isArray(areas) ? areas : [];
   const mode = detectMode(areaList);
   const safeVal = (subtitleValue && String(subtitleValue).trim()) || "—";
@@ -66,9 +70,9 @@ export function buildFirstBlockHTML({
           <div class="abc-wrap"
                data-mode="${esc(mode)}"
                data-areas="${areaList.map(String).map(esc).join("|")}"
-               data-overlay="${esc(overlay)}">
+               data-overlay="${esc(overlayPath)}">
             <div class="donut"></div>
-            <img class="overlay" alt="ABC overlay">
+            <img class="overlay" src="${overlayPath}" alt="ABC overlay">
           </div>
         </div>
       </div>
@@ -84,8 +88,11 @@ export function hydrateABCMaps() {
       .split("|")
       .map((s) => s.trim())
       .filter(Boolean);
-    const overlayPath = container.dataset.overlay || IMAGES.abcFrame;
+
+    // Same exact fallback path & casing
+    const fallback = `${PATHS.images}ABC_map_frame.PNG`;
+    const overlayPath = container.dataset.overlay || fallback;
+
     setABCMap({ container, mode: m, areas: a, overlayPath });
   });
 }
-
