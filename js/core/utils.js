@@ -12,13 +12,44 @@ export function esc(str) {
     .replace(/'/g, "&#39;");
 }
 
-/* ---------- Drive view URL -> direct download ---------- */
-export function toDownloadLink(viewUrl) {
-  const s = String(viewUrl || "");
-  const m = s.match(/\/d\/([a-zA-Z0-9_-]+)\//);
-  return m && m[1]
-    ? `https://drive.google.com/uc?export=download&id=${m[1]}`
-    : s;
+/* ---------- Robust: build a safe, downloadable PDF link (never throws) ---------- */
+export function toDownloadLink(raw) {
+  if (!raw || typeof raw !== "string") return "";
+
+  try {
+    const s = raw.trim();
+
+    // Already a data: PDF URL
+    if (/^data:application\/pdf/i.test(s)) return s;
+
+    // Any direct http(s) .pdf URL
+    if (/^https?:\/\/\S+\.pdf(\?.*)?$/i.test(s)) return s;
+
+    // Google Drive: file/d/<ID>/...
+    let m = s.match(/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/i);
+    if (m) return `https://drive.google.com/uc?export=download&id=${m[1]}`;
+
+    // Google Drive links with ?id=<ID> (open?id=..., uc?id=..., etc.)
+    m = s.match(/[?&]id=([a-zA-Z0-9_-]{10,})/);
+    if (m) return `https://drive.google.com/uc?export=download&id=${m[1]}`;
+
+    // Google Docs/Sheets/Slides -> export as PDF
+    // Keeps existing export=pdf links intact; otherwise builds one.
+    m = s.match(/docs\.google\.com\/(document|spreadsheets|presentation)\/d\/([a-zA-Z0-9_-]+)/i);
+    if (m) {
+      if (/export=pdf/i.test(s)) return s;
+      const type = m[1].toLowerCase(); // document | spreadsheets | presentation
+      const id   = m[2];
+      return `https://docs.google.com/${type}/d/${id}/export?format=pdf`;
+    }
+
+    // Unknown/unsupported format → fail closed but do NOT throw.
+    console.warn("toDownloadLink: Unrecognized URL format", s);
+    return "";
+  } catch (e) {
+    console.warn("toDownloadLink failed:", e);
+    return "";
+  }
 }
 
 /* ---------- UI helper ---------- */
