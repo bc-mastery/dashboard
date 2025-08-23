@@ -23,6 +23,34 @@ export function ensureCharts() {
 }
 
 /**
+ * Inject shared CSS for Growth Scan bars once.
+ * Safe to call multiple times.
+ */
+const GS_STYLE_ID = "gs-shared-styles";
+export function injectGsStylesOnce() {
+  if (document.getElementById(GS_STYLE_ID)) return;
+
+  const css = `
+  .gsBars { display: grid; gap: 12px; }
+  .gsRow { display:grid; grid-template-columns: 150px 1fr 56px; gap:12px; align-items:center; }
+  .gsLabel span{ font-weight:700; color:var(--bc-dark, #333333); letter-spacing:.2px; }
+  .gsPct{ text-align:right; font-weight:700; color:var(--bc-dark, #333333); }
+  @media (max-width: 560px){ .gsRow{ grid-template-columns: 120px 1fr 48px; } }
+
+  .gsBar.v2 { position: relative; height: 16px; border-radius: 999px; }
+  .gsBar.v2 .gsTrack { position:absolute; inset:0; background:rgba(2,77,79,0.08); border-radius: inherit; z-index:0; }
+  .gsBar.v2 .gsFill  { position:absolute; inset:0 auto 0 0; width:0; background:var(--bc-green, #30BA80); border-radius:inherit; transition: width 420ms cubic-bezier(.22,.61,.36,1); box-shadow: inset 0 1px 0 rgba(255,255,255,.4); z-index:2; }
+  .gsBar.v2 .gsTicks { position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:1;
+    background: repeating-linear-gradient( to right, transparent 0, transparent calc(10% - 1px), rgba(2,77,79,0.14) calc(10% - 1px), rgba(2,77,79,0.14) 10% );
+  }`;
+
+  const style = document.createElement("style");
+  style.id = GS_STYLE_ID;
+  style.textContent = css;
+  document.head.appendChild(style);
+}
+
+/**
  * Draw the GS utilization donut: green = utilized, red = remaining.
  * Accepts numbers in 0..100 (strings like "78%" also fine).
  */
@@ -36,7 +64,6 @@ export async function drawUtilizationDonut(containerId, utilizedPct, counterPct)
   const clamp = (n) => Math.max(0, Math.min(100, Number(n) || 0));
   const utilized = clamp(toNum(utilizedPct));
   let remaining = clamp(toNum(counterPct));
-  // If only one side is reliable, infer the other so total≈100
   if (utilized + remaining === 0 || utilized + remaining > 100.0001) {
     remaining = clamp(100 - utilized);
   }
@@ -58,10 +85,7 @@ export async function drawUtilizationDonut(containerId, utilizedPct, counterPct)
     pieSliceText: "none",
     backgroundColor: "transparent",
     tooltip: { textStyle: { fontSize: 12 } },
-    slices: {
-      0: { color: "#30BA80" }, // utilized
-      1: { color: "#FF0040" }, // untapped
-    },
+    slices: { 0: { color: "#30BA80" }, 1: { color: "#FF0040" } },
     chartArea: { left: 0, top: 8, width: "80%", height: "84%" },
   };
 
@@ -70,41 +94,41 @@ export async function drawUtilizationDonut(containerId, utilizedPct, counterPct)
 }
 
 /**
- * Render the 4 pillar segmented bars (no Google Charts required).
+ * Render the 4 pillar segmented bars with tick marks.
  * pillars: [{ key, label, value }, ...] with value in 0..100.
+ * Uses the CSS injected by injectGsStylesOnce().
  */
 export function drawSegmentedBars(containerId, pillars = []) {
+  injectGsStylesOnce(); // make sure styles exist
+
   const el = document.getElementById(containerId);
   if (!el) return;
 
   const clamp = (n) => Math.max(0, Math.min(100, Number(n) || 0));
-  const getBarColor = (v) => {
+  const colorFor = (v) => {
     const n = clamp(v);
     if (n <= 60) return "#333333";
     if (n <= 80) return "#024D4F";
     return "#30BA80";
   };
 
-  // Inject minimal structure & styles (kept scoped)
   el.innerHTML = pillars
     .map((p) => {
       const v = clamp(p.value);
-      const color = getBarColor(v);
+      const color = colorFor(v);
       return `
-        <div class="gsRow" role="listitem" aria-label="${p.label} ${v}%"
-             style="display:grid; grid-template-columns: 150px 1fr 56px; gap:12px; align-items:center;">
-          <div class="gsLabel"><span style="font-weight:700; color:#333333; letter-spacing:.2px;">${p.label}</span></div>
-          <div class="gsBar v2" style="position:relative; height:16px; border-radius:999px;">
-            <div class="gsTrack" style="position:absolute; inset:0; background:rgba(2,77,79,0.08); border-radius:inherit;"></div>
-            <div class="gsFill" data-width="${v}%" style="position:absolute; inset:0 auto 0 0; width:0; background:${color}; border-radius:inherit; transition:width 420ms cubic-bezier(.22,.61,.36,1); box-shadow: inset 0 1px 0 rgba(255,255,255,.4);"></div>
-            <div class="gsTicks" aria-hidden="true" style="position:absolute; inset:0; border-radius:inherit; pointer-events:none; background:repeating-linear-gradient(to right, transparent 0, transparent calc(10% - 1px), rgba(2,77,79,0.14) calc(10% - 1px), rgba(2,77,79,0.14) 10%);"></div>
+        <div class="gsRow" role="listitem" aria-label="${p.label} ${v}%">
+          <div class="gsLabel"><span>${p.label}</span></div>
+          <div class="gsBar v2">
+            <div class="gsTrack"></div>
+            <div class="gsFill" data-width="${v}%" style="background:${color}"></div>
+            <div class="gsTicks" aria-hidden="true"></div>
           </div>
-          <div class="gsPct" style="text-align:right; font-weight:700; color:#333333;">${v}%</div>
+          <div class="gsPct">${v}%</div>
         </div>`;
     })
     .join("");
 
-  // Animate bar widths after insertion
   requestAnimationFrame(() => {
     el.querySelectorAll(".gsFill").forEach((fill) => {
       const w = fill.getAttribute("data-width");
