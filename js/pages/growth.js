@@ -1,161 +1,138 @@
-// /js/pages/growth.js
-import { APPS_SCRIPT_URL, token, nocacheFlag, ACCESS } from "../core/config.js";
-import { state, setCurrentTab } from "../core/state.js";
-import { ensureCharts, drawUtilizationDonut, drawSegmentedBars } from "../core/charts.js";
-import { inferAccess, esc, toDownloadLink } from "../core/utils.js";
-import {
-  populateBlockTabsFromPage,
-  toggleFloatingCallBtn,
-  updateFloatingCTA,
-  clearUpgradeBlock,
-} from "../core/ui.js";
-import { fetchPdfLinks } from "../services/pdf.js";
+// /js/core/charts.js
 
-const pct = (v) => {
-  const n = Number(String(v ?? "").replace(/[^0-9.]/g, "")) || 0;
-  return Math.max(0, Math.min(100, n));
-};
-
-export async function renderGrowthTab() {
-  setCurrentTab("growth");
-  document.body.setAttribute("data-current-tab", "growth");
-  clearUpgradeBlock();
-
-  const contentDiv = document.getElementById("content");
-  if (!contentDiv) return;
-
-  if (!token) {
-    contentDiv.innerHTML = `<div class="card"><p class="muted">No token provided in URL.</p></div>`;
-    return;
-  }
-
-  contentDiv.innerHTML = `<div class="card"><p class="muted">Loading Growth Scan…</p></div>`;
-
-  try {
-    const url = `${APPS_SCRIPT_URL}?token=${encodeURIComponent(token)}${nocacheFlag ? "&nocache=1" : ""}`;
-    const r = await fetch(url);
-    const api = await r.json();
-
-    if (!api || !api.ok) {
-      contentDiv.innerHTML = `<div class="card"><p class="muted">${(api && api.message) || "No data found."}</p></div>`;
+/** Ensure Google Charts loader is available (used elsewhere too) */
+export function ensureCharts() {
+  return new Promise((resolve, reject) => {
+    if (window.google && google.charts) {
+      google.charts.load("current", { packages: ["corechart"] });
+      google.charts.setOnLoadCallback(resolve);
       return;
     }
+    const s = document.createElement("script");
+    s.src = "https://www.gstatic.com/charts/loader.js";
+    s.onload = () => {
+      google.charts.load("current", { packages: ["corechart"] });
+      google.charts.setOnLoadCallback(resolve);
+    };
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
 
-    state.lastApiByTab.growth = { ...api, data: { ...api.data } };
-    const d = api.data || {};
-    state.lastAccess = inferAccess(d);
+/**
+ * CSS/DOM donut showing "Utilized" (green) vs "Untapped" (red).
+ * containerId: element id to render into
+ * utilizedPct: number 0..100 (green)
+ * untappedPct: number 0..100 (red)
+ */
+export function drawUtilizationDonut(containerId, utilizedPct, untappedPct) {
+  const el = document.getElementById(containerId);
+  if (!el) return;
 
-    // Header brand
-    const brandEl = document.getElementById("brandName");
-    if (brandEl) {
-      const full = String(d.Brand || "");
-      const short = full.length > 80 ? full.slice(0, 80) : full;
-      brandEl.textContent = short;
-      brandEl.title = full;
-    }
+  const u = clamp0to100(utilizedPct);
+  const r = clamp0to100(untappedPct);
+  const sum = u + r || 1;
+  const uNorm = (u / sum) * 100;
+  const rNorm = 100 - uNorm;
 
-    // Numbers
-    const avg = pct(d.GS_AVERAGE);              // MW
-    const counter = pct(d.GS_COUNTER_AVERAGE);  // MX
-    const potential = pct(d.GS_GROWTH_POTENTIAL); // NA
+  el.innerHTML = `
+    <div style="
+      position:relative; width:100%; height:100%;
+      display:grid; place-items:center;
+    ">
+      <div style="
+        position:relative; width:100%; height:100%; max-width:360px; aspect-ratio:1/1;
+      ">
+        <div aria-hidden="true" style="
+          position:absolute; inset:0; border-radius:50%;
+          background:
+            conic-gradient(#30BA80 0 ${uNorm}%,
+                           #FF0040 ${uNorm}% 100%);
+          -webkit-mask: radial-gradient(circle at 50% 50%, transparent 0 38%, #000 38.5% 100%);
+                  mask: radial-gradient(circle at 50% 50%, transparent 0 38%, #000 38.5% 100%);
+          box-shadow: 0 6px 18px rgba(0,0,0,0.12) inset;
+          transition: background 320ms ease;
+        "></div>
 
-    const tRate = pct(d.GS_T_RATE); // MF
-    const oRate = pct(d.GS_O_RATE); // MG
-    const mRate = pct(d.GS_M_RATE); // MH
-    const sRate = pct(d.GS_S_RATE); // MI
-
-    // Build HTML blocks
-    const block1 = `
-      <div class="card scrollTarget" id="block-gs-summary">
-        <div class="bfGrid">
-          <!-- LEFT: Donut -->
-          <div class="bfMap">
-            <div id="gsDonut" style="width:min(28.5vw,315px);max-width:100%;aspect-ratio:1/1"></div>
-          </div>
-          <!-- RIGHT: Text -->
-          <div class="bfText">
-            <div class="bfTitle">Growth Scan</div>
-            <p><span class="bfSub">Currently utilized potential:</span> <strong>${avg}%</strong></p>
-            <p>That means you miss out on another <strong style="color:#ff0040">${counter}%</strong>. So you leave money on the table.</p>
-            <p>To be accurate, with just a few strategic changes, you could achieve <strong style="color:#30ba80">${potential}%</strong> growth.</p>
-            <p>Below you can see how your business performs in the most critical strategic areas (pillars).</p>
-          </div>
+        <div style="
+          position:absolute; inset:0; display:grid; place-items:center;
+          font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+          text-align:center; line-height:1.15;
+        ">
+          <div style="font-weight:700; font-size:22px; color:#024D4F;">Currently utilized</div>
+          <div style="font-weight:900; font-size:36px; color:#30BA80;">${round1(u)}%</div>
+          <div style="margin-top:6px; font-size:13px; color:#333">Untapped: <b style="color:#FF0040">${round1(r)}%</b></div>
         </div>
       </div>
-    `;
+    </div>
+  `;
 
-    const block2 = `
-      <div class="card scrollTarget" id="block-gs-pillars">
-        <div class="sectionTitle">4-Pillar Snapshot</div>
-        <div id="gsBars" class="gsBars" role="list" aria-label="Pillar progress"></div>
+  // simple hover tooltip effect (title attribute on container)
+  el.title = `Utilized: ${round1(u)}% • Untapped: ${round1(r)}%`;
+}
+
+/**
+ * Segmented bars (Targeting, Offer, Marketing, Sales)
+ * containerId: element id where rows are injected
+ * items: [{ key, label, value }]
+ */
+export function drawSegmentedBars(containerId, items) {
+  const root = document.getElementById(containerId);
+  if (!root) return;
+
+  const rows = (items || []).map((p) => {
+    const v = clamp0to100(p.value);
+    const color = barColor(v);
+    return `
+      <div class="gsRow" role="listitem" aria-label="${escapeHtml(p.label)} ${v}%"
+           style="display:grid; grid-template-columns: 150px 1fr 56px; gap:12px; align-items:center;">
+        <div class="gsLabel"><span style="font-weight:700; color:#333; letter-spacing:.2px;">${escapeHtml(p.label)}</span></div>
+        <div class="gsBar v2" style="position:relative; height:16px; border-radius:999px;">
+          <div class="gsTrack" style="position:absolute; inset:0; background:rgba(2,77,79,0.08); border-radius:inherit;"></div>
+          <div class="gsFill" data-width="${v}%" style="position:absolute; inset:0 auto 0 0; width:0; background:${color}; border-radius:inherit; transition: width 420ms cubic-bezier(.22,.61,.36,1); box-shadow: inset 0 1px 0 rgba(255,255,255,.4);"></div>
+          <div class="gsTicks" aria-hidden="true" style="position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+            background: repeating-linear-gradient(to right,
+              transparent 0,
+              transparent calc(10% - 1px),
+              rgba(2,77,79,0.14) calc(10% - 1px),
+              rgba(2,77,79,0.14) 10%
+            );"></div>
+        </div>
+        <div class="gsPct" style="text-align:right; font-weight:700; color:#333;">${v}%</div>
       </div>
     `;
+  }).join("");
 
-    const block3 = d.GS_T_DESC ? `
-      <div class="card scrollTarget" id="block-gs-targeting">
-        <div class="sectionTitle">Targeting Scan</div>
-        <p class="preserve">${esc(d.GS_T_DESC)}</p>
-      </div>` : "";
+  root.innerHTML = rows;
 
-    const block4 = d.GS_O_DESC ? `
-      <div class="card scrollTarget" id="block-gs-offer">
-        <div class="sectionTitle">Offer Scan</div>
-        <p class="preserve">${esc(d.GS_O_DESC)}</p>
-      </div>` : "";
+  // animate widths
+  requestAnimationFrame(() => {
+    root.querySelectorAll(".gsFill").forEach((el) => {
+      const w = el.getAttribute("data-width");
+      if (w) el.style.width = w;
+    });
+  });
+}
 
-    const block5 = d.GS_M_DESC ? `
-      <div class="card scrollTarget" id="block-gs-marketing">
-        <div class="sectionTitle">Marketing Scan</div>
-        <p class="preserve">${esc(d.GS_M_DESC)}</p>
-      </div>` : "";
-
-    const block6 = d.GS_S_DESC ? `
-      <div class="card scrollTarget" id="block-gs-sales">
-        <div class="sectionTitle">Sales Scan</div>
-        <p class="preserve">${esc(d.GS_S_DESC)}</p>
-      </div>` : "";
-
-    const block7 = d.GS_GAPS_SUMMARY ? `
-      <div class="card scrollTarget" id="block-gs-summary-text">
-        <div class="sectionTitle">Growth Scan Summary</div>
-        <p class="preserve">${esc(d.GS_GAPS_SUMMARY)}</p>
-      </div>` : "";
-
-    // Render page
-    const contentDiv2 = document.getElementById("content");
-    contentDiv2.innerHTML = block1 + block2 + block3 + block4 + block5 + block6 + block7;
-
-    // Charts
-    await ensureCharts();
-    drawUtilizationDonut("gsDonut", avg, counter);
-    drawSegmentedBars("gsBars", [
-      { key: "targeting", label: "Targeting", value: tRate },
-      { key: "offer",     label: "Offer",     value: oRate },
-      { key: "marketing", label: "Marketing", value: mRate },
-      { key: "sales",     label: "Sales",     value: sRate },
-    ]);
-
-    // Chips & CTA
-    const blockTabsRow = document.getElementById("blockTabsRow");
-    if (blockTabsRow) blockTabsRow.style.display = "block";
-    populateBlockTabsFromPage();
-
-    // Download link (always allowed for Growth)
-    const out = d.GS_OUTPUT || "";
-    if (out) {
-      state.dynamicPdfLinks.growth = toDownloadLink(out);
-      updateFloatingCTA("growth");
-    } else {
-      try {
-        await fetchPdfLinks("growth");
-        updateFloatingCTA("growth");
-      } catch {}
-    }
-
-    // Floating call button for GS-only users
-    toggleFloatingCallBtn(state.lastAccess === ACCESS.GS_ONLY);
-  } catch (err) {
-    console.error(err);
-    contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || err)}</p></div>`;
-  }
+/* --------------------------- helpers --------------------------- */
+function clamp0to100(n) {
+  const v = Number(n);
+  if (!Number.isFinite(v)) return 0;
+  return Math.max(0, Math.min(100, v));
+}
+function round1(n) {
+  return Math.round(clamp0to100(n) * 10) / 10;
+}
+function barColor(v) {
+  if (v <= 60) return "#333333";
+  if (v <= 80) return "#024D4F";
+  return "#30BA80";
+}
+function escapeHtml(s) {
+  return String(s ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
