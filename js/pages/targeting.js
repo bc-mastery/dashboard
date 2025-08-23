@@ -145,4 +145,26 @@ function paintTargeting(api, allowFull = false) {
         ${d.TP_ROLE ? `<p><span class="subtitle">Role and objectives:</span> ${esc(d.TP_ROLE)}</p>` : ""}
         ${d.TP_INTENT ? `<p><span class="subtitle">Intent and purchasing behavior:</span> ${esc(d.TP_INTENT)}</p>` : ""}
         ${d.TP_TRIGGERS ? `<p><span class="subtitle">Behavior, mindset and decision triggers:</span> ${esc(d.TP_TRIGGERS)}</p>` : ""}
-        ${d.TP_DRIVERS ? `<p><span class="subtitle">Emoti_
+        ${d.TP_DRIVERS ? `<p><span class="subtitle">Emotional drivers and motivations:</span> ${esc(d.TP_DRIVERS)}</p>` : ""}
+        ${d.TP_FEARS ? `<p><span class="subtitle">Underlying fears and sensitivities:</span> ${esc(d.TP_FEARS)}</p>` : ""}
+        ${d.TP_OFFER_FIT ? `<p><span class="subtitle">Brand and offering fit:</span> ${esc(d.TP_OFFER_FIT)}</p>` : ""}
+        ${d.TP_COMM_STYLE ? `<p><span class="subtitle">Ideal communication style:</span> ${esc(d.TP_COMM_STYLE)}</p>` : ""}
+        ${d.TP_SUMMARY ? `<p><span class="subtitle">Persona summary statement:</span> ${esc(d.TP_SUMMARY)}</p>` : ""}
+      </div>
+    `;
+  }
+
+  contentDiv.innerHTML = html;
+
+  // Hydrate any ABC maps present
+  document.querySelectorAll(".abc-wrap").forEach((container) => {
+    const m = (container.dataset.mode || "B2B").toUpperCase();
+    const a = (container.dataset.areas || "")
+      .split("|")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    // Use default overlay from abcMap if needed; here we just pass blank to keep previous default
+    const overlayPath = container.dataset.overlay || "ABC_map_frame.PNG";
+    setABCMap({ container, mode: m, areas: a, overlayPath });
+  });
+}
