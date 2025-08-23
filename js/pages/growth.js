@@ -27,7 +27,8 @@ function toPct(x) {
 /* ------------------------------ main render ------------------------------ */
 export async function renderGrowthTab() {
   // Mark active tab and clear any stale upgrade block from other pages.
-  document.body.setAttribute("data-current-tab", "growth");
+  import { setCurrentTab } from "../core/state.js";
+setCurrentTab("growth"); // or "targeting" / "offer" / "marketing" / "sales";
   clearUpgradeBlock();
 
   const contentDiv = document.getElementById("content");
@@ -125,3 +126,4 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${err?.message || err}</p></div>`;
   }
 }
+
