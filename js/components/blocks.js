@@ -48,7 +48,7 @@ export function buildFirstBlockHTML({
   areas,
   overlay, // optional custom overlay path
 }) {
-  // Single source of truth for the overlay path (case-sensitive)
+  // Single source of truth (Cloudflare is case-sensitive)
   const overlayPath = overlay || IMAGES.abcFrame;
 
   const areaList = Array.isArray(areas) ? areas : [];
