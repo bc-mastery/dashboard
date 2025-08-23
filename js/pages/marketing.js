@@ -1,7 +1,7 @@
 // /js/pages/marketing.js
 
 import { APPS_SCRIPT_URL, token, nocacheFlag, ACCESS } from "../core/config.js";
-import { state } from "../core/state.js";
+import { state, setCurrentTab } from "../core/state.js";
 import { inferAccess, parseAreas, toDownloadLink, esc } from "../core/utils.js";
 import {
   buildFirstBlockHTML,
@@ -13,11 +13,17 @@ import {
   toggleFloatingCallBtn,
   maybeInsertUniversalUpgradeBlock,
   updateFloatingCTA,
+  clearUpgradeBlock, // prevent stale upgrade block on tab switch
 } from "../core/ui.js";
 import { fetchPdfLinks } from "../services/pdf.js";
 
 /* ------------------------------ main render ------------------------------ */
 export async function renderMarketingTab() {
+  // Mark active tab & clear any leftover upgrade block from previous tab
+  setCurrentTab("marketing");
+  document.body.setAttribute("data-current-tab", "marketing");
+  clearUpgradeBlock();
+
   const contentDiv = document.getElementById("content");
   if (!contentDiv) return;
 
@@ -29,12 +35,16 @@ export async function renderMarketingTab() {
   contentDiv.innerHTML = `<div class="card"><p class="muted">Loading Marketing Strategy…</p></div>`;
 
   try {
-    const url = `${APPS_SCRIPT_URL}?token=${encodeURIComponent(token)}${nocacheFlag ? "&nocache=1" : ""}`;
+    const url = `${APPS_SCRIPT_URL}?token=${encodeURIComponent(token)}${
+      nocacheFlag ? "&nocache=1" : ""
+    }`;
     const r = await fetch(url);
     const api = await r.json();
 
     if (!api || !api.ok) {
-      contentDiv.innerHTML = `<div class="card"><p class="muted">${(api && api.message) || "No data found."}</p></div>`;
+      contentDiv.innerHTML = `<div class="card"><p class="muted">${
+        (api && api.message) || "No data found."
+      }</p></div>`;
       return;
     }
 
@@ -42,6 +52,15 @@ export async function renderMarketingTab() {
     state.lastApiByTab.marketing = { ...api, data: { ...api.data } };
     const d = api.data || {};
     state.lastAccess = inferAccess(d);
+
+    // Header brand text
+    const brandEl = document.getElementById("brandName");
+    if (brandEl) {
+      const full = String(d.Brand || "");
+      const short = full.length > 80 ? full.slice(0, 80) : full;
+      brandEl.textContent = short;
+      brandEl.title = full;
+    }
 
     // Pre-fill direct PDF link (from M_STRATEGY_OUTPUT)
     const view = d.M_STRATEGY_OUTPUT || "";
@@ -66,11 +85,12 @@ export async function renderMarketingTab() {
       await fetchPdfLinks("marketing");
       updateFloatingCTA("marketing");
     } catch (_) {
-      // ignore
+      /* ignore */
     }
 
-    // Insert upgrade block for preview users
+    // Insert upgrade block for preview users (guarded by tab name)
     maybeInsertUniversalUpgradeBlock({
+      tab: "marketing",
       isPreviewOnly: !allowFull,
       content: finalBlockContent.marketing,
     });
@@ -79,7 +99,9 @@ export async function renderMarketingTab() {
     toggleFloatingCallBtn(state.lastAccess === ACCESS.GS_ONLY);
   } catch (err) {
     console.error(err);
-    contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${err?.message || err}</p></div>`;
+    contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${
+      err?.message || err
+    }</p></div>`;
   }
 }
 
@@ -91,33 +113,66 @@ function paintMarketing(api, allowFull = false) {
   const d = (api && api.data) || {};
   const areas = parseAreas(d.D_AREA);
 
+  // Try to pick a sensible subtitle + description if your sheet uses different field names.
+  const subtitleValue =
+    d.M_FOCUS ||
+    d.M_MESSAGE ||
+    d.M_CHANNELS ||
+    d.M_POSITIONING ||
+    d.M_ARCH ||
+    d.M_THEME ||
+    ""; // falls back to "—" via buildFirstBlockHTML
+
+  const descText =
+    d.M_DESC ||
+    d.M_SUMMARY ||
+    d.M_STRATEGY ||
+    d.M_OVERVIEW ||
+    d.M_OUTLINE ||
+    d.MARKETING_DESC ||
+    "";
+
   let html = "";
 
-  // First block — always shown
+  // First block — always shown (ABC map via buildFirstBlockHTML -> IMAGES.abcFrame)
   html += buildFirstBlockHTML({
-    title: "Marketing Characteristics",
-    subtitleLabel: "Marketing Character",
-    subtitleValue: d.M_CHARACTER,
-    descText: d.M_PROMISES,
+    title: "Marketing Foundations",
+    subtitleLabel: "Primary Focus",
+    subtitleValue,
+    descText,
     areas,
   });
 
-  // Full details when allowed
+  // Full details when allowed — render only fields that exist
   if (allowFull) {
-    html += `
-      <div class="card scrollTarget" id="block-marketing-details">
+    const lines = [
+      d.M_CONCEPT && ["Concept", d.M_CONCEPT],
+      d.M_CHANNELS && ["Channels", d.M_CHANNELS],
+      d.M_CONTENT && ["Content Strategy", d.M_CONTENT],
+      d.M_SEQUENCING && ["Message Sequencing", d.M_SEQUENCING],
+      d.M_RETENTION && ["Retention Loop", d.M_RETENTION],
+      d.M_AUTOMATION && ["Automation", d.M_AUTOMATION],
+      d.M_BUDGET && ["Budget / Bids", d.M_BUDGET],
+      d.M_TIMING && ["Cadence & Timing", d.M_TIMING],
+      d.M_PROMOTION && ["Key Promotions", d.M_PROMOTION],
+      d.M_KPIS && ["Primary KPIs", d.M_KPIS],
+    ].filter(Boolean);
+
+    if (lines.length) {
+      html += `<div class="card scrollTarget" id="block-marketing-details">
         <div class="sectionTitle">Marketing Strategy</div>
-        ${d.M_BASE ? `<p><span class="subtitle">Marketing Base:</span> ${esc(d.M_BASE)}</p>` : ""}
-        ${d.M_MESSAGE ? `<p><span class="subtitle">Message Focus:</span> ${esc(d.M_MESSAGE)}</p>` : ""}
-        ${d.M_TONE ? `<p><span class="subtitle">Tone & Emotion:</span> ${esc(d.M_TONE)}</p>` : ""}
-        ${d.M_ANGLE ? `<p><span class="subtitle">Marketing Angle:</span> ${esc(d.M_ANGLE)}</p>` : ""}
-        ${d.M_CHANNEL ? `<p><span class="subtitle">Channel Preference:</span> ${esc(d.M_CHANNEL)}</p>` : ""}
-        ${d.M_ACTION ? `<p><span class="subtitle">Marketing CTA:</span> ${esc(d.M_ACTION)}</p>` : ""}
-        ${d.M_EXPERIENCE ? `<p><span class="subtitle">Marketing Experience:</span> ${esc(d.M_EXPERIENCE)}</p>` : ""}
-      </div>
-    `;
+        ${lines
+          .map(
+            ([label, val]) =>
+              `<p><span class="subtitle">${esc(label)}:</span> ${esc(val)}</p>`
+          )
+          .join("")}
+      </div>`;
+    }
   }
 
   contentDiv.innerHTML = html;
+
+  // Activate any abc-wrap we just injected
   hydrateABCMaps();
 }
