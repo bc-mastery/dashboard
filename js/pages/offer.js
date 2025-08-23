@@ -43,6 +43,15 @@ export async function renderOfferTab() {
     const d = api.data || {};
     state.lastAccess = inferAccess(d);
 
+    // Header brand text
+    const brandEl = document.getElementById("brandName");
+    if (brandEl) {
+      const full = String(d.Brand || "");
+      const short = full.length > 80 ? full.slice(0, 80) : full;
+      brandEl.textContent = short;
+      brandEl.title = full;
+    }
+
     // Pre-fill direct PDF link (from O_STRATEGY_OUTPUT)
     const view = d.O_STRATEGY_OUTPUT || "";
     if (view) {
@@ -93,7 +102,7 @@ function paintOffer(api, allowFull = false) {
 
   let html = "";
 
-  // First block — always shown
+  // First block — always shown (ABC map via buildFirstBlockHTML -> IMAGES.abcFrame)
   html += buildFirstBlockHTML({
     title: "Offer Characteristics",
     subtitleLabel: "Offer Character",
@@ -119,5 +128,7 @@ function paintOffer(api, allowFull = false) {
   }
 
   contentDiv.innerHTML = html;
+
+  // Activate any abc-wrap we just injected
   hydrateABCMaps();
 }
