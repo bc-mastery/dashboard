@@ -9,7 +9,7 @@ import {
   toggleFloatingCallBtn,
   maybeInsertUniversalUpgradeBlock,
   updateFloatingCTA,
-  clearUpgradeBlock,               // ← NEW
+  clearUpgradeBlock,
 } from "../core/ui.js";
 import { finalBlockContent } from "../components/blocks.js";
 import { fetchPdfLinks } from "../services/pdf.js";
@@ -17,8 +17,8 @@ import { fetchPdfLinks } from "../services/pdf.js";
 /* ------------------------------ main render ------------------------------ */
 export async function renderTargetingTab() {
   // Mark active tab + clear any stale upgrade block immediately
-  document.body.setAttribute("data-current-tab", "targeting");  // ← NEW
-  clearUpgradeBlock();                                          // ← NEW
+  document.body.setAttribute("data-current-tab", "targeting");
+  clearUpgradeBlock();
 
   const contentDiv = document.getElementById("content");
   if (!contentDiv) return;
@@ -66,13 +66,13 @@ export async function renderTargetingTab() {
     try {
       await fetchPdfLinks("targeting");
       updateFloatingCTA("targeting");
-    } catch (_) {
+    } catch {
       /* ignore */
     }
 
     // Insert upgrade block only if preview; guard by tab name to avoid stale async writes
     maybeInsertUniversalUpgradeBlock({
-      tab: "targeting",                     // ← NEW (prevents stale insert from other tabs)
+      tab: "targeting",
       isPreviewOnly: !allowFull,
       content: finalBlockContent.targeting,
     });
@@ -115,9 +115,9 @@ function paintTargeting(api, allowFull = false) {
           <div class="abc-wrap"
                data-mode="${esc(mode)}"
                data-areas="${areas.map(String).map(esc).join("|")}"
-               data-overlay="${esc(IMAGES.abcFrame)}">           <!-- ← ensure dataset has the overlay -->
+               data-overlay="${esc(IMAGES.abcFrame)}">
             <div class="donut"></div>
-            <img class="overlay" src="${IMAGES.abcFrame}" alt="ABC overlay"> <!-- ← paint immediately -->
+            <img class="overlay" src="${IMAGES.abcFrame}" alt="ABC overlay">
           </div>
         </div>
       </div>
