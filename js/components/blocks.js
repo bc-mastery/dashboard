@@ -46,7 +46,7 @@ export function buildFirstBlockHTML({
   subtitleValue,
   descText,
   areas,
-  overlay = IMAGES.abcFrame, // ← uses ./assets/images/abc/ABC_map_frame.png via config
+  overlay = IMAGES.abcFrame, // ← uses ./assets/images/ABC_map_frame.png via config
 }) {
   const areaList = Array.isArray(areas) ? areas : [];
   const mode = detectMode(areaList);
@@ -88,3 +88,4 @@ export function hydrateABCMaps() {
     setABCMap({ container, mode: m, areas: a, overlayPath });
   });
 }
+
