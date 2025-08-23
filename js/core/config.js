@@ -45,8 +45,9 @@ export const UI_ICONS = {
 };
 
 // Used by components/blocks.js for the ABC overlay frame
+// IMPORTANT: filename + casing must match your repo exactly.
 export const IMAGES = {
-  abcFrame: `${PATHS.images}abc/ABC_map_frame.png`,
+  abcFrame: `${PATHS.images}ABC_map_frame.PNG`,
 };
 
 // Access enum
