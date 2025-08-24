@@ -118,13 +118,14 @@ export async function renderGrowthTab() {
               of untapped business potential.
             </p>
 
-            <p>Your utilization rate depends on how well you know…</p>
-            <ul style="margin-top:0px; margin-bottom:12px; padding-left:20px;">
-              <li>Who you sell to;</li>
-              <li>What you sell to them;</li>
-              <li>How you attract them;</li>
-              <li>And how you sell to them.</li>
+           <p>Your utilization rate depends on how well you know…</p>
+            <ul style="margin:0; padding-left:18px; list-style-position:outside;">
+              <li style="margin:0;">Who you sell to;</li>
+              <li style="margin:0;">What you sell to them;</li>
+              <li style="margin:0;">How you attract them;</li>
+              <li style="margin:0;">And how you sell to them.</li>
             </ul>
+
 
             <p>
               But right now, you’re leaving money on the table and limiting your ability to break through.
@@ -209,5 +210,6 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
+
 
 
