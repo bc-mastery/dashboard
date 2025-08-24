@@ -1,30 +1,9 @@
 // /js/core/utils.js
-import { ACCESS } from "./config.js";
+import { ACCESS, token } from "./config.js";
 
 /* =========================================================
-   URL / Token / API helpers (canonical)
+   URL / API helpers (canonical)
    ========================================================= */
-
-/** Read the token from the URL query string robustly. */
-export function getTokenFromUrl() {
-  try {
-    // Primary: ?token=...
-    const u = new URL(window.location.href);
-    const t = (u.searchParams.get("token") || "").trim();
-    if (t) return t;
-
-    // Fallbacks (if someone ever puts it in the hash accidentally)
-    const h = (window.location.hash || "").replace(/^#/, "");
-    if (h) {
-      const hs = new URLSearchParams(h);
-      const th = (hs.get("token") || "").trim();
-      if (th) return th;
-    }
-  } catch (e) {
-    // no-op
-  }
-  return "";
-}
 
 /** Build the Apps Script endpoint URL in one place. */
 export function buildApiUrl(params = {}) {
@@ -39,8 +18,8 @@ export function buildApiUrl(params = {}) {
   const url = new URL(base);
   url.searchParams.set("lib", APPS_SCRIPT_LIB);
 
-  const token = (tokenOverride ?? getTokenFromUrl()).trim();
-  if (token) url.searchParams.set("token", token);
+  const t = (tokenOverride ?? token).trim();
+  if (t) url.searchParams.set("token", t);
   if (mode) url.searchParams.set("mode", String(mode));
   if (nocache) url.searchParams.set("nocache", "1");
 
@@ -84,7 +63,6 @@ export function toDownloadLink(raw) {
     if (m) return `https://drive.google.com/uc?export=download&id=${m[1]}`;
 
     // Google Docs/Sheets/Slides -> export as PDF
-    // Keeps existing export=pdf links intact; otherwise builds one.
     m = s.match(/docs\.google\.com\/(document|spreadsheets|presentation)\/d\/([a-zA-Z0-9_-]+)/i);
     if (m) {
       if (/export=pdf/i.test(s)) return s;
