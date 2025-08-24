@@ -105,7 +105,7 @@ export async function renderGrowthTab() {
             <div id="gsDonut" style="width:min(44vw,420px); max-width:100%; height:320px;"></div>
           </div>
           <div class="bfText">
-            <div class="bfTitle">Growth Scan</div>
+            <div class="bfTitle">Quick Scan</div>
 
             <p>
               <span class="bfSub">Currently utilized business potential:</span>
@@ -211,6 +211,7 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
+
 
 
 
