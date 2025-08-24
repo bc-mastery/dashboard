@@ -7,7 +7,7 @@ export const nocacheFlag = params.get("nocache") === "1";
 
 // Apps Script endpoint (BASE URL — no token here)
 export const APPS_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbwSSewkiyRw1QaCZCCoT4U9CawClXEE9sH53Mz7DICuJ79gon6Z1V3s8q0iFOiy5iAt/exec";
+  "https://script.google.com/macros/s/AKfycbz3aia88ngH0vnWvPEAznF0nxQ1ogqzRlz6YjXsfmNYxhXdxLpV7m8RI8oX7fTFwuE1/exec";
 
 /**
  * Asset paths
@@ -61,4 +61,5 @@ export const ACCESS = {
   TARGETING_ONLY: "TARGETING_ONLY",
   FULL_4PBS: "FULL_4PBS",
 };
+
 
