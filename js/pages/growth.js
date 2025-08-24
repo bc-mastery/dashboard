@@ -70,6 +70,7 @@ export async function renderGrowthTab() {
     // Cache + access + header brand
     state.lastApiByTab.growth = { ...api, data: { ...api.data } };
     const d = api.data || {};
+    console.info("Growth keys:", Object.keys(d).sort());
 
     const brandEl = document.getElementById("brandName");
     if (brandEl) {
@@ -191,3 +192,4 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
+
