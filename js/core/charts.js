@@ -66,14 +66,14 @@ export function drawDonut(targetId, slices = [], options = {}) {
   const opts = {
     pieHole: options.pieHole ?? 0.6,
     legend: {
-      position: options.legendPosition || "right",
+      position: options.legendPosition || "none",
       textStyle: { color: "#024D4F", fontSize: 12, bold: true },
     },
     pieSliceText: "none",
     backgroundColor: "transparent",
     slices: sliceOpts,
     chartArea: options.chartArea || { left: 10, top: 10, width: "85%", height: "85%" },
-    tooltip: { text: "both" },
+    tooltip: { text: "percentage" },
   };
 
   const chart = new google.visualization.PieChart(el);
@@ -119,3 +119,4 @@ export function drawSegmentedBars(targetId, pillars = []) {
     });
   });
 }
+
