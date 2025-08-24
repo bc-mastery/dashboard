@@ -1,8 +1,8 @@
 // /js/pages/growth.js
 
-import { ACCESS, APPS_SCRIPT_URL } from "../core/config.js";
+import { ACCESS, APPS_SCRIPT_URL, token } from "../core/config.js";
 import { state, setCurrentTab } from "../core/state.js";
-import { esc, toDownloadLink, getTokenFromUrl } from "../core/utils.js";
+import { esc, toDownloadLink } from "../core/utils.js";
 import { ensureCharts, drawDonut, drawSegmentedBars, injectGsStylesOnce } from "../core/charts.js";
 import {
   setTitleAndIcon,
@@ -44,11 +44,10 @@ export async function renderGrowthTab() {
   const contentDiv = document.getElementById("content");
   if (!contentDiv) return;
 
-  const token = getTokenFromUrl();
   if (!token) {
-    contentDiv.innerHTML = `<div class="card"><p class="muted">No token provided in URL.</p></div>`;
-    return;
-  }
+  contentDiv.innerHTML = `<div class="card"><p class="muted">No token provided in URL.</p></div>`;
+  return;
+}
 
   contentDiv.innerHTML = `<div class="card"><p class="muted">Loading Growth Scan…</p></div>`;
 
@@ -212,6 +211,7 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
+
 
 
 
