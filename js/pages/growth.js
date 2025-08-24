@@ -193,7 +193,7 @@ export async function renderGrowthTab() {
       "gsDonut",
       [
         { label: "Your utilized business potential", value: util,    color: "#30BA80" },
-        { label: "Your untapped business potential", value: untapped, color: "#D34B4B" },
+        { label: "Your untapped business potential", value: untapped, color: "#FF0040 },
       ],
       { pieHole: 0.62, legendPosition: "none" }
     );
@@ -211,6 +211,7 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
+
 
 
 
