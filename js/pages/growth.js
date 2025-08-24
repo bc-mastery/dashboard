@@ -107,15 +107,16 @@ export async function renderGrowthTab() {
           <div class="bfText">
             <div class="bfTitle">Quick Scan</div>
 
-            <p>
-              <span class="bfSub">Currently utilized business potential:</span>
-              <strong>${esc(pctLabel(util))}</strong>
+            <p style="margin:0; color:#333333;">
+              Currently utilized business potential:
+              <strong style="color:#30BA80;">${esc(pctLabel(util))}</strong>
             </p>
 
             <p>
               That means your business still has another
-              <strong style="color:#FF0040">${esc(pctLabel(untapped))}</strong>
-              of untapped business potential.
+              <strong style="color:#FF0040;">
+                ${esc(pctLabel(untapped))} of untapped business potential.
+              </strong>
             </p>
 
            <p style="margin-bottom:0;">Your utilization rate depends on how well you know…</p>
@@ -211,6 +212,7 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
+
 
 
 
