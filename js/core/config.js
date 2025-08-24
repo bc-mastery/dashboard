@@ -1,9 +1,22 @@
 // /js/core/config.js
 
-// URL params
-export const params = new URLSearchParams(window.location.search);
-export const token = params.get("token") || "";
-export const nocacheFlag = params.get("nocache") === "1";
+// URL params (query + hash fallback)
+function getParam(name) {
+  const searchParams = new URLSearchParams(window.location.search);
+  let val = searchParams.get(name);
+  if (!val) {
+    // fallback: also check hash (#token=...)
+    const hash = window.location.hash.replace(/^#/, "");
+    if (hash.includes("=")) {
+      const hashParams = new URLSearchParams(hash);
+      val = hashParams.get(name);
+    }
+  }
+  return val ? val.trim().toLowerCase() : "";
+}
+
+export const token = getParam("token");
+export const nocacheFlag = getParam("nocache") === "1";
 
 // Apps Script endpoint (BASE URL — no token here)
 export const APPS_SCRIPT_URL =
@@ -61,6 +74,7 @@ export const ACCESS = {
   TARGETING_ONLY: "TARGETING_ONLY",
   FULL_4PBS: "FULL_4PBS",
 };
+
 
 
 
