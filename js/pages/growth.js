@@ -27,19 +27,11 @@ function toPercent(val) {
 }
 const pctLabel = (n) => `${toPercent(n)}%`;
 
+/** Build URL safely (adds token & extra query params). */
 function buildUrlWithToken(baseUrl, token, extraParams = {}) {
   const sep = baseUrl.includes("?") ? "&" : "?";
   const qs = new URLSearchParams({ token, ...extraParams });
   return `${baseUrl}${sep}${qs.toString()}`;
-}
-
-// Return first non-empty field among keys
-function firstNonEmpty(obj, keys) {
-  for (const k of keys) {
-    const v = obj[k];
-    if (v !== undefined && v !== null && String(v).trim() !== "") return v;
-  }
-  return "";
 }
 
 /* ------------------------------ main render ------------------------------ */
@@ -62,40 +54,35 @@ export async function renderGrowthTab() {
 
   try {
     const url = buildUrlWithToken(APPS_SCRIPT_URL, token, { nocache: "1" });
-    console.debug("Growth fetch:", { url, token, tokenLen: token.length });
-
     const r = await fetch(url, { cache: "no-store" });
     if (!r.ok) throw new Error(`HTTP ${r.status} ${r.statusText}`);
     const api = await r.json();
-    console.debug("Growth API response:", api);
 
     if (!api || !api.ok) {
       contentDiv.innerHTML = `<div class="card"><p class="muted">${(api && api.message) || "No data found."}</p></div>`;
       return;
     }
 
+    // Cache + data
     state.lastApiByTab.growth = { ...api, data: { ...api.data } };
     const d = api.data || {};
-    const keys = Object.keys(d).sort();
-    console.info("Growth keys:", keys);
 
-    /* ========= ROBUST extraction with fallbacks ========= */
-    // Utilized / Untapped
-    const avgRaw     = firstNonEmpty(d, ["GS_AVERAGE", "GS_AVERAGE_CHART"]);
-    const counterRaw = firstNonEmpty(d, ["GS_COUNTER_AVERAGE", "GS_COUNTER_AVERAGE_CHART"]);
+    // Header brand
+    const brandEl = document.getElementById("brandName");
+    if (brandEl) {
+      const full = String(d.Brand || "");
+      brandEl.textContent = full.length > 80 ? full.slice(0, 80) : full;
+      brandEl.title = full;
+    }
 
-    // Pillars: rate → chart_value → chart
-    const tRaw = firstNonEmpty(d, ["GS_T_RATE", "GS_T_CHART_VALUE", "GS_T_CHART"]);
-    const oRaw = firstNonEmpty(d, ["GS_O_RATE", "GS_O_CHART_VALUE", "GS_O_CHART"]);
-    const mRaw = firstNonEmpty(d, ["GS_M_RATE", "GS_M_CHART_VALUE", "GS_M_CHART"]);
-    const sRaw = firstNonEmpty(d, ["GS_S_RATE", "GS_S_CHART_VALUE", "GS_S_CHART"]);
+    // PDF link
+    if (d.GS_OUTPUT) {
+      state.dynamicPdfLinks.growth = toDownloadLink(String(d.GS_OUTPUT));
+    }
 
-    const potRaw = firstNonEmpty(d, ["GS_GROWTH_POTENTIAL"]);
-
-    // Coerce to percent
-    const avg = toPercent(avgRaw);
-    const counter = toPercent(counterRaw);
-
+    // Numbers
+    const avg = toPercent(d.GS_AVERAGE);
+    const counter = toPercent(d.GS_COUNTER_AVERAGE);
     let util = avg, untapped = counter;
     const sum = util + untapped;
     if (sum > 100 && sum > 0) {
@@ -103,49 +90,14 @@ export async function renderGrowthTab() {
       untapped = Math.round((untapped / sum) * 10000) / 100;
     }
 
-    const tRate = toPercent(tRaw);
-    const oRate = toPercent(oRaw);
-    const mRate = toPercent(mRaw);
-    const sRate = toPercent(sRaw);
-    const growthPotential = toPercent(potRaw);
-
-    // DEBUG TABLE (remove later)
-    console.table({
-      brand: d.Brand,
-      avgRaw, avg,
-      counterRaw, counter,
-      tRaw, tRate, oRaw, oRate, mRaw, mRate, sRaw, sRate,
-      potRaw, growthPotential
-    });
-
-    const brandEl = document.getElementById("brandName");
-    if (brandEl) {
-      const full = String(d.Brand || "");
-      const short = full.length > 80 ? full.slice(0, 80) : full;
-      brandEl.textContent = short;
-      brandEl.title = full;
-    }
-
-    if (d.GS_OUTPUT) {
-      state.dynamicPdfLinks.growth = toDownloadLink(String(d.GS_OUTPUT));
-    }
+    const tRate = toPercent(d.GS_T_RATE);
+    const oRate = toPercent(d.GS_O_RATE);
+    const mRate = toPercent(d.GS_M_RATE);
+    const sRate = toPercent(d.GS_S_RATE);
+    const growthPotential = toPercent(d.GS_GROWTH_POTENTIAL);
 
     // HTML
     contentDiv.innerHTML = `
-      <!-- TEMP DEBUG: collapsible raw dump (remove when done) -->
-      <details class="card" style="margin-bottom:14px;">
-        <summary>Debug: API keys & values</summary>
-        <pre class="preserve" style="white-space:pre-wrap;font-size:12px;line-height:1.3;margin-top:10px;">${esc(JSON.stringify({ ok: api.ok, rowNumber: api.rowNumber, tokenUsed: api.tokenUsed, keys, sample:
-{
-  Brand: d.Brand,
-  GS_AVERAGE: d.GS_AVERAGE, GS_COUNTER_AVERAGE: d.GS_COUNTER_AVERAGE,
-  GS_T_RATE: d.GS_T_RATE, GS_O_RATE: d.GS_O_RATE, GS_M_RATE: d.GS_M_RATE, GS_S_RATE: d.GS_S_RATE,
-  GS_T_CHART_VALUE: d.GS_T_CHART_VALUE, GS_O_CHART_VALUE: d.GS_O_CHART_VALUE, GS_M_CHART_VALUE: d.GS_M_CHART_VALUE, GS_S_CHART_VALUE: d.GS_S_CHART_VALUE,
-  GS_GROWTH_POTENTIAL: d.GS_GROWTH_POTENTIAL
-}
-}, null, 2))}</pre>
-      </details>
-
       <!-- Block 1 -->
       <section class="card scrollTarget" id="block-gs-overview">
         <div class="bfGrid" style="grid-template-columns: auto 1fr; align-items:start; gap:22px;">
