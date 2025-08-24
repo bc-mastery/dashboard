@@ -53,18 +53,13 @@ export async function renderGrowthTab() {
   contentDiv.innerHTML = `<div class="card"><p class="muted">Loading Growth Scan…</p></div>`;
 
   try {
+    // Build API URL like Targeting does (same APPS_SCRIPT_URL base)
     const url = buildUrlWithToken(APPS_SCRIPT_URL, token, { nocache: "1" });
     console.debug("Growth fetch:", { url, token, tokenLen: token.length });
 
     const r = await fetch(url, { cache: "no-store" });
-    const text = await r.text();
-    let api;
-    try {
-      api = JSON.parse(text);
-    } catch (e) {
-      throw new Error(`Non-JSON from API. HTTP ${r.status}. First 200 chars: ${text.slice(0, 200)}`);
-    }
-
+    if (!r.ok) throw new Error(`HTTP ${r.status} ${r.statusText}`);
+    const api = await r.json();
     console.debug("Growth API response:", api);
 
     if (!api || !api.ok) {
@@ -72,14 +67,9 @@ export async function renderGrowthTab() {
       return;
     }
 
+    // Cache + access + header brand
     state.lastApiByTab.growth = { ...api, data: { ...api.data } };
     const d = api.data || {};
-
-    // If core GS fields are missing, surface it immediately
-    const keys = Object.keys(d);
-    if (!("GS_T_RATE" in d) && !("GS_AVERAGE" in d)) {
-      console.warn("Growth: API returned no GS_* fields. Keys:", keys);
-    }
 
     const brandEl = document.getElementById("brandName");
     if (brandEl) {
@@ -89,10 +79,12 @@ export async function renderGrowthTab() {
       brandEl.title = full;
     }
 
+    // PDF link
     if (d.GS_OUTPUT) {
       state.dynamicPdfLinks.growth = toDownloadLink(String(d.GS_OUTPUT));
     }
 
+    // Numbers
     const avg = toPercent(d.GS_AVERAGE);
     const counter = toPercent(d.GS_COUNTER_AVERAGE);
     let util = avg, untapped = counter;
@@ -106,9 +98,9 @@ export async function renderGrowthTab() {
     const oRate = toPercent(d.GS_O_RATE);
     const mRate = toPercent(d.GS_M_RATE);
     const sRate = toPercent(d.GS_S_RATE);
-
     const growthPotential = toPercent(d.GS_GROWTH_POTENTIAL);
 
+    // HTML
     contentDiv.innerHTML = `
       <!-- Block 1 -->
       <section class="card scrollTarget" id="block-gs-overview">
@@ -172,6 +164,7 @@ export async function renderGrowthTab() {
       </section>
     `;
 
+    // UI & charts
     const blockTabsRow = document.getElementById("blockTabsRow");
     if (blockTabsRow) blockTabsRow.style.display = "block";
     populateBlockTabsFromPage();
@@ -181,7 +174,7 @@ export async function renderGrowthTab() {
     await ensureCharts();
 
     drawDonut("gsDonut", [
-      { label: "Utilized", value: util, color: "#30BA80" },
+      { label: "Utilized", value: util,   color: "#30BA80" },
       { label: "Untapped", value: untapped, color: "#D34B4B" },
     ], { pieHole: 0.62, legendPosition: "right" });
 
