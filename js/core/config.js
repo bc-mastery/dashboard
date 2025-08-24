@@ -17,6 +17,7 @@ const getParam = (name) => {
   return v ? v.trim() : "";
 };
 
+// Get token + nocache
 let _token = getParam("token");
 export const token = _token ? _token.toLowerCase() : "";
 export const nocacheFlag = getParam("nocache") === "1";
@@ -39,9 +40,6 @@ export const nocacheFlag = getParam("nocache") === "1";
 
 // Debug marker to verify new build is live
 console.debug("config.js: URL param patch active");
-
-export const token = getParam("token");
-export const nocacheFlag = getParam("nocache") === "1";
 
 // Apps Script endpoint (BASE URL — no token here)
 export const APPS_SCRIPT_URL =
@@ -99,8 +97,3 @@ export const ACCESS = {
   TARGETING_ONLY: "TARGETING_ONLY",
   FULL_4PBS: "FULL_4PBS",
 };
-
-
-
-
-
