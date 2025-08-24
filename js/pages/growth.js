@@ -106,22 +106,40 @@ export async function renderGrowthTab() {
           </div>
           <div class="bfText">
             <div class="bfTitle">Growth Scan</div>
+
             <p>
-              <span class="bfSub">Currently utilized potential:</span>
+              <span class="bfSub">Currently utilized business potential:</span>
               <strong>${esc(pctLabel(util))}</strong>
             </p>
+
             <p>
-              That means you miss out on another
+              That means your business still has another
               <strong style="color:#FF0040">${esc(pctLabel(untapped))}</strong>
-              — so you leave money on the table.
+              of untapped business potential.
             </p>
+
+            <p>Your utilization rate depends on how well you know…</p>
+            <p class="preserve">
+              &#8226; Who you sell to;<br>
+              &#8226; What you sell to them;<br>
+              &#8226; How you attract them;<br>
+              &#8226; And how you sell to them.
+            </p>
+
             <p>
-              To be accurate, with just a few strategic changes, you could achieve
+              But right now, you’re leaving money on the table and limiting your ability to break through.
+              With only a few strategic changes, you could achieve
               <strong style="color:#30BA80">${esc(pctLabel(growthPotential))}</strong>
               growth.
             </p>
+
+            <p>
+              Right now, your biggest blocker is
+              <strong style="color:#FF0040">${esc(d.GS_BLOCKER || "")}</strong>.
+            </p>
+
             <p class="muted">
-              Below you can see how your business performs in the most critical strategic areas (pillars).
+              Besides that, below you can see how your business performs in the most critical strategic areas — a.k.a. pillars.
             </p>
           </div>
         </div>
@@ -169,10 +187,14 @@ export async function renderGrowthTab() {
     injectGsStylesOnce();
     await ensureCharts();
 
-    drawDonut("gsDonut", [
-      { label: "Utilized", value: util,   color: "#30BA80" },
-      { label: "Untapped", value: untapped, color: "#D34B4B" },
-    ], { pieHole: 0.62, legendPosition: "right" });
+    drawDonut(
+      "gsDonut",
+      [
+        { label: "Utilized", value: util,    color: "#30BA80" },
+        { label: "Untapped", value: untapped, color: "#D34B4B" },
+      ],
+      { pieHole: 0.62, legendPosition: "none" }
+    );
 
     drawSegmentedBars("gsBars", [
       { key: "targeting", label: "Targeting", value: tRate },
