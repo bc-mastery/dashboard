@@ -7,6 +7,9 @@ import {
 } from "./core/ui.js";
 import { state } from "./core/state.js";
 
+// ⬇️ NEW: bring in the fixed token from config.js
+import { token } from "./core/config.js";
+
 // Page renderers
 import { renderGrowthTab } from "./pages/growth.js";
 import { renderTargetingTab } from "./pages/targeting.js";
@@ -36,7 +39,6 @@ function loadTab(tabName) {
   switch (tabName) {
     case "growth":
       renderGrowthTab();
-      // CTA updates after the chart renders
       setTimeout(() => updateFloatingCTA("growth"), 100);
       break;
     case "targeting":
@@ -65,6 +67,12 @@ function loadTab(tabName) {
 
 /* ----------------------------- bootstrap --------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
+  // ✅ Centralized token check before anything else
+  if (!token) {
+    alert("Token missing in URL");
+    return;
+  }
+
   // Wire primary navigation tabs
   document.querySelectorAll(".tabBtn").forEach((tabBtn) => {
     tabBtn.addEventListener("click", () => {
