@@ -10,14 +10,18 @@ const parseHashParams = () => {
   return q ? new URLSearchParams(q) : new URLSearchParams();
 };
 
-const getParam = (name) => {
+// ✅ Exported helper so other modules can use the robust reader
+export const getParam = (name) => {
   const qs = new URLSearchParams(window.location.search);
   let v = qs.get(name);
   if (!v) v = parseHashParams().get(name);
   return v ? v.trim() : "";
 };
 
-// Get token + nocache
+// ✅ Back-compat: some modules import `params` (query-only). Keep it so nothing breaks.
+export const params = new URLSearchParams(window.location.search);
+
+// Canonical token + flags
 let _token = getParam("token");
 export const token = _token ? _token.toLowerCase() : "";
 export const nocacheFlag = getParam("nocache") === "1";
@@ -33,7 +37,9 @@ export const nocacheFlag = getParam("nocache") === "1";
   if (!url.searchParams.get("tab") && htab) { url.searchParams.set("tab", htab); changed = true; }
   if (changed) {
     // strip token/tab from hash
-    const newHash = (window.location.hash || "").replace(/([?&])(token|tab)=[^&#]*/g, "").replace(/[?&]$/, "");
+    const newHash = (window.location.hash || "")
+      .replace(/([?&])(token|tab)=[^&#]*/g, "")
+      .replace(/[?&]$/, "");
     history.replaceState(null, "", url.origin + url.pathname + "?" + url.searchParams.toString() + newHash);
   }
 })();
