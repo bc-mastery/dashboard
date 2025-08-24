@@ -1,8 +1,10 @@
 // /js/pages/growth.js
 
-import { APPS_SCRIPT_URL, token, ACCESS } from "../core/config.js";
+// NOTE: We no longer import APPS_SCRIPT_URL or token.
+// The token and endpoint are built centrally via utils.js.
+import { ACCESS } from "../core/config.js";
 import { state, setCurrentTab } from "../core/state.js";
-import { toDownloadLink, esc } from "../core/utils.js";
+import { esc, toDownloadLink, getTokenFromUrl, buildApiUrl } from "../core/utils.js";
 import { ensureCharts, drawDonut, drawSegmentedBars, injectGsStylesOnce } from "../core/charts.js";
 import {
   setTitleAndIcon,
@@ -19,7 +21,7 @@ function toPercent(val) {
   let s = String(val).trim();
   // handle european decimal comma
   s = s.replace(",", ".");
-  let hasPercent = s.includes("%");
+  const hasPercent = s.includes("%");
   if (hasPercent) s = s.replace("%", "");
   let n = parseFloat(s);
   if (!isFinite(n)) return 0;
@@ -45,6 +47,8 @@ export async function renderGrowthTab() {
   const contentDiv = document.getElementById("content");
   if (!contentDiv) return;
 
+  // Get token robustly from URL (single source of truth)
+  const token = getTokenFromUrl();
   if (!token) {
     contentDiv.innerHTML = `<div class="card"><p class="muted">No token provided in URL.</p></div>`;
     return;
@@ -54,7 +58,9 @@ export async function renderGrowthTab() {
 
   try {
     // Force nocache for Growth to avoid stale payloads during setup
-    const url = `${APPS_SCRIPT_URL}?token=${encodeURIComponent(token)}&nocache=1`;
+    const url = buildApiUrl({ nocache: true });
+    console.debug("Growth fetch:", { token, url, tokenLen: token.length });
+
     const r = await fetch(url);
     const api = await r.json();
 
@@ -81,8 +87,8 @@ export async function renderGrowthTab() {
     }
 
     // Extract + normalize Growth numbers
-    const avg = toPercent(d.GS_AVERAGE);           // utilized
-    const counter = toPercent(d.GS_COUNTER_AVERAGE); // untapped
+    const avg = toPercent(d.GS_AVERAGE);             // utilized
+    const counter = toPercent(d.GS_COUNTER_AVERAGE);  // untapped
     // If both set but sum > 100, normalize proportionally
     let util = avg, untapped = counter;
     const sum = util + untapped;
@@ -162,7 +168,7 @@ export async function renderGrowthTab() {
         <div class="sectionTitle">Growth Scan Summary</div>
         <p class="preserve">${esc(d.GS_GAPS_SUMMARY || "")}</p>
       </section>
-    `;
+    ";
 
     // Populate chips row and ensure CTA label/link
     const blockTabsRow = document.getElementById("blockTabsRow");
@@ -174,13 +180,17 @@ export async function renderGrowthTab() {
     injectGsStylesOnce();
     await ensureCharts();
 
-    drawDonut("gsDonut", [
-      { label: "Utilized", value: util, color: "#30BA80" },
-      { label: "Untapped", value: untapped, color: "#D34B4B" },
-    ], {
-      pieHole: 0.62,
-      legendPosition: "right",
-    });
+    drawDonut(
+      "gsDonut",
+      [
+        { label: "Utilized", value: util,   color: "#30BA80" },
+        { label: "Untapped", value: untapped, color: "#D34B4B" },
+      ],
+      {
+        pieHole: 0.62,
+        legendPosition: "right",
+      }
+    );
 
     drawSegmentedBars("gsBars", [
       { key: "targeting", label: "Targeting", value: tRate },
