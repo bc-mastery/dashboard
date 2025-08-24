@@ -118,13 +118,14 @@ export async function renderGrowthTab() {
               of untapped business potential.
             </p>
 
-           <p>Your utilization rate depends on how well you know…</p>
+           <p style="margin-bottom:0;">Your utilization rate depends on how well you know…</p>
             <ul style="margin:0; padding-left:18px; list-style-position:outside;">
               <li style="margin:0;">Who you sell to;</li>
               <li style="margin:0;">What you sell to them;</li>
               <li style="margin:0;">How you attract them;</li>
               <li style="margin:0;">And how you sell to them.</li>
             </ul>
+
 
 
             <p>
@@ -210,6 +211,7 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
+
 
 
 
