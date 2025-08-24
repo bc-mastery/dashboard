@@ -1,6 +1,56 @@
 // /js/core/utils.js
 import { ACCESS } from "./config.js";
 
+/* =========================================================
+   URL / Token / API helpers (canonical)
+   ========================================================= */
+
+/** Read the token from the URL query string robustly. */
+export function getTokenFromUrl() {
+  try {
+    // Primary: ?token=...
+    const u = new URL(window.location.href);
+    const t = (u.searchParams.get("token") || "").trim();
+    if (t) return t;
+
+    // Fallbacks (if someone ever puts it in the hash accidentally)
+    const h = (window.location.hash || "").replace(/^#/, "");
+    if (h) {
+      const hs = new URLSearchParams(h);
+      const th = (hs.get("token") || "").trim();
+      if (th) return th;
+    }
+  } catch (e) {
+    // no-op
+  }
+  return "";
+}
+
+/** Build the Apps Script endpoint URL in one place. */
+export function buildApiUrl(params = {}) {
+  const { mode, nocache, token: tokenOverride } = params;
+
+  // Base Apps Script "echo" endpoint
+  const base = "https://script.googleusercontent.com/macros/echo";
+
+  // Your deployed library id lives here (single source of truth in the UI)
+  const APPS_SCRIPT_LIB = "MyGZErQjaGPMG4T-tOl6kcFAa2PiayXsG";
+
+  const url = new URL(base);
+  url.searchParams.set("lib", APPS_SCRIPT_LIB);
+
+  const token = (tokenOverride ?? getTokenFromUrl()).trim();
+  if (token) url.searchParams.set("token", token);
+  if (mode) url.searchParams.set("mode", String(mode));
+  if (nocache) url.searchParams.set("nocache", "1");
+
+  return url.toString();
+}
+
+/* =========================================================
+   HTML / UI helpers
+   ========================================================= */
+
 /* ---------- HTML escape ---------- */
 export function esc(str) {
   if (str === null || str === undefined) return "";
@@ -39,7 +89,7 @@ export function toDownloadLink(raw) {
     if (m) {
       if (/export=pdf/i.test(s)) return s;
       const type = m[1].toLowerCase(); // document | spreadsheets | presentation
-      const id   = m[2];
+      const id = m[2];
       return `https://docs.google.com/${type}/d/${id}/export?format=pdf`;
     }
 
@@ -58,6 +108,10 @@ export function getMinTabsRequiredForDownload() {
   const n = parseInt(row?.getAttribute("data-min-tabs") || "2", 10);
   return Number.isFinite(n) && n > 0 ? n : 2;
 }
+
+/* =========================================================
+   Data / flags
+   ========================================================= */
 
 /* ---------- truthy flags ---------- */
 export function truthyFlag(v) {
