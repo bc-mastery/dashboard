@@ -119,12 +119,12 @@ export async function renderGrowthTab() {
             </p>
 
             <p>Your utilization rate depends on how well you know…</p>
-            <p class="preserve">
-              &#8226; Who you sell to;<br>
-              &#8226; What you sell to them;<br>
-              &#8226; How you attract them;<br>
-              &#8226; And how you sell to them.
-            </p>
+            <ul style="margin-top:6px; margin-bottom:12px; padding-left:20px;">
+              <li>Who you sell to;</li>
+              <li>What you sell to them;</li>
+              <li>How you attract them;</li>
+              <li>And how you sell to them.</li>
+            </ul>
 
             <p>
               But right now, you’re leaving money on the table and limiting your ability to break through.
@@ -209,3 +209,4 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
+
