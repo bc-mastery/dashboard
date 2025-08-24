@@ -119,7 +119,7 @@ export async function renderGrowthTab() {
             </p>
 
             <p>Your utilization rate depends on how well you know…</p>
-            <ul style="margin-top:6px; margin-bottom:12px; padding-left:20px;">
+            <ul style="margin-top:0px; margin-bottom:12px; padding-left:20px;">
               <li>Who you sell to;</li>
               <li>What you sell to them;</li>
               <li>How you attract them;</li>
@@ -209,4 +209,5 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
+
 
