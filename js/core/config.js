@@ -1,19 +1,44 @@
 // /js/core/config.js
 
-// URL params (query + hash fallback)
-function getParam(name) {
-  const searchParams = new URLSearchParams(window.location.search);
-  let val = searchParams.get(name);
-  if (!val) {
-    // fallback: also check hash (#token=...)
-    const hash = window.location.hash.replace(/^#/, "");
-    if (hash.includes("=")) {
-      const hashParams = new URLSearchParams(hash);
-      val = hashParams.get(name);
-    }
+// URL params (query + hash) with auto-repair to query string
+const parseHashParams = () => {
+  const h = window.location.hash || "";
+  if (!h) return new URLSearchParams();
+  const s = h.startsWith("#") ? h.slice(1) : h; // remove leading '#'
+  // support "#token=...", "#/path?token=...", "#?token=..."
+  const q = s.includes("?") ? s.slice(s.indexOf("?") + 1) : (s.includes("=") ? s : "");
+  return q ? new URLSearchParams(q) : new URLSearchParams();
+};
+
+const getParam = (name) => {
+  const qs = new URLSearchParams(window.location.search);
+  let v = qs.get(name);
+  if (!v) v = parseHashParams().get(name);
+  return v ? v.trim() : "";
+};
+
+let _token = getParam("token");
+export const token = _token ? _token.toLowerCase() : "";
+export const nocacheFlag = getParam("nocache") === "1";
+
+// one-time auto-repair: move token/tab from hash → query so refreshes keep working
+(() => {
+  const url = new URL(window.location.href);
+  const hp = parseHashParams();
+  let changed = false;
+  const ht = hp.get("token");
+  const htab = hp.get("tab");
+  if (!url.searchParams.get("token") && ht) { url.searchParams.set("token", ht); changed = true; }
+  if (!url.searchParams.get("tab") && htab) { url.searchParams.set("tab", htab); changed = true; }
+  if (changed) {
+    // strip token/tab from hash
+    const newHash = (window.location.hash || "").replace(/([?&])(token|tab)=[^&#]*/g, "").replace(/[?&]$/, "");
+    history.replaceState(null, "", url.origin + url.pathname + "?" + url.searchParams.toString() + newHash);
   }
-  return val ? val.trim().toLowerCase() : "";
-}
+})();
+
+// Debug marker to verify new build is live
+console.debug("config.js: URL param patch active");
 
 export const token = getParam("token");
 export const nocacheFlag = getParam("nocache") === "1";
@@ -74,6 +99,7 @@ export const ACCESS = {
   TARGETING_ONLY: "TARGETING_ONLY",
   FULL_4PBS: "FULL_4PBS",
 };
+
 
 
 
