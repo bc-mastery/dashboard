@@ -13,26 +13,25 @@ import {
 } from "../core/ui.js";
 
 /* ------------------------------ helpers ------------------------------ */
-// Accepts 65, "65", "65%", "65,3%", 0.65 → 65, etc.
 function toPercent(val) {
   if (val === null || val === undefined) return 0;
-  let s = String(val).trim();
-  // handle european decimal comma
-  s = s.replace(",", ".");
+  let s = String(val).trim().replace(",", ".");
   const hasPercent = s.includes("%");
   if (hasPercent) s = s.replace("%", "");
   let n = parseFloat(s);
   if (!isFinite(n)) return 0;
-  // If looks like a ratio (0..1) and wasn't explicitly a percent string, scale
-  if (!hasPercent && n > 0 && n <= 1) n = n * 100;
-  // clamp
+  if (!hasPercent && n > 0 && n <= 1) n *= 100;
   if (n < 0) n = 0;
   if (n > 100) n = 100;
   return Math.round(n * 100) / 100;
 }
+const pctLabel = (n) => `${toPercent(n)}%`;
 
-function pctLabel(n) {
-  return `${toPercent(n)}%`;
+/** Build URL safely regardless of base style (exec vs macros/echo). */
+function buildUrlWithToken(baseUrl, token, extraParams = {}) {
+  const sep = baseUrl.includes("?") ? "&" : "?";
+  const qs = new URLSearchParams({ token, ...extraParams });
+  return `${baseUrl}${sep}${qs.toString()}`;
 }
 
 /* ------------------------------ main render ------------------------------ */
@@ -45,7 +44,6 @@ export async function renderGrowthTab() {
   const contentDiv = document.getElementById("content");
   if (!contentDiv) return;
 
-  // Get token robustly from URL (single source of truth)
   const token = getTokenFromUrl();
   if (!token) {
     contentDiv.innerHTML = `<div class="card"><p class="muted">No token provided in URL.</p></div>`;
@@ -55,22 +53,33 @@ export async function renderGrowthTab() {
   contentDiv.innerHTML = `<div class="card"><p class="muted">Loading Growth Scan…</p></div>`;
 
   try {
-    // Build API URL safely (add ? if needed)
-    const sep = APPS_SCRIPT_URL.includes("?") ? "&" : "?";
-    const url = `${APPS_SCRIPT_URL}${sep}token=${encodeURIComponent(token)}&nocache=1`;
-    console.debug("Growth fetch:", { token, url, tokenLen: token.length });
+    const url = buildUrlWithToken(APPS_SCRIPT_URL, token, { nocache: "1" });
+    console.debug("Growth fetch:", { url, token, tokenLen: token.length });
 
-    const r = await fetch(url);
-    const api = await r.json();
+    const r = await fetch(url, { cache: "no-store" });
+    const text = await r.text();
+    let api;
+    try {
+      api = JSON.parse(text);
+    } catch (e) {
+      throw new Error(`Non-JSON from API. HTTP ${r.status}. First 200 chars: ${text.slice(0, 200)}`);
+    }
+
+    console.debug("Growth API response:", api);
 
     if (!api || !api.ok) {
       contentDiv.innerHTML = `<div class="card"><p class="muted">${(api && api.message) || "No data found."}</p></div>`;
       return;
     }
 
-    // Cache + access + header brand
     state.lastApiByTab.growth = { ...api, data: { ...api.data } };
     const d = api.data || {};
+
+    // If core GS fields are missing, surface it immediately
+    const keys = Object.keys(d);
+    if (!("GS_T_RATE" in d) && !("GS_AVERAGE" in d)) {
+      console.warn("Growth: API returned no GS_* fields. Keys:", keys);
+    }
 
     const brandEl = document.getElementById("brandName");
     if (brandEl) {
@@ -80,14 +89,12 @@ export async function renderGrowthTab() {
       brandEl.title = full;
     }
 
-    // Growth PDF direct link (always allowed on Growth)
     if (d.GS_OUTPUT) {
       state.dynamicPdfLinks.growth = toDownloadLink(String(d.GS_OUTPUT));
     }
 
-    // Extract + normalize Growth numbers
-    const avg = toPercent(d.GS_AVERAGE);             // utilized
-    const counter = toPercent(d.GS_COUNTER_AVERAGE); // untapped
+    const avg = toPercent(d.GS_AVERAGE);
+    const counter = toPercent(d.GS_COUNTER_AVERAGE);
     let util = avg, untapped = counter;
     const sum = util + untapped;
     if (sum > 100 && sum > 0) {
@@ -102,16 +109,13 @@ export async function renderGrowthTab() {
 
     const growthPotential = toPercent(d.GS_GROWTH_POTENTIAL);
 
-    // Build page HTML
     contentDiv.innerHTML = `
       <!-- Block 1 -->
       <section class="card scrollTarget" id="block-gs-overview">
         <div class="bfGrid" style="grid-template-columns: auto 1fr; align-items:start; gap:22px;">
-          <!-- Left: donut -->
           <div class="bfMap">
             <div id="gsDonut" style="width:min(44vw,420px); max-width:100%; height:320px;"></div>
           </div>
-          <!-- Right: text -->
           <div class="bfText">
             <div class="bfTitle">Growth Scan</div>
             <p>
@@ -168,23 +172,18 @@ export async function renderGrowthTab() {
       </section>
     `;
 
-    // Populate chips row and ensure CTA label/link
     const blockTabsRow = document.getElementById("blockTabsRow");
     if (blockTabsRow) blockTabsRow.style.display = "block";
     populateBlockTabsFromPage();
     updateFloatingCTA("growth");
 
-    // Draw charts
     injectGsStylesOnce();
     await ensureCharts();
 
     drawDonut("gsDonut", [
       { label: "Utilized", value: util, color: "#30BA80" },
       { label: "Untapped", value: untapped, color: "#D34B4B" },
-    ], {
-      pieHole: 0.62,
-      legendPosition: "right",
-    });
+    ], { pieHole: 0.62, legendPosition: "right" });
 
     drawSegmentedBars("gsBars", [
       { key: "targeting", label: "Targeting", value: tRate },
@@ -193,10 +192,9 @@ export async function renderGrowthTab() {
       { key: "sales",     label: "Sales",     value: sRate },
     ]);
 
-    // Show floating call button only for GS-only users
     toggleFloatingCallBtn(state.lastAccess === ACCESS.GS_ONLY);
   } catch (err) {
     console.error(err);
-    contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${err?.message || err}</p></div>`;
+    contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
