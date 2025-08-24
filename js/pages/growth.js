@@ -148,7 +148,7 @@ export async function renderGrowthTab() {
       </section>
 
       <!-- Block 2 -->
-      <section class="card scrollTarget" id="block-gs-pillars">
+      <section class="card scrollTarget" id="block-gs-pillars" style="padding-bottom: 28px;">
         <div class="sectionTitle">4-Pillar Snapshot</div>
         <div id="gsBars" class="gsBars" role="list" aria-label="Pillar progress"></div>
       </section>
@@ -211,6 +211,7 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
+
 
 
 
