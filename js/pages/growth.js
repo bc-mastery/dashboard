@@ -1,10 +1,8 @@
 // /js/pages/growth.js
 
-// NOTE: We no longer import APPS_SCRIPT_URL or token.
-// The token and endpoint are built centrally via utils.js.
-import { ACCESS } from "../core/config.js";
+import { ACCESS, APPS_SCRIPT_URL } from "../core/config.js";
 import { state, setCurrentTab } from "../core/state.js";
-import { esc, toDownloadLink, getTokenFromUrl, buildApiUrl } from "../core/utils.js";
+import { esc, toDownloadLink, getTokenFromUrl } from "../core/utils.js";
 import { ensureCharts, drawDonut, drawSegmentedBars, injectGsStylesOnce } from "../core/charts.js";
 import {
   setTitleAndIcon,
@@ -57,8 +55,8 @@ export async function renderGrowthTab() {
   contentDiv.innerHTML = `<div class="card"><p class="muted">Loading Growth Scan…</p></div>`;
 
   try {
-    // Force nocache for Growth to avoid stale payloads during setup
-    const url = buildApiUrl({ nocache: true });
+    // Build API URL (always append token + nocache)
+    const url = `${APPS_SCRIPT_URL}&token=${encodeURIComponent(token)}&nocache=1`;
     console.debug("Growth fetch:", { token, url, tokenLen: token.length });
 
     const r = await fetch(url);
@@ -88,8 +86,7 @@ export async function renderGrowthTab() {
 
     // Extract + normalize Growth numbers
     const avg = toPercent(d.GS_AVERAGE);             // utilized
-    const counter = toPercent(d.GS_COUNTER_AVERAGE);  // untapped
-    // If both set but sum > 100, normalize proportionally
+    const counter = toPercent(d.GS_COUNTER_AVERAGE); // untapped
     let util = avg, untapped = counter;
     const sum = util + untapped;
     if (sum > 100 && sum > 0) {
@@ -104,33 +101,89 @@ export async function renderGrowthTab() {
 
     const growthPotential = toPercent(d.GS_GROWTH_POTENTIAL);
 
-    // Build page HTML (Block #1 reversed layout; then bars; then text blocks)
+    // Build page HTML
     contentDiv.innerHTML = `
-  <div class="card"><p>DEBUG Growth</p></div>
-`;
+      <!-- Block 1 -->
+      <section class="card scrollTarget" id="block-gs-overview">
+        <div class="bfGrid" style="grid-template-columns: auto 1fr; align-items:start; gap:22px;">
+          <!-- Left: donut -->
+          <div class="bfMap">
+            <div id="gsDonut" style="width:min(44vw,420px); max-width:100%; height:320px;"></div>
+          </div>
+          <!-- Right: text -->
+          <div class="bfText">
+            <div class="bfTitle">Growth Scan</div>
+            <p>
+              <span class="bfSub">Currently utilized potential:</span>
+              <strong>${esc(pctLabel(util))}</strong>
+            </p>
+            <p>
+              That means you miss out on another
+              <strong style="color:#FF0040">${esc(pctLabel(untapped))}</strong>
+              — so you leave money on the table.
+            </p>
+            <p>
+              To be accurate, with just a few strategic changes, you could achieve
+              <strong style="color:#30BA80">${esc(pctLabel(growthPotential))}</strong>
+              growth.
+            </p>
+            <p class="muted">
+              Below you can see how your business performs in the most critical strategic areas (pillars).
+            </p>
+          </div>
+        </div>
+      </section>
 
+      <!-- Block 2 -->
+      <section class="card scrollTarget" id="block-gs-pillars">
+        <div class="sectionTitle">4-Pillar Snapshot</div>
+        <div id="gsBars" class="gsBars" role="list" aria-label="Pillar progress"></div>
+      </section>
+
+      <!-- Block 3..7 -->
+      <section class="card scrollTarget" id="block-gs-targeting">
+        <div class="sectionTitle">Targeting Scan</div>
+        <p class="preserve">${esc(d.GS_T_DESC || "")}</p>
+      </section>
+
+      <section class="card scrollTarget" id="block-gs-offer">
+        <div class="sectionTitle">Offer Scan</div>
+        <p class="preserve">${esc(d.GS_O_DESC || "")}</p>
+      </section>
+
+      <section class="card scrollTarget" id="block-gs-marketing">
+        <div class="sectionTitle">Marketing Scan</div>
+        <p class="preserve">${esc(d.GS_M_DESC || "")}</p>
+      </section>
+
+      <section class="card scrollTarget" id="block-gs-sales">
+        <div class="sectionTitle">Sales Scan</div>
+        <p class="preserve">${esc(d.GS_S_DESC || "")}</p>
+      </section>
+
+      <section class="card scrollTarget" id="block-gs-summary">
+        <div class="sectionTitle">Growth Scan Summary</div>
+        <p class="preserve">${esc(d.GS_GAPS_SUMMARY || "")}</p>
+      </section>
+    `;
 
     // Populate chips row and ensure CTA label/link
     const blockTabsRow = document.getElementById("blockTabsRow");
     if (blockTabsRow) blockTabsRow.style.display = "block";
     populateBlockTabsFromPage();
-    updateFloatingCTA("growth"); // Growth is always downloadable
+    updateFloatingCTA("growth");
 
     // Draw charts
     injectGsStylesOnce();
     await ensureCharts();
 
-    drawDonut(
-      "gsDonut",
-      [
-        { label: "Utilized", value: util,   color: "#30BA80" },
-        { label: "Untapped", value: untapped, color: "#D34B4B" },
-      ],
-      {
-        pieHole: 0.62,
-        legendPosition: "right",
-      }
-    );
+    drawDonut("gsDonut", [
+      { label: "Utilized", value: util, color: "#30BA80" },
+      { label: "Untapped", value: untapped, color: "#D34B4B" },
+    ], {
+      pieHole: 0.62,
+      legendPosition: "right",
+    });
 
     drawSegmentedBars("gsBars", [
       { key: "targeting", label: "Targeting", value: tRate },
@@ -146,7 +199,3 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${err?.message || err}</p></div>`;
   }
 }
-
-
-
-
