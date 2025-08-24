@@ -55,8 +55,9 @@ export async function renderGrowthTab() {
   contentDiv.innerHTML = `<div class="card"><p class="muted">Loading Growth Scan…</p></div>`;
 
   try {
-    // Build API URL (always append token + nocache)
-    const url = `${APPS_SCRIPT_URL}&token=${encodeURIComponent(token)}&nocache=1`;
+    // Build API URL safely (add ? if needed)
+    const sep = APPS_SCRIPT_URL.includes("?") ? "&" : "?";
+    const url = `${APPS_SCRIPT_URL}${sep}token=${encodeURIComponent(token)}&nocache=1`;
     console.debug("Growth fetch:", { token, url, tokenLen: token.length });
 
     const r = await fetch(url);
