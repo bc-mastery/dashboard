@@ -168,7 +168,7 @@ export async function renderGrowthTab() {
         <div class="sectionTitle">Growth Scan Summary</div>
         <p class="preserve">${esc(d.GS_GAPS_SUMMARY || "")}</p>
       </section>
-    ";
+    `;
 
     // Populate chips row and ensure CTA label/link
     const blockTabsRow = document.getElementById("blockTabsRow");
@@ -206,5 +206,6 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${err?.message || err}</p></div>`;
   }
 }
+
 
 
