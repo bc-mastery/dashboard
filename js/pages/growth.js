@@ -45,9 +45,9 @@ export async function renderGrowthTab() {
   if (!contentDiv) return;
 
   if (!token) {
-  contentDiv.innerHTML = `<div class="card"><p class="muted">No token provided in URL.</p></div>`;
-  return;
-}
+    contentDiv.innerHTML = `<div class="card"><p class="muted">No token provided in URL.</p></div>`;
+    return;
+  }
 
   contentDiv.innerHTML = `<div class="card"><p class="muted">Loading Growth Scan…</p></div>`;
 
@@ -118,15 +118,13 @@ export async function renderGrowthTab() {
               </strong>
             </p>
 
-           <p style="margin-bottom:0;">Your utilization rate depends on how well you know…</p>
+            <p style="margin-bottom:0;">Your utilization rate depends on how well you know…</p>
             <ul style="margin:0; padding-left:18px; list-style-position:outside;">
               <li style="margin:0;">Who you sell to;</li>
               <li style="margin:0;">What you sell to them;</li>
               <li style="margin:0;">How you attract them;</li>
               <li style="margin:0;">And how you sell to them.</li>
             </ul>
-
-
 
             <p>
               But right now, you’re leaving money on the table and limiting your ability to break through.
@@ -157,21 +155,104 @@ export async function renderGrowthTab() {
       <section class="card scrollTarget" id="block-gs-targeting">
         <div class="sectionTitle">Targeting Scan</div>
         <p class="preserve">${esc(d.GS_T_DESC || "")}</p>
+
+        <!-- green divider -->
+        <div style="height:3px; background:#30BA80; width:100%; border-radius:2px; margin:16px 0 14px;"></div>
+
+        <!-- Targeting: universal follow-up -->
+        <p style="margin:10px 0 6px; color:#024D4F; font-weight:700;">Core aspects to understand in your Targeting:</p>
+        <ul style="margin:0; padding-left:18px; list-style-position:outside;">
+          <li style="margin:0;">Behavioral Factors</li>
+          <li style="margin:0;">Positioning</li>
+          <li style="margin:0;">Macro-Behavior</li>
+          <li style="margin:0;">Target Persona</li>
+        </ul>
+        <p style="margin-top:10px;">
+          Even if you already have a clear picture of your audience, deeper insights into how they actually think and decide make your targeting sharper and more effective.
+          In the full strategy, we connect these aspects directly to behavioral patterns so you know exactly who to focus on — and how to reach them.
+          Want a preview? → Check the <strong>TARGETING</strong> tab.
+        </p>
       </section>
 
       <section class="card scrollTarget" id="block-gs-offer">
         <div class="sectionTitle">Offer Scan</div>
         <p class="preserve">${esc(d.GS_O_DESC || "")}</p>
+
+        <!-- green divider -->
+        <div style="height:3px; background:#30BA80; width:100%; border-radius:2px; margin:16px 0 14px;"></div>
+
+        <!-- Offer: universal follow-up -->
+        <p style="margin:10px 0 6px; color:#024D4F; font-weight:700;">Core elements to define in your Offer:</p>
+        <ul style="margin:0; padding-left:18px; list-style-position:outside;">
+          <li style="margin:0;">Offer Concept</li>
+          <li style="margin:0;">Features</li>
+          <li style="margin:0;">Perceived Value</li>
+          <li style="margin:0;">Retention Factors</li>
+          <li style="margin:0;">Appearance (design &amp; visuals)</li>
+          <li style="margin:0;">Price Positioning</li>
+          <li style="margin:0;">Actual Price Point</li>
+          <li style="margin:0;">Pricing Logic (tiers &amp; packages)</li>
+          <li style="margin:0;">Friction Reductors</li>
+        </ul>
+        <p style="margin-top:10px;">
+          Even if your offer feels well-structured today, a clear strategy makes sure every element consistently reflects your audience’s needs and motivations.
+          In the full strategy, we shape your offer around how your market really thinks and buys.
+          Want a snapshot? → Check the <strong>OFFER</strong> tab.
+        </p>
       </section>
 
       <section class="card scrollTarget" id="block-gs-marketing">
         <div class="sectionTitle">Marketing Scan</div>
         <p class="preserve">${esc(d.GS_M_DESC || "")}</p>
+
+        <!-- green divider -->
+        <div style="height:3px; background:#30BA80; width:100%; border-radius:2px; margin:16px 0 14px;"></div>
+
+        <!-- Marketing: universal follow-up -->
+        <p style="margin:10px 0 6px; color:#024D4F; font-weight:700;">Core elements to align in your Marketing:</p>
+        <ul style="margin:0; padding-left:18px; list-style-position:outside;">
+          <li style="margin:0;">Preferred Channels</li>
+          <li style="margin:0;">Decision Ladder</li>
+          <li style="margin:0;">Pain Points</li>
+          <li style="margin:0;">Preferred Contents</li>
+          <li style="margin:0;">Communication Style</li>
+          <li style="margin:0;">Buying Triggers</li>
+          <li style="margin:0;">Red Flags to avoid</li>
+          <li style="margin:0;">CTAs</li>
+          <li style="margin:0;">Visual Elements</li>
+        </ul>
+        <p style="margin-top:10px;">
+          Even if your marketing is already performing, a solid strategy ensures your efforts stay consistent, scalable, and in tune with how your audience reacts.
+          In the full strategy, we align each element with your audience’s behavior so your message always lands.
+          Want to see how this looks? → Check the <strong>MARKETING</strong> tab.
+        </p>
       </section>
 
       <section class="card scrollTarget" id="block-gs-sales">
         <div class="sectionTitle">Sales Scan</div>
         <p class="preserve">${esc(d.GS_S_DESC || "")}</p>
+
+        <!-- green divider -->
+        <div style="height:3px; background:#30BA80; width:100%; border-radius:2px; margin:16px 0 14px;"></div>
+
+        <!-- Sales: universal follow-up -->
+        <p style="margin:10px 0 6px; color:#024D4F; font-weight:700;">Core elements to keep aligned in your Sales:</p>
+        <ul style="margin:0; padding-left:18px; list-style-position:outside;">
+          <li style="margin:0;">Prospecting &amp; Lead Flow</li>
+          <li style="margin:0;">Sales Communication</li>
+          <li style="margin:0;">Trust Building Elements</li>
+          <li style="margin:0;">Cadence &amp; Processes</li>
+          <li style="margin:0;">Sales Deck Elements</li>
+          <li style="margin:0;">Negotiation Tactics</li>
+          <li style="margin:0;">Objection Handling</li>
+          <li style="margin:0;">Follow-up Methods</li>
+          <li style="margin:0;">Retention Tactics</li>
+        </ul>
+        <p style="margin-top:10px;">
+          Even if you already have these elements working well, a clear strategy keeps them consistently aligned with your actual target audience and how they think.
+          In the full strategy, we map each of these directly to behavior so you can sell with precision.
+          Want a preview? → Check the <strong>SALES</strong> tab.
+        </p>
       </section>
 
       <section class="card scrollTarget" id="block-gs-summary">
@@ -211,14 +292,3 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
