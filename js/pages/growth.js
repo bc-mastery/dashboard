@@ -210,10 +210,10 @@ export async function renderGrowthTab() {
               growth.
             </p>
 
-            <p>
-              Right now, your biggest blocker is
-              <strong style="color:#FF0040">${esc(d.GS_BLOCKER || "")}</strong>.
+            <p style="color:#FF0040; font-weight:700;">
+              Right now, your biggest blocker is ${esc(d.GS_BLOCKER || "")}.
             </p>
+
 
             <p class="muted">
               Besides that, below you can see how your business performs in the most critical strategic areas — a.k.a. pillars.
@@ -420,6 +420,7 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
+
 
 
 
