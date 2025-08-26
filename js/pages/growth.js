@@ -304,7 +304,7 @@ export async function renderGrowthTab() {
         <div style="height:3px; background:#30BA80; width:100%; border-radius:2px; margin:16px 0 14px;"></div>
 
         <!-- Offer: universal follow-up -->
-        <p style="margin:10px 0 6px; color:#024D4F; font-weight:700;">Core elements to define in your Offer:</p>
+        <p style="margin:10px 0 6px; color:#024D4F; font-weight:700;">Core elements to keep aligned in your Offer:</p>
         <ul style="margin:0; padding-left:18px; list-style-position:outside;">
           <li style="margin:0;">Offer Concept</li>
           <li style="margin:0;">Features</li>
@@ -331,7 +331,7 @@ export async function renderGrowthTab() {
         <div style="height:3px; background:#30BA80; width:100%; border-radius:2px; margin:16px 0 14px;"></div>
 
         <!-- Marketing: universal follow-up -->
-        <p style="margin:10px 0 6px; color:#024D4F; font-weight:700;">Core elements to align in your Marketing:</p>
+        <p style="margin:10px 0 6px; color:#024D4F; font-weight:700;">Core elements to keep aligned in your Marketing:</p>
         <ul style="margin:0; padding-left:18px; list-style-position:outside;">
           <li style="margin:0;">Preferred Channels</li>
           <li style="margin:0;">Decision Ladder</li>
@@ -502,5 +502,6 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
+
 
 
