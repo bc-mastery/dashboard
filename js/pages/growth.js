@@ -170,7 +170,11 @@ export async function renderGrowthTab() {
     const oRate = toPercent(d.GS_O_RATE);
     const mRate = toPercent(d.GS_M_RATE);
     const sRate = toPercent(d.GS_S_RATE);
-    const growthPotential = toPercent(d.GS_GROWTH_POTENTIAL);
+    // Growth Potential can be a fuzzy range like "~80–85%". If so, show it as-is.
+    const rawGP = String(d.GS_GROWTH_POTENTIAL ?? "");
+    const isRange = /~?\s*\d+(\.\d+)?\s*[–-]\s*\d+(\.\d+)?\s*%?/.test(rawGP);
+    const growthPotential = toPercent(d.GS_GROWTH_POTENTIAL); // keep numeric in case it’s exact
+    const growthPotentialLabel = isRange ? rawGP : pctLabel(growthPotential);
 
     // HTML
     contentDiv.innerHTML = `
@@ -206,7 +210,7 @@ export async function renderGrowthTab() {
             <p>
               But right now, you’re leaving money on the table and limiting your ability to break through.
               With only a few strategic changes, you could achieve
-              <strong style="color:#30BA80">${esc(pctLabel(growthPotential))}</strong>
+              <strong style="color:#30BA80">${esc(growthPotentialLabel)}</strong>
               growth.
             </p>
 
@@ -420,6 +424,7 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
+
 
 
 
