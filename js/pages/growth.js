@@ -119,6 +119,14 @@ function injectPillarHelpStylesOnce() {
       display: none;
     }
     #gsOverlay.show { display: block; }
+
+    /* Keep bubble visible while hovering, even if overlay is on top */
+    .gsHelpWrap.openHover .gsHelpBubble { display: block; }
+    
+    /* Overlay should not intercept pointer on hover mode (prevents flicker) */
+    #gsOverlay.hover { pointer-events: none; }
+
+    
   `;
   document.head.appendChild(style);
 }
@@ -416,33 +424,59 @@ export async function renderGrowthTab() {
     if (wrap && btn) {
       const close = () => {
         wrap.classList.remove("open");
+        wrap.classList.remove("openHover");
         btn.setAttribute("aria-expanded", "false");
-        if (overlay) overlay.classList.remove("show");
+        if (overlay) {
+          overlay.classList.remove("show");
+          overlay.classList.remove("hover");
+        }
         document.body.style.removeProperty("overflow");
       };
+    
       const open = () => {
+        // click/tap open: real modal-like state
+        wrap.classList.remove("openHover");       // switch from hover state if present
         wrap.classList.add("open");
         btn.setAttribute("aria-expanded", "true");
-        if (overlay) overlay.classList.add("show");
-        document.body.style.overflow = "hidden";
+        if (overlay) {
+          overlay.classList.add("show");
+          overlay.classList.remove("hover");      // clickable overlay
+        }
+        document.body.style.overflow = "hidden";  // lock scroll
       };
+    
       const toggle = (e) => {
         e.preventDefault();
         wrap.classList.contains("open") ? close() : open();
       };
     
+      // Click/tap toggles bubble + overlay
       btn.addEventListener("click", toggle, { passive: false });
     
-      // 🔹 NEW: overlay also on hover in/out
+      // 🔹 Hover should also show overlay without stealing pointer (no flicker)
       wrap.addEventListener("mouseenter", () => {
-        if (overlay) overlay.classList.add("show");
-      });
-      wrap.addEventListener("mouseleave", () => {
-        if (!wrap.classList.contains("open") && overlay) {
-          overlay.classList.remove("show");
+        // only if not already "open" by click
+        if (!wrap.classList.contains("open")) {
+          wrap.classList.add("openHover");          // keep bubble forced open
+          if (overlay) {
+            overlay.classList.add("show");
+            overlay.classList.add("hover");         // pointer-events:none
+          }
         }
       });
     
+      wrap.addEventListener("mouseleave", () => {
+        // if not opened via click, remove hover overlay/state
+        if (!wrap.classList.contains("open")) {
+          wrap.classList.remove("openHover");
+          if (overlay) {
+            overlay.classList.remove("show");
+            overlay.classList.remove("hover");
+          }
+        }
+      });
+    
+      // Keyboard close
       btn.addEventListener("keydown", (e) => {
         if (e.key === "Escape") close();
       });
@@ -450,10 +484,15 @@ export async function renderGrowthTab() {
         if (e.key === "Escape") close();
       });
     
+      // Click outside to close
       document.addEventListener("click", (e) => {
         if (!wrap.contains(e.target)) close();
       });
+    
+      // Prevent immediate close when interacting inside the help area
       wrap.addEventListener("click", (e) => e.stopPropagation());
+    
+      // Clicking the overlay closes too (only meaningful in non-hover mode)
       if (overlay) overlay.addEventListener("click", close);
     }
 
@@ -463,4 +502,5 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
+
 
