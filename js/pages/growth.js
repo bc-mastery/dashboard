@@ -34,7 +34,7 @@ function buildUrlWithToken(baseUrl, token, extraParams = {}) {
   return `${baseUrl}${sep}${qs.toString()}`;
 }
 
-/* ------------------------------ local styles for the help icon/bubble ------------------------------ */
+/* ------------------------------ local styles for the help icon/bubble & overlay ------------------------------ */
 function injectPillarHelpStylesOnce() {
   if (document.getElementById("gs-pillar-help-styles")) return;
   const style = document.createElement("style");
@@ -46,7 +46,7 @@ function injectPillarHelpStylesOnce() {
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      position: relative;
+      position: relative; /* bubble anchors to this */
     }
 
     /* Green circular ? icon */
@@ -85,12 +85,12 @@ function injectPillarHelpStylesOnce() {
       top: calc(100% + 8px);
       width: auto;
       max-width: none;         /* remove previous cap */
-      background: #333333;
+      background: #333333;     /* dark bubble per your last version */
       border: 1px solid #E5E7EB;
       border-radius: 12px;
       padding: 12px 14px;
       box-shadow: 0 10px 20px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.06);
-      z-index: 1000;
+      z-index: 1001;           /* above overlay */
       display: none;
     }
     .gsHelpBubble p {
@@ -100,13 +100,25 @@ function injectPillarHelpStylesOnce() {
     }
     .gsHelpBubble p:last-child { margin-bottom: 0; }
 
-    /* Show on hover/focus */
+    /* Show on hover/focus (desktop) */
     .gsHelpWrap:hover .gsHelpBubble,
     .gsHelpWrap:has(.gsHelpBtn:focus) .gsHelpBubble {
       display: block;
     }
-    /* Show when toggled open (mobile tap) */
+    /* Show when toggled open (mobile tap / explicit click) */
     .gsHelpWrap.open .gsHelpBubble { display: block; }
+
+    /* Screen dimmer behind the tooltip (for click/tap open) */
+    #gsOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(2, 77, 79, 0.25);   /* teal-ish grey */
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      z-index: 900;                         /* below bubble, above page */
+      display: none;
+    }
+    #gsOverlay.show { display: block; }
   `;
   document.head.appendChild(style);
 }
@@ -217,7 +229,6 @@ export async function renderGrowthTab() {
             <p style="color:#FF0040; font-weight:700;">
               Right now, your biggest blocker is ${esc(d.GS_BLOCKER || "")}.
             </p>
-
 
             <p class="muted">
               Besides that, below you can see how your business performs in the most critical strategic areas — a.k.a. pillars.
@@ -371,7 +382,7 @@ export async function renderGrowthTab() {
     updateFloatingCTA("growth");
 
     injectGsStylesOnce();
-    injectPillarHelpStylesOnce(); // <-- styles for the help icon/bubble
+    injectPillarHelpStylesOnce(); // <-- styles for the help icon/bubble & overlay
     await ensureCharts();
 
     drawDonut(
@@ -390,7 +401,15 @@ export async function renderGrowthTab() {
       { key: "sales",     label: "Sales",     value: sRate },
     ]);
 
-    // --- Help icon behavior (hover via CSS; click for touch/tablet) ---
+    // --- Create the screen overlay once (for blur/grey dim when opened via click/tap) ---
+    let overlay = document.getElementById("gsOverlay");
+    if (!overlay) {
+      overlay = document.createElement("div");
+      overlay.id = "gsOverlay";
+      document.body.appendChild(overlay);
+    }
+
+    // --- Help icon behavior (hover via CSS; click for touch/tablet + overlay) ---
     const wrap = document.getElementById("gsPillarHelpWrap");
     const btn  = document.getElementById("gsPillarHelpBtn");
 
@@ -398,24 +417,42 @@ export async function renderGrowthTab() {
       const close = () => {
         wrap.classList.remove("open");
         btn.setAttribute("aria-expanded", "false");
+        if (overlay) overlay.classList.remove("show");
+        document.body.style.removeProperty("overflow");
+      };
+      const open = () => {
+        wrap.classList.add("open");
+        btn.setAttribute("aria-expanded", "true");
+        if (overlay) overlay.classList.add("show");
+        // Optional: lock scroll while overlay is shown
+        document.body.style.overflow = "hidden";
       };
       const toggle = (e) => {
         e.preventDefault();
-        const isOpen = wrap.classList.toggle("open");
-        btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+        wrap.classList.contains("open") ? close() : open();
       };
 
+      // Click/tap toggles bubble + overlay
       btn.addEventListener("click", toggle, { passive: false });
+
+      // Keyboard close
       btn.addEventListener("keydown", (e) => {
         if (e.key === "Escape") close();
       });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") close();
+      });
 
-      // Click outside to close (mobile)
+      // Click outside to close
       document.addEventListener("click", (e) => {
         if (!wrap.contains(e.target)) close();
       });
-      // Prevent section scroll tap from instantly closing after opening
+
+      // Prevent immediate close when interacting inside the help area
       wrap.addEventListener("click", (e) => e.stopPropagation());
+
+      // Clicking the overlay closes too
+      if (overlay) overlay.addEventListener("click", close);
     }
 
     toggleFloatingCallBtn(state.lastAccess === ACCESS.GS_ONLY);
@@ -424,10 +461,3 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
-
-
-
-
-
-
-
