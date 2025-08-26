@@ -266,7 +266,7 @@ export async function renderGrowthTab() {
               <p><strong>0–60%:</strong> You don’t have an established strategy in the given area. You plan and execute based on intuition and experience — which may have gotten you this far, but to break through, you need a stable strategy and the right tactics.</p>
               <p><strong>61–80%:</strong> You have an established strategy in the given area. You know how to catch the right customers and build a prosperous business. However, you have plenty of room to improve — and with the right resources, you can multiply your outcomes.</p>
               <p><strong>81–100%:</strong> You’ve mastered the given area with a well-built strategy. If you’ve plateaued and want to level up, you need a strategic shift in this or other areas so you can break out of your current limitations.</p>
-              <p style="margin-top: 16px; color:#30BA80; font-weight:700;">
+              <p style="margin-top: 16px; color:#B4FDE5; font-weight:700;">
                 <strong>Scroll down to see how to improve your Targeting, Offer, Marketing, and Sales!</strong>
               </p>
             </div>
@@ -505,6 +505,7 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
+
 
 
 
