@@ -82,7 +82,7 @@ function injectPillarHelpStylesOnce() {
       position: absolute;
       right: 0;
       top: calc(100% + 8px);
-      max-width: min(560px, 88vw);
+      width: calc(100% - 24px); /* adjust 24px to match your left padding */
       background: #FFFFFF;
       border: 1px solid #E5E7EB;
       border-radius: 12px;
@@ -418,3 +418,4 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
+
