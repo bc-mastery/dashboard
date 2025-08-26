@@ -80,9 +80,11 @@ function injectPillarHelpStylesOnce() {
     /* Tooltip bubble */
     .gsHelpBubble {
       position: absolute;
-      right: 0;
+      left: 24px;         /* align with text start */
+      right: 0;           /* align with help icon */
       top: calc(100% + 8px);
-      width: calc(100% - 24px); /* adjust 24px to match your left padding */
+      width: auto;        /* span between left & right */
+      max-width: none;    /* remove previous cap */
       background: #FFFFFF;
       border: 1px solid #E5E7EB;
       border-radius: 12px;
@@ -418,4 +420,5 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
+
 
