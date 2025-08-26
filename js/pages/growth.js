@@ -383,7 +383,7 @@ export async function renderGrowthTab() {
       </section>
 
       <section class="card scrollTarget" id="block-gs-summary">
-        <div class="sectionTitle">Growth Scan Summary</div>
+        <div class="sectionTitle">Strategic Summary</div>
         <p class="preserve">${esc(d.GS_GAPS_SUMMARY || "")}</p>
       </section>
     `;
@@ -507,6 +507,7 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
+
 
 
 
