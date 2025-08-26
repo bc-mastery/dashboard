@@ -51,7 +51,7 @@ function injectPillarHelpStylesOnce() {
 
     /* Green circular ? icon */
     .gsHelpWrap {
-      position: relative;
+      position: static;   /* let the bubble position against .sectionHeader */
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -80,17 +80,17 @@ function injectPillarHelpStylesOnce() {
     /* Tooltip bubble */
     .gsHelpBubble {
       position: absolute;
-      left: 24px;         /* align with text start */
-      right: 0;           /* align with help icon */
+      left: 24px;              /* align with the card’s inner left padding */
+      right: 0;                /* end at the icon/right edge */
       top: calc(100% + 8px);
-      width: auto;        /* span between left & right */
-      max-width: none;    /* remove previous cap */
+      width: auto;
+      max-width: none;         /* remove previous cap */
       background: #FFFFFF;
       border: 1px solid #E5E7EB;
       border-radius: 12px;
       padding: 12px 14px;
       box-shadow: 0 10px 20px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.06);
-      z-index: 40;
+      z-index: 1000;
       display: none;
     }
     .gsHelpBubble p {
@@ -420,5 +420,6 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
+
 
 
