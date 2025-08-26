@@ -88,8 +88,8 @@ export function drawSegmentedBars(targetId, pillars = []) {
 
   // Decide color by value
   const colorFor = (v) => {
-    if (v <= 60) return "#333333";
-    if (v <= 80) return "#024D4F";
+    if (v <= 60) return "#FF0040";
+    if (v <= 80) return "#333333";
     return "#30BA80";
   };
 
@@ -119,4 +119,5 @@ export function drawSegmentedBars(targetId, pillars = []) {
     });
   });
 }
+
 
