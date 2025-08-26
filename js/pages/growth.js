@@ -85,7 +85,7 @@ function injectPillarHelpStylesOnce() {
       top: calc(100% + 8px);
       width: auto;
       max-width: none;         /* remove previous cap */
-      background: #FFFFFF;
+      background: #333333;
       border: 1px solid #E5E7EB;
       border-radius: 12px;
       padding: 12px 14px;
@@ -95,7 +95,7 @@ function injectPillarHelpStylesOnce() {
     }
     .gsHelpBubble p {
       margin: 0 0 8px 0;
-      color: #333333;
+      color: #FFFFFF;
       font-size: 14px;
     }
     .gsHelpBubble p:last-child { margin-bottom: 0; }
@@ -420,6 +420,7 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
+
 
 
 
