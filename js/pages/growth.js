@@ -34,6 +34,81 @@ function buildUrlWithToken(baseUrl, token, extraParams = {}) {
   return `${baseUrl}${sep}${qs.toString()}`;
 }
 
+/* ------------------------------ local styles for the help icon/bubble ------------------------------ */
+function injectPillarHelpStylesOnce() {
+  if (document.getElementById("gs-pillar-help-styles")) return;
+  const style = document.createElement("style");
+  style.id = "gs-pillar-help-styles";
+  style.textContent = `
+    /* Header line that holds the title and the help icon (keeps spacing equal to section padding) */
+    #block-gs-pillars .sectionHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      position: relative;
+    }
+
+    /* Green circular ? icon */
+    .gsHelpWrap {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    .gsHelpBtn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #30BA80;
+      color: #FFFFFF;
+      border: none;
+      cursor: pointer;
+      font-weight: 800;
+      font-size: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 2px rgba(0,0,0,.06);
+    }
+    .gsHelpBtn:focus-visible {
+      outline: 2px solid #024D4F;
+      outline-offset: 2px;
+    }
+
+    /* Tooltip bubble */
+    .gsHelpBubble {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 8px);
+      max-width: min(560px, 88vw);
+      background: #FFFFFF;
+      border: 1px solid #E5E7EB;
+      border-radius: 12px;
+      padding: 12px 14px;
+      box-shadow: 0 10px 20px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.06);
+      z-index: 40;
+      display: none;
+    }
+    .gsHelpBubble p {
+      margin: 0 0 8px 0;
+      color: #333333;
+      font-size: 14px;
+    }
+    .gsHelpBubble p:last-child { margin-bottom: 0; }
+
+    /* Show on hover/focus */
+    .gsHelpWrap:hover .gsHelpBubble,
+    .gsHelpWrap:has(.gsHelpBtn:focus) .gsHelpBubble {
+      display: block;
+    }
+    /* Show when toggled open (mobile tap) */
+    .gsHelpWrap.open .gsHelpBubble { display: block; }
+  `;
+  document.head.appendChild(style);
+}
+
 /* ------------------------------ main render ------------------------------ */
 export async function renderGrowthTab() {
   setCurrentTab("growth");
@@ -147,7 +222,29 @@ export async function renderGrowthTab() {
 
       <!-- Block 2 -->
       <section class="card scrollTarget" id="block-gs-pillars" style="padding-bottom: 28px;">
-        <div class="sectionTitle">4-Pillar Snapshot</div>
+        <div class="sectionHeader">
+          <div class="sectionTitle">4-Pillar Snapshot</div>
+
+          <!-- Help icon + bubble -->
+          <div class="gsHelpWrap" id="gsPillarHelpWrap">
+            <button
+              type="button"
+              class="gsHelpBtn"
+              id="gsPillarHelpBtn"
+              aria-label="What do the percentage ranges mean?"
+              aria-expanded="false"
+              aria-controls="gsPillarHelpBubble"
+              title="What do these percentages mean?"
+            >?</button>
+
+            <div class="gsHelpBubble" id="gsPillarHelpBubble" role="tooltip">
+              <p><strong>0–60%:</strong> You don’t have an established strategy in the given area. You plan and execute based on intuition and experience—which may have gotten you this far, but to break through, you need a stable strategy and the right tactics.</p>
+              <p><strong>61–80%:</strong> You have an established strategy in the given area. You know how to catch the right customers and build a prosperous business. However, you have plenty of room to improve—and with the right resources, you can multiply your outcomes.</p>
+              <p><strong>81–100%:</strong> You’ve mastered the given area with a well-built strategy. If you’ve plateaued and want to level up, you need a strategic shift in this or other areas so you can break out of your current limitations.</p>
+            </div>
+          </div>
+        </div>
+
         <div id="gsBars" class="gsBars" role="list" aria-label="Pillar progress"></div>
       </section>
 
@@ -268,6 +365,7 @@ export async function renderGrowthTab() {
     updateFloatingCTA("growth");
 
     injectGsStylesOnce();
+    injectPillarHelpStylesOnce(); // <-- styles for the help icon/bubble
     await ensureCharts();
 
     drawDonut(
@@ -285,6 +383,34 @@ export async function renderGrowthTab() {
       { key: "marketing", label: "Marketing", value: mRate },
       { key: "sales",     label: "Sales",     value: sRate },
     ]);
+
+    // --- Help icon behavior (hover via CSS; click for touch/tablet) ---
+    const wrap = document.getElementById("gsPillarHelpWrap");
+    const btn  = document.getElementById("gsPillarHelpBtn");
+
+    if (wrap && btn) {
+      const close = () => {
+        wrap.classList.remove("open");
+        btn.setAttribute("aria-expanded", "false");
+      };
+      const toggle = (e) => {
+        e.preventDefault();
+        const isOpen = wrap.classList.toggle("open");
+        btn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      };
+
+      btn.addEventListener("click", toggle, { passive: false });
+      btn.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") close();
+      });
+
+      // Click outside to close (mobile)
+      document.addEventListener("click", (e) => {
+        if (!wrap.contains(e.target)) close();
+      });
+      // Prevent section scroll tap from instantly closing after opening
+      wrap.addEventListener("click", (e) => e.stopPropagation());
+    }
 
     toggleFloatingCallBtn(state.lastAccess === ACCESS.GS_ONLY);
   } catch (err) {
