@@ -97,6 +97,8 @@ function injectPillarHelpStylesOnce() {
       margin: 0 0 8px 0;
       color: #FFFFFF;
       font-size: 14px;
+      line-height: 1.5;
+      font-family: 'Inter', sans-serif;
     }
     .gsHelpBubble p:last-child { margin-bottom: 0; }
 
@@ -505,6 +507,7 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
+
 
 
 
