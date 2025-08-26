@@ -424,34 +424,36 @@ export async function renderGrowthTab() {
         wrap.classList.add("open");
         btn.setAttribute("aria-expanded", "true");
         if (overlay) overlay.classList.add("show");
-        // Optional: lock scroll while overlay is shown
         document.body.style.overflow = "hidden";
       };
       const toggle = (e) => {
         e.preventDefault();
         wrap.classList.contains("open") ? close() : open();
       };
-
-      // Click/tap toggles bubble + overlay
+    
       btn.addEventListener("click", toggle, { passive: false });
-
-      // Keyboard close
+    
+      // 🔹 NEW: overlay also on hover in/out
+      wrap.addEventListener("mouseenter", () => {
+        if (overlay) overlay.classList.add("show");
+      });
+      wrap.addEventListener("mouseleave", () => {
+        if (!wrap.classList.contains("open") && overlay) {
+          overlay.classList.remove("show");
+        }
+      });
+    
       btn.addEventListener("keydown", (e) => {
         if (e.key === "Escape") close();
       });
       document.addEventListener("keydown", (e) => {
         if (e.key === "Escape") close();
       });
-
-      // Click outside to close
+    
       document.addEventListener("click", (e) => {
         if (!wrap.contains(e.target)) close();
       });
-
-      // Prevent immediate close when interacting inside the help area
       wrap.addEventListener("click", (e) => e.stopPropagation());
-
-      // Clicking the overlay closes too
       if (overlay) overlay.addEventListener("click", close);
     }
 
@@ -461,3 +463,4 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
+
