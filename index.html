@@ -322,14 +322,12 @@
   html, body{ overflow-x:hidden; }
   .panel, .wrap, .tabsRow, #blockTabsRow{ overflow-x:clip; }
 
-  /* Ensure content never tucks under the header */
+  /* Adjust first card start under header */
   .main{
-    padding-top: var(--headerH) !important;  /* header only, no extra gap */
+    padding-top: var(--headerH);   /* only clear header itself */
   }
-
-  /* First block should sit just below header with equal spacing */
-  #content > .card:first-child{
-    margin-top: 24px !important;
+  .main > .card:first-of-type{
+    margin-top: 24px !important;  /* force same spacing as between cards */
   }
 }
     /* === Growth: Block #1 desktop layout (1 : 2) === */
@@ -502,5 +500,6 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
 
 
