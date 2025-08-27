@@ -323,8 +323,12 @@
       .panel, .wrap, .tabsRow, #blockTabsRow{ overflow-x:clip; }
 
       /* Ensure content never tucks under the header */
-      .main{ padding-top: calc(var(--headerH) + 10px); }
-    }
+      .main{
+  padding-top: var(--headerH);   /* just enough to clear the header */
+}
+.card:first-of-type{
+  margin-top: 24px;              /* same spacing as between cards */
+}
 
     /* === Growth: Block #1 desktop layout (1 : 2) === */
     #block-gs-overview .bfGrid{
@@ -496,3 +500,4 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
