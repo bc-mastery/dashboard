@@ -60,27 +60,27 @@ function injectTargetingStylesOnce() {
     }
 
     /* Mobile: stack and center */
-    @media (max-width: 860px) {
-      #content .card .bfGrid {
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
-      #content .bfMap {
-        display: flex;
-        justify-content: center;
-      }
-      #content .bfMap .abc-wrap {
-        max-width: 300px;
-        margin-left: 0;
-      }
+@media (max-width: 860px) {
+  #content .card .bfGrid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  #content .bfMap {
+    display: flex;
+    justify-content: center;
+  }
+  #content .bfMap .abc-wrap {
+    max-width: 300px;
+    margin-left: 0;
+  }
 
-      /* >>> FORCE NUDGE ON MOBILE (override Google Charts) <<< */
-      /* Tune the -6px below to -4px / -8px if needed */
-      #content .bfMap .abc-wrap .donut.gc-nudge-up > div,
-      #content .bfMap .abc-wrap .donut.gc-nudge-up svg {
-        transform: translateY(-6px) !important; /* negative = move up */
-      }
-    }
+  /* FORCE the host transform (center + UP nudge) */
+  /* Adjust -8px to -6 / -10 as needed */
+  #content .bfMap .abc-wrap .donut.gc-nudge-up {
+    transform: translate(-50%, calc(-50% - 8px)) !important;
+  }
+}
+
   `;
   document.head.appendChild(style);
 }
@@ -244,5 +244,6 @@ document.querySelectorAll(".abc-wrap").forEach((wrapper) => {
   }
 });
 }
+
 
 
