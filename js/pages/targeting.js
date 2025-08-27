@@ -203,12 +203,12 @@ function injectTargetingStylesOnce() {
   object-fit: contain;
 }
 
-/* Donut also fills container, centers like overlay */
+//* Donut centered & nudged */
 #content .bfMap .abc-wrap .donut {
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -48%); /* <-- shift slightly down */
   width: 100%;
   height: 100%;
 }
@@ -232,5 +232,6 @@ function injectTargetingStylesOnce() {
   `;
   document.head.appendChild(style);
 }
+
 
 
