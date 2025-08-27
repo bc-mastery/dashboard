@@ -77,7 +77,7 @@ function injectTargetingStylesOnce() {
   /* FORCE the host transform (center + UP nudge) */
   /* Adjust -8px to -6 / -10 as needed */
   #content .bfMap .abc-wrap .donut.gc-nudge-up {
-    transform: translate(-50%, calc(-50% - 8px)) !important;
+    transform: translate(-50%, calc(-50% - 16px)) !important;
   }
 }
 
@@ -244,6 +244,7 @@ document.querySelectorAll(".abc-wrap").forEach((wrapper) => {
   }
 });
 }
+
 
 
 
