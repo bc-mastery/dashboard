@@ -477,55 +477,107 @@ html, body { overflow-x: hidden; width: 100%; }
 /* OPTIONAL: if any image in content was overflowing, this ensures it can’t */
 .main img { display: block; max-width: 100%; height: auto; }
 
-/* =================== FOOTER FIXES =================== */
+/* ========= FIX PACK (append at end of <style>) ========= */
 
-/* 1) Prevent any horizontal overflow (mobile + desktop) */
+/* 0) Safety: never let anything cause sideways scroll */
 *, *::before, *::after { box-sizing: border-box; }
-img, svg, canvas, video { max-width: 100%; height: auto; }
-
+img, svg, canvas, video { max-width: 100%; height: auto; display: block; }
 html, body { overflow-x: hidden; width: 100%; }
 .wrap, .panel, .tabsRow, #blockTabsRow, .main { max-width: 100vw; overflow-x: hidden; }
 .card, .footerCard { overflow: hidden; }
+#tabs, .footer-inner, .footer-left, .footer-middle, .footer-right, .main, #content { min-width: 0; }
 
-#tabs, .footer-inner, .footer-left, .footer-middle, .footer-right,
-.main, #content { min-width: 0; }
-
-.footer-inner { gap: 20px; }
-.footer-left, .footer-middle, .footer-right { min-width: 0; }
-.footer-middle a { word-break: break-word; }
-
-/* 2) Service links: make spacing consistent */
-.footer-middle a {
-  display: block;
-  margin-bottom: 6px;
-  padding-bottom: 4px;
-  border-bottom: 1px solid rgba(0,0,0,0.1);
+/* 1) Donut + overlay: keep sizes in sync on mobile */
+@media (max-width: 768px){
+  .abc-wrap{
+    width: min(86vw, 360px);
+    margin: 0 auto;
+    /* keep these two equal so overlay & Google chart move together */
+    --overlay-nudge-y: 10px;
+    --donut-nudge-y:   10px;
+    /* slight visual scale so the ring covers the overlay slice exactly */
+    --overlay-scale: 1.045;
+  }
+  .abc-wrap .donut{ --outer-radius: 43.5%; }
 }
-.footer-middle a:last-child { margin-bottom: 0; }
 
-/* 3) Logo & badge sizing */
-.footer-logo {
-  max-width: 160px;   /* limit BC logo */
+/* 2) FOOTER — desktop+mobile tidy, spacing, and image sizes */
+.siteFooter.footerCard { padding: 22px; }
+.footer-inner{
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1.2fr;
+  align-items: start;
+  gap: 24px;
+}
+.footer-left,
+.footer-middle,
+.footer-right{ min-width: 0; }
+
+.footer-logo{ height: 36px; width: auto; object-fit: contain; margin-bottom: 8px; }
+
+.footer-company{ font-size: 14px; line-height: 1.5; color: var(--bc-dark); }
+.footer-company .company-name{ font-weight: 600; color: var(--bc-teal); margin-bottom: 4px; }
+.footer-company a{
+  display:inline-block;            /* creates spacing without huge lines */
+  margin: 2px 0;
+  color: var(--bc-teal);
+  text-decoration: none;
+}
+.footer-company a:hover{ text-decoration: underline; }
+
+/* “Services” column */
+.footer-heading{
+  margin: 0 0 8px;
+  font-family: 'Rokkitt', serif;
+  font-weight: 900;
+  font-size: 16px;
+  color: var(--bc-green);
+}
+
+/* Remove those full-width “rules” under each link */
+.footer-middle a{
+  position: static;
+  display: inline-block;           /* width = just the text */
+  margin: 6px 0;
+  text-decoration: none;           /* no rule */
+  color: var(--bc-dark);
+}
+.footer-middle a::after{ display: none !important; }  /* hard kill */
+.footer-middle a:hover{ text-decoration: underline; }
+
+/* Credibility logos/right column */
+.badge-text{ font-size: 14px; line-height: 1.5; color: var(--bc-dark); margin: 8px 0; }
+.badge-logos{ display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 4px 0 10px; }
+.badge-logos img{
   height: auto;
-}
-.badge-logos img {
-  max-width: 120px;   /* limit EDIH/Stevie badges */
-  height: auto;
+  max-width: 180px;                /* sane desktop size */
+  object-fit: contain;
 }
 
-/* 4) Mobile stacking */
+/* Add breathing room between sections inside the footer card */
+.footer-left > * + *,
+.footer-middle > * + *,
+.footer-right > * + *{ margin-top: 8px; }
+
+/* 3) MOBILE footer — left aligned, stacked, smaller logos and tighter spacing */
+@media (max-width: 900px){
+  .footer-inner{ grid-template-columns: 1fr; }
+  .footer-right{ grid-column: auto; }
+}
 @media (max-width: 640px){
-  .footer-inner {
-    grid-template-columns: 1fr !important;
-    text-align: center;
-    gap: 18px;
+  .footer-inner{ gap: 16px; }
+  .footer-left, .footer-middle, .footer-right{
+    text-align: left;              /* ← restore left-aligned mobile */
   }
-  .footer-left, .footer-middle, .footer-right {
-    align-items: center;
-    text-align: center;
-  }
-  .badge-logos img { max-width: 80px; }
+  .badge-logos{ justify-content: flex-start; }
+  .badge-logos img{ max-width: 120px; }  /* smaller mobile logos */
+  .footer-company a{ margin: 1px 0; }
 }
+
+/* 4) Optional: make long domain/email break nicely instead of pushing widths */
+.footer-company a, .footer-right, .footer-middle { word-break: break-word; }
+
+/* ========= END FIX PACK ========= */
     
   </style>
 </head>
@@ -651,5 +703,6 @@ html, body { overflow-x: hidden; width: 100%; }
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
 
 
