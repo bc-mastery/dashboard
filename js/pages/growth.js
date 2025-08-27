@@ -231,12 +231,12 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `
       <!-- Block 1 -->
       <section class="card scrollTarget" id="block-gs-overview">
+        <div class="bfTitle">Quick Scan</div>   <!-- 🔹 Title is now at block top -->
         <div class="bfGrid">
           <div class="bfMap">
-            <div id="gsDonut"></div>
+            <div id="gsDonut" class="gsDonutChart"></div>
           </div>
           <div class="bfText">
-            <div class="bfTitle">Quick Scan</div>
 
             <p style="margin:0; color:#333333;">
               Currently utilized business potential:
@@ -502,3 +502,4 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
+
