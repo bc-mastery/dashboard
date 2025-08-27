@@ -152,6 +152,9 @@
       /* NEW: let us move the overlay’s visual center a few px */
       object-position: 50% calc(50% + var(--overlay-nudge-y, 0px));
       pointer-events:none; z-index:2;
+       /* 👇 add these two lines */
+      transform: scale(var(--overlay-scale, 1));
+      transform-origin: 50% 50%;
     }
     .abc-wrap .donut{
       position:absolute; inset:0; background: conic-gradient(from -90deg, transparent 0 360deg);
@@ -365,16 +368,21 @@
     margin: 0 auto;
   }
 
-  /* ✅ Mobile donut alignment: nudge overlay DOWN so it matches the donut */
-  .abc-wrap{ --overlay-nudge-y: -2px; } /* increase if the overlay still sits too high */
+  /* ✅ Mobile donut overlay tuning */
+  .abc-wrap{
+    /* shift overlay DOWN a touch and scale it up so grid lines sit exactly where they do on desktop */
+    --overlay-nudge-y: 8px;     /* try 6–12px if you need tiny tweaks */
+    --overlay-scale:   1.035;   /* try 1.02–1.05 depending on device */
+  }
+  .abc-wrap .donut{ --outer-radius: 43.5%; } /* keeps the ring thickness consistent on mobile */
 
   /* Prevent sideways scroll */
   html, body{ overflow-x:hidden; }
   .panel, .wrap, .tabsRow, #blockTabsRow{ overflow-x:clip; }
 
-  /* ✅ First block starts exactly 18px below the header */
+  /* ✅ First block starts exactly 18px below the header (any page) */
   .main{ padding-top: var(--headerH); }
-  .main > .card:first-of-type{ margin-top: 18px !important; }
+  .main > *:first-child{ margin-top: 18px !important; }
 
   /* ✅ Chip scroll targets align beneath the fixed header with the same 18px gap */
   .scrollTarget { scroll-margin-top: calc(var(--headerH) + 18px); }
@@ -547,6 +555,7 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
 
 
 
