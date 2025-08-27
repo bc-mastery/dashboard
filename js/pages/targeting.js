@@ -36,33 +36,43 @@ function injectTargetingStylesOnce() {
       }
     }
 
-    /* Keep images/canvas/svg responsive */
-    #content .abc-wrap,
-    #content .bfMap {
-      max-width: 100%;
-      overflow: hidden; /* nothing can poke out horizontally */
-    }
-    #content .abc-wrap img,
-    #content .bfMap img,
-    #content .bfMap canvas,
-    #content .bfMap svg {
-      display: block;
-      max-width: 100%;
-      height: auto;
-    }
+    /* Wrapper of the map/chart area */
+    #content .bfMap { max-width: 100%; overflow: hidden; }
 
-    /* Donut container: responsive square-ish area that scales down */
-    #content .abc-wrap .donut {
+    /* ABC map wrapper = single source of truth for size (perfect square) */
+    #content .abc-wrap {
+      position: relative;
       width: 100%;
-      max-width: 520px;       /* desktop cap inside the card */
-      height: min(62vw, 360px); /* mobile-friendly height */
+      max-width: 520px;       /* desktop cap; tweak if you like */
       margin: 0 auto;
+      aspect-ratio: 1 / 1;    /* force a perfect square */
+      overflow: hidden;
     }
 
-    /* If abc overlay is absolutely positioned in your base CSS, ensure it scales */
-    #content .abc-wrap img.overlay {
+    /* The chart container fills the square */
+    #content .abc-wrap .donut {
+      position: absolute;
+      inset: 0;               /* top/right/bottom/left: 0 */
       width: 100%;
-      height: auto;
+      height: 100%;
+    }
+
+    /* Whatever the chart lib renders (svg/canvas/div), make it fill the square */
+    #content .abc-wrap .donut > * {
+      width: 100% !important;
+      height: 100% !important;
+      display: block;
+    }
+
+    /* The overlay covers the same square exactly */
+    #content .abc-wrap img.overlay {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;   /* clicks go through */
+      user-select: none;
     }
 
     /* Safety: wrap long tokens in text blocks */
@@ -74,6 +84,54 @@ function injectTargetingStylesOnce() {
     }
   `;
   document.head.appendChild(style);
+}
+
+/* Ensure child SVG/canvas really fills the square even after async chart init */
+function lockAbcSizing(container) {
+  const donut = container.querySelector(".donut");
+  if (!donut) return;
+
+  // Helper that resizes any immediate child to fill the square
+  const fit = () => {
+    const child = donut.firstElementChild;
+    if (!child) return;
+    // Force sizing for common cases (div>svg, canvas, etc.)
+    child.style.width = "100%";
+    child.style.height = "100%";
+    // Google Charts sometimes nests <div><svg> — grab svg if present
+    const svg = child.tagName === "SVG" ? child : child.querySelector && child.querySelector("svg");
+    if (svg) {
+      svg.setAttribute("width", "100%");
+      svg.setAttribute("height", "100%");
+      // If it has viewBox, let it scale cleanly
+      if (!svg.getAttribute("viewBox") && svg.viewBox && svg.viewBox.baseVal) {
+        const vb = svg.viewBox.baseVal;
+        svg.setAttribute("viewBox", `0 0 ${vb.width || 100} ${vb.height || 100}`);
+      }
+    }
+    const canvas = child.tagName === "CANVAS" ? child : child.querySelector && child.querySelector("canvas");
+    if (canvas) {
+      // Match canvas CSS size; some libs read width/height attributes for raster size
+      const rect = donut.getBoundingClientRect();
+      canvas.style.width = "100%";
+      canvas.style.height = "100%";
+      canvas.width = Math.round(rect.width);
+      canvas.height = Math.round(rect.height);
+    }
+  };
+
+  // Run now and after a brief delay (for async chart render)
+  fit();
+  setTimeout(fit, 0);
+  setTimeout(fit, 100);
+
+  // Observe future mutations (chart re-render)
+  const mo = new MutationObserver(() => fit());
+  mo.observe(donut, { childList: true, subtree: true });
+
+  // Keep in sync on resize
+  const ro = new ResizeObserver(() => fit());
+  ro.observe(donut);
 }
 
 /* ------------------------------ main render ------------------------------ */
@@ -175,11 +233,7 @@ function paintTargeting(api, allowFull = false) {
                data-mode="${esc(mode)}"
                data-areas="${areas.map(String).map(esc).join("|")}"
                data-overlay="${esc(IMAGES.abcFrame)}">
-            <!--
-              The donut container is responsive via CSS (width:100%, max-width, height:min(…))
-              set in injectTargetingStylesOnce(). We keep this div empty; setABCMap
-              will render into it without forcing a fixed width.
-            -->
+            <!-- The donut square: chart will render inside, overlay covers it -->
             <div class="donut"></div>
             <img class="overlay" src="${IMAGES.abcFrame}" alt="ABC overlay">
           </div>
@@ -225,7 +279,7 @@ function paintTargeting(api, allowFull = false) {
 
   contentDiv.innerHTML = html;
 
-  // Activate ABC map
+  // Activate ABC map (render chart) and lock sizing/alignment
   document.querySelectorAll(".abc-wrap").forEach((container) => {
     const m = (container.dataset.mode || "B2B").toUpperCase();
     const a = (container.dataset.areas || "")
@@ -234,8 +288,10 @@ function paintTargeting(api, allowFull = false) {
       .filter(Boolean);
     const overlayPath = container.dataset.overlay || IMAGES.abcFrame;
 
-    // Ensure setABCMap renders responsively into the .donut container
-    // (it should respect the current width of .donut which is capped in CSS)
+    // Render chart
     setABCMap({ container, mode: m, areas: a, overlayPath });
+
+    // Enforce fill/lock so overlay + chart stay aligned
+    lockAbcSizing(container);
   });
 }
