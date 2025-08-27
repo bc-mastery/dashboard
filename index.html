@@ -366,7 +366,7 @@
   }
 
   /* ✅ Mobile donut alignment: nudge overlay DOWN so it matches the donut */
-  .abc-wrap{ --overlay-nudge-y: -2px; } /* increase if the overlay still sits too high */
+  .abc-wrap{ --overlay-nudge-y: -12px; } /* increase if the overlay still sits too high */
 
   /* Prevent sideways scroll */
   html, body{ overflow-x:hidden; }
@@ -374,10 +374,10 @@
 
   /* ✅ First block starts exactly 18px below the header */
   .main{ padding-top: var(--headerH); }
-  .main > .card:first-of-type{ margin-top: 18px !important; }
+  .main > .card:first-of-type{ margin-top: 10px !important; }
 
   /* ✅ Chip scroll targets align beneath the fixed header with the same 18px gap */
-  .scrollTarget { scroll-margin-top: calc(var(--headerH) + 18px); }
+  .scrollTarget { scroll-margin-top: calc(var(--headerH) + 10px); }
 }
 
     /* === Growth: Block #1 desktop layout (1 : 2) === */
@@ -547,6 +547,7 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
 
 
 
