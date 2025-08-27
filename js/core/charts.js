@@ -115,11 +115,8 @@ export function drawSegmentedBars(targetId, pillars = []) {
 }
 
 /* ---------------------------------------------------------------------- */
-/*  Universal center-lock helper for Google Charts / canvas / svg outputs */
-/*  Use this anywhere you need donut (or other chart) visually centered.  */
+/*  Universal helpers to keep Google Charts visually centered/aligned     */
 /* ---------------------------------------------------------------------- */
-
-// Add/replace this in /js/core/charts.js
 
 /**
  * centerLockChart({ wrapper, host, extraYOffset })
@@ -136,7 +133,7 @@ export function centerLockChart({ wrapper, host, extraYOffset = 0 }) {
     rafId = requestAnimationFrame(() => {
       const wrapRect = wrapper.getBoundingClientRect();
 
-      // try to detect the actual rendered graphic area inside host
+      // detect the rendered graphic area inside the host
       let innerRect = null;
       const svg = host.querySelector("svg");
       if (svg) innerRect = svg.getBoundingClientRect();
@@ -154,6 +151,7 @@ export function centerLockChart({ wrapper, host, extraYOffset = 0 }) {
       const innerCY = innerRect.top + innerRect.height / 2;
       const dy = (wrapCY - innerCY) + (Number(extraYOffset) || 0);
 
+      // keep X centered from CSS, adjust Y by measured delta (+ optional nudge)
       host.style.transform = `translate(-50%, calc(-50% + ${dy}px))`;
     });
   };
@@ -169,4 +167,23 @@ export function centerLockChart({ wrapper, host, extraYOffset = 0 }) {
 
   const mo = new MutationObserver(measure);
   mo.observe(host, { childList: true, subtree: true });
+}
+
+/** Nudge the rendered chart vertically by X px (affects the inner <svg>) */
+export function nudgeChartY(hostEl, px = 0) {
+  const apply = () => {
+    const svg = hostEl && hostEl.querySelector && hostEl.querySelector("svg");
+    if (svg) {
+      svg.style.transform = `translateY(${px}px)`;  // negative = move up
+      svg.style.willChange = "transform";
+    }
+  };
+  // initial + a couple retries in case the chart redraws async
+  apply();
+  setTimeout(apply, 60);
+  setTimeout(apply, 160);
+
+  // keep it applied if Google Charts re-renders its DOM
+  const mo = new MutationObserver(apply);
+  if (hostEl) mo.observe(hostEl, { childList: true, subtree: true });
 }
