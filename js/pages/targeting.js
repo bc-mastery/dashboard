@@ -13,141 +13,11 @@ import {
 } from "../core/ui.js";
 import { finalBlockContent } from "../components/blocks.js";
 
-/* ------------------------------ style fix (scoped) ------------------------------ */
-function injectTargetingStylesOnce() {
-  if (document.getElementById("tgt-mobile-fixes")) return;
-  const style = document.createElement("style");
-  style.id = "tgt-mobile-fixes";
-  style.textContent = `
-    /* Prevent any horizontal scroll only within the content area */
-    #content { overflow-x: hidden; }
-
-    /* ✅ Desktop proportions: text flexible on the left, map auto on the right */
-    #content .card .bfGrid {
-      display: grid;
-      grid-template-columns: 1fr auto; /* text | map */
-      align-items: start;
-      gap: 22px;
-    }
-
-    /* Map column container */
-    #content .bfMap { max-width: 100%; overflow: hidden; }
-
-    /* Map wrapper: width looks like your original (tweak 480px if needed) */
-    #content .bfMap .abc-wrap {
-      position: relative;
-      width: min(44vw, 480px); /* original-ish desktop size */
-      max-width: 100%;
-      margin-left: auto;       /* hug the right on desktop */
-      overflow: hidden;
-    }
-
-    /* Square ratio hack: ensures the wrapper always has height */
-    #content .bfMap .abc-wrap::before {
-      content: "";
-      display: block;
-      padding-top: 100%; /* 1:1 square */
-    }
-
-    /* Donut & overlay absolutely fill the square */
-    #content .abc-wrap .donut,
-    #content .abc-wrap img.overlay {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-    }
-    #content .abc-wrap .donut > * {
-      width: 100% !important;
-      height: 100% !important;
-      display: block;
-    }
-    #content .abc-wrap img.overlay {
-      object-fit: contain;
-      pointer-events: none;
-      user-select: none;
-    }
-
-    /* 📱 Mobile: stack and center the map under the text, full width in card */
-    @media (max-width: 860px) {
-      #content .card .bfGrid {
-        grid-template-columns: 1fr;  /* stack */
-        gap: 16px;
-      }
-      #content .bfMap .abc-wrap {
-        width: 100%;
-        max-width: 520px;   /* sensible cap; adjust if you want */
-        margin: 0 auto;     /* center */
-      }
-    }
-
-    /* Safety: wrap long tokens in text blocks */
-    #content .card p,
-    #content .card li,
-    #content .card .preserve {
-      overflow-wrap: anywhere;
-      word-break: break-word;
-    }
-  `;
-  document.head.appendChild(style);
-}
-
-/* Ensure child SVG/canvas really fills the square even after async chart init */
-function lockAbcSizing(container) {
-  const donut = container.querySelector(".donut");
-  if (!donut) return;
-
-  const fit = () => {
-    const child = donut.firstElementChild;
-    if (!child) return;
-
-    // enforce size for common renderers
-    child.style.width = "100%";
-    child.style.height = "100%";
-
-    const svg = child.tagName === "SVG" ? child : child.querySelector?.("svg");
-    if (svg) {
-      svg.setAttribute("width", "100%");
-      svg.setAttribute("height", "100%");
-      if (!svg.getAttribute("viewBox") && svg.getBBox) {
-        try {
-          const bb = svg.getBBox();
-          if (bb && bb.width && bb.height) {
-            svg.setAttribute("viewBox", `0 0 ${bb.width} ${bb.height}`);
-          }
-        } catch {}
-      }
-    }
-
-    const canvas = child.tagName === "CANVAS" ? child : child.querySelector?.("canvas");
-    if (canvas) {
-      const rect = donut.getBoundingClientRect();
-      canvas.style.width = "100%";
-      canvas.style.height = "100%";
-      // set backing size so it stays crisp
-      canvas.width = Math.max(1, Math.round(rect.width));
-      canvas.height = Math.max(1, Math.round(rect.height));
-    }
-  };
-
-  fit();
-  setTimeout(fit, 0);
-  setTimeout(fit, 100);
-
-  const mo = new MutationObserver(() => fit());
-  mo.observe(donut, { childList: true, subtree: true });
-
-  const ro = new ResizeObserver(() => fit());
-  ro.observe(donut);
-}
-
 /* ------------------------------ main render ------------------------------ */
 export async function renderTargetingTab() {
   setCurrentTab("targeting");
   document.body.setAttribute("data-current-tab", "targeting");
   clearUpgradeBlock();
-
-  injectTargetingStylesOnce();
 
   const contentDiv = document.getElementById("content");
   if (!contentDiv) return;
@@ -239,7 +109,6 @@ function paintTargeting(api, allowFull = false) {
                data-mode="${esc(mode)}"
                data-areas="${areas.map(String).map(esc).join("|")}"
                data-overlay="${esc(IMAGES.abcFrame)}">
-            <!-- The donut square: chart will render inside, overlay covers it -->
             <div class="donut"></div>
             <img class="overlay" src="${IMAGES.abcFrame}" alt="ABC overlay">
           </div>
@@ -285,7 +154,10 @@ function paintTargeting(api, allowFull = false) {
 
   contentDiv.innerHTML = html;
 
-  // Activate ABC map (render chart) and lock sizing/alignment
+  // Inject responsive CSS
+  injectTargetingStylesOnce();
+
+  // Activate ABC map
   document.querySelectorAll(".abc-wrap").forEach((container) => {
     const m = (container.dataset.mode || "B2B").toUpperCase();
     const a = (container.dataset.areas || "")
@@ -293,11 +165,52 @@ function paintTargeting(api, allowFull = false) {
       .map((s) => s.trim())
       .filter(Boolean);
     const overlayPath = container.dataset.overlay || IMAGES.abcFrame;
-
-    // Render chart
     setABCMap({ container, mode: m, areas: a, overlayPath });
-
-    // Enforce fill/lock so overlay + chart stay aligned at every size
-    lockAbcSizing(container);
   });
+}
+
+/* ------------------------------ local styles ----------------------------- */
+function injectTargetingStylesOnce() {
+  if (document.getElementById("targeting-styles")) return;
+  const style = document.createElement("style");
+  style.id = "targeting-styles";
+  style.textContent = `
+    /* Desktop grid: 2:1 ratio */
+    #block-behavioral .bfGrid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      align-items: start;
+      gap: 22px;
+    }
+
+    /* Map wrapper keeps donut+overlay locked */
+    .abc-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 360px;
+      margin: 0 auto;
+    }
+    .abc-wrap .donut,
+    .abc-wrap .overlay {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: auto;
+    }
+    .abc-wrap .donut {
+      position: relative; /* chart draws inside */
+      aspect-ratio: 1/1;  /* square container */
+    }
+
+    /* Responsive stacking */
+    @media (max-width: 860px) {
+      #block-behavioral .bfGrid {
+        grid-template-columns: 1fr;
+      }
+      .abc-wrap {
+        max-width: 280px;
+      }
+    }
+  `;
+  document.head.appendChild(style);
 }
