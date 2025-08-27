@@ -89,24 +89,42 @@
       background-clip: padding-box;     /* important for gradient border trick */
     }
     
-    /* Gradient/glassy border for active tab */
-    .tabBtn.tab-active::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      border-radius: inherit;
-      padding: 2px; /* thickness of border */
-      background: linear-gradient(135deg, var(--bc-mint), var(--bc-teal));
-      -webkit-mask:
-        linear-gradient(#fff 0 0) content-box,
-        linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor;
-              mask-composite: exclude;
-      pointer-events: none;
-    }
-    .tabBtn:hover { background:#e0e0e0; }
-    .tabBtn:active { transform:translateY(1px); background:#d5d5d5; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2), 0 1px 1px rgba(0,0,0,0.08); }
-    #tabs .tabBtn.active { background:var(--bc-white); border:2px solid var(--bc-teal); font-weight:600; }
+    .tabBtn:hover { 
+  background:#e0e0e0; 
+}
+
+.tabBtn:active { 
+  transform:translateY(1px); 
+  background:#d5d5d5; 
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.2), 0 1px 1px rgba(0,0,0,0.08); 
+}
+
+/* Active primary tab (clicked) — supports BOTH new `.tab-active` and legacy `.active` */
+.tabBtn.tab-active,
+#tabs .tabBtn.active {
+  position: relative;
+  border: 2px solid transparent;
+  background-color: var(--bc-dark); /* #333333 */
+  color: var(--bc-white);
+  background-clip: padding-box; /* needed for gradient border trick */
+}
+
+/* Gradient/glassy border for active tab */
+.tabBtn.tab-active::before,
+#tabs .tabBtn.active::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px; /* border thickness */
+  background: linear-gradient(135deg, var(--bc-mint), var(--bc-teal));
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  pointer-events: none;
+}
 
     .main{ padding-top: calc(var(--headerH) + 10px); padding-bottom: 18px; max-width:1100px; margin:0 auto; padding-left:20px; padding-right:20px; }
 
@@ -386,7 +404,7 @@
 
       /* text third; hide the in-text title to avoid duplicate heading */
       #block-gs-overview .bfText{ order: 3; }
-      #block-gs-overview .bfText .bfTitle{ display: none !important; }
+      #block-gs-overview .bfTitle{ display: none !important; }
 
       /* override inline width/height from growth.js so the donut matches text width */
       #block-gs-overview #gsDonut{
@@ -524,6 +542,7 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
 
 
 
