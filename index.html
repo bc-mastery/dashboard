@@ -84,47 +84,35 @@
     .tabBtn.tab-active {
       position: relative;
       border: 2px solid transparent;
-      background-color: var(--bc-dark); /* #333333 */
-      color: var(--bc-white);           /* white text */
-      background-clip: padding-box;     /* important for gradient border trick */
+      background-color: var(--bc-dark);
+      color: var(--bc-white);
+      background-clip: padding-box;
     }
-    
-    .tabBtn:hover { 
-  background:#e0e0e0; 
-}
+    .tabBtn:hover { background:#e0e0e0; }
+    .tabBtn:active { transform:translateY(1px); background:#d5d5d5; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2), 0 1px 1px rgba(0,0,0,0.08); }
 
-.tabBtn:active { 
-  transform:translateY(1px); 
-  background:#d5d5d5; 
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.2), 0 1px 1px rgba(0,0,0,0.08); 
-}
-
-/* Active primary tab (clicked) — supports BOTH new `.tab-active` and legacy `.active` */
-.tabBtn.tab-active,
-#tabs .tabBtn.active {
-  position: relative;
-  border: 2px solid transparent;
-  background-color: var(--bc-dark); /* #333333 */
-  color: var(--bc-white);
-  background-clip: padding-box; /* needed for gradient border trick */
-}
-
-/* Gradient/glassy border for active tab */
-.tabBtn.tab-active::before,
-#tabs .tabBtn.active::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 2px; /* border thickness */
-  background: linear-gradient(135deg, var(--bc-mint), var(--bc-teal));
-  -webkit-mask:
-    linear-gradient(#fff 0 0) content-box,
-    linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-          mask-composite: exclude;
-  pointer-events: none;
-}
+    /* Support legacy .active too */
+    .tabBtn.tab-active,
+    #tabs .tabBtn.active {
+      position: relative;
+      border: 2px solid transparent;
+      background-color: var(--bc-dark);
+      color: var(--bc-white);
+      background-clip: padding-box;
+    }
+    .tabBtn.tab-active::before,
+    #tabs .tabBtn.active::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 2px;
+      background: linear-gradient(135deg, var(--bc-mint), var(--bc-teal));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+              mask-composite: exclude;
+      pointer-events: none;
+    }
 
     .main{ padding-top: calc(var(--headerH) + 10px); padding-bottom: 18px; max-width:1100px; margin:0 auto; padding-left:20px; padding-right:20px; }
 
@@ -143,16 +131,19 @@
     .bfSub{ font-weight:700; color:#024D4F; }
     .bfDesc{ color:#333333; font-weight:400; }
 
+    /* ✅ Restored base .abc-wrap — needed for correct absolute positioning */
     .abc-wrap{
-      position:relative; width:min(28.5vw, 315px); max-width:100%; aspect-ratio:1/1; margin-left:22px;
+      position: relative;
+      width: min(28.5vw, 315px);
+      max-width: 100%;
+      aspect-ratio: 1 / 1;
+      margin-left: 22px;
     }
     .abc-wrap .overlay{
       position:absolute; inset:0; width:100%; height:100%;
       object-fit:contain;
-      /* NEW: let us move the overlay’s visual center a few px */
       object-position: 50% calc(50% + var(--overlay-nudge-y, 0px));
       pointer-events:none; z-index:2;
-       /* 👇 add these two lines */
       transform: scale(var(--overlay-scale, 1));
       transform-origin: 50% 50%;
     }
@@ -163,11 +154,6 @@
               mask: radial-gradient(circle at 50% 50%, #000 0 var(--outer-radius), transparent calc(var(--outer-radius) + 1px) 100%);
       z-index:1; transition: background 200ms ease;
     }
-
-    @media (max-width: 680px){
-  .abc-wrap{ width: min(86vw, 360px); }   /* match chart size */
-  .abc-wrap .donut{ --outer-radius: 43.5%; }
-}
 
     /* Secondary tabs row (chips + CTA) */
     #blockTabsRow { min-height:42px; display:flex; align-items:center; flex-wrap:wrap; padding-top:2px; padding-bottom:0; gap:6px; visibility:visible; }
@@ -225,16 +211,9 @@
     .footer-middle a { position:relative; color:var(--bc-dark); font-size:14px; text-decoration:none; }
     .footer-middle a::after { content:""; position:absolute; left:0; bottom:-2px; width:100%; height:1px; background:currentColor; opacity:.75; transition: height 180ms, opacity 180ms; }
     .footer-middle a:hover::after, .footer-middle a:focus::after { height:2px; opacity:1; }
-    @media (prefers-reduced-motion: reduce) { .footer-middle a::after { transition:none; } }
+    @media (prefers-reduced-motion: reduce) { .footer-middle a::after { transition:none; }
 
-    .badge-text { font-size:12px; color:var(--bc-dark); margin-bottom:8px; }
-    .badge-logos { display:flex; gap:10px; align-items:center; margin:0 0 16px; }
-    .badge-logos img { height:48px; object-fit:contain; }
-
-    .siteFooter a:focus { outline:2px solid var(--bc-mint); outline-offset:2px; }
-
-    @media (max-width: 900px) { .footer-inner { grid-template-columns: 1fr 1fr; } .footer-right { grid-column: 1 / -1; } }
-    @media (max-width: 640px) { .footer-inner { grid-template-columns: 1fr; } }
+    }
 
     /* Equal-width primary tabs */
     :root{ --primaryTabW: 128px; --primaryTabH: 28px; }
@@ -294,104 +273,96 @@
     .gsBar.v2 .gsTicks { position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:1; background: repeating-linear-gradient( to right, transparent 0, transparent calc(10% - 1px), rgba(2,77,79,0.14) calc(10% - 1px), rgba(2,77,79,0.14) 10% ); }
 
     /* ====================== MOBILE-ONLY OVERRIDES ====================== */
-@media (max-width: 768px){
-  /* Make header non-obtrusive & smaller on mobile */
-  .siteHeader{ position: sticky; top: 0; }
+    @media (max-width: 768px){
+      /* Match wrapper & chart sizes; synchronized nudges */
+      .abc-wrap{
+        width: min(86vw, 360px);
+        margin: 0 auto;
+        --overlay-nudge-y: 10px;
+        --overlay-scale:   1.045;
+        --donut-nudge-y:   10px;  /* charts.js reads this */
+      }
+      .gsDonutChart, .donutChart{
+        width: min(86vw, 360px);
+        height: min(86vw, 360px);
+        max-width: 100%;
+        margin: 0 auto;
+      }
+      .abc-wrap .donut{ --outer-radius: 43.5%; }
 
-  /* Hide BC logo on mobile */
-  .headerLogo{ display:none !important; }
+      /* Make header non-obtrusive & smaller on mobile */
+      .siteHeader{ position: sticky; top: 0; }
 
-  /* Header grid becomes: title (left) | brand (right) */
-  .bar{ grid-template-columns: 1fr 1fr; }
+      /* Hide BC logo on mobile */
+      .headerLogo{ display:none !important; }
 
-  .brandName{
-    font-size:12px; line-height:1.2;
-    max-width:42vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    justify-self:end;
-  }
+      /* Header grid becomes: title (left) | brand (right) */
+      .bar{ grid-template-columns: 1fr 1fr; }
 
-  .titleBlock img{ width:24px; height:24px; }
-  .pageTitle{
-    font-size: clamp(18px, 4.6vw, 22px);
-    max-width:50vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-  }
+      .brandName{
+        font-size:12px; line-height:1.2;
+        max-width:42vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        justify-self:end;
+      }
 
-  /* Reduce computed header height so main padding isn’t excessive */
-  :root{
-    --headerBarH: 44px;
-    --headerTabsH: 0px;      /* we hide chips below */
-    --headerH: calc(var(--headerBarH) + 16px);
-  }
+      .titleBlock img{ width:24px; height:24px; }
+      .pageTitle{
+        font-size: clamp(18px, 4.6vw, 22px);
+        max-width:50vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      }
 
-  /* Primary tabs → 3 per row, smaller buttons */
-  #tabs{
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    width:100%;
-    overflow-x: clip;
-  }
-  #tabs .tabBtn{
-    width: 100%;
-    height: 40px;
-    padding: 10px 6px;
-    font-size: 12px;
-    border-radius: 10px;
-    flex: 0 0 auto;
-    -webkit-appearance: none;
-    appearance: none;
-    overflow: hidden;
-    white-space: normal;
-    text-overflow: clip;
-  }
+      /* Reduce computed header height so main padding isn’t excessive */
+      :root{
+        --headerBarH: 44px;
+        --headerTabsH: 0px;      /* we hide chips below */
+        --headerH: calc(var(--headerBarH) + 16px);
+      }
 
-  /* Hide all secondary chips on mobile, keep the Download CTA visible */
-  #blockTabs .blockBtn{ display:none !important; }
+      /* Primary tabs → 3 per row, smaller buttons */
+      #tabs{
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        width:100%;
+        overflow-x: clip;
+      }
+      #tabs .tabBtn{
+        width: 100%;
+        height: 40px;
+        padding: 10px 6px;
+        font-size: 12px;
+        border-radius: 10px;
+        -webkit-appearance: none;
+        appearance: none;
+        overflow: hidden;
+        white-space: normal;
+        text-overflow: clip;
+      }
 
-  /* Download CTA on its own centered row (not full-bleed) */
-  #blockTabsRow{ display:block; padding-top:0; overflow-x:clip; }
-  #blockTabs{ display:block; }
-  #blockTabsRow .floatingCTA{
-    display:block !important;
-    width:auto; max-width:480px; box-sizing:border-box;
-    margin:8px auto 12px;
-    text-align:center; font-size:13px;
-    padding:10px 14px; border-radius:8px;
-    position: static !important; top:auto; right:auto; height:auto;
-  }
+      /* Hide all secondary chips on mobile, keep the Download CTA visible */
+      #blockTabs .blockBtn{ display:none !important; }
 
-  /* ✅ Donut chart sizing + overlay alignment */
-.gsDonutChart, .donutChart{
-  width: min(86vw, 360px);
-  height: min(86vw, 360px);
-  max-width: 100%;
-  margin: 0 auto;
-}
+      /* Download CTA on its own centered row (not full-bleed) */
+      #blockTabsRow{ display:block; padding-top:0; overflow-x:clip; }
+      #blockTabs{ display:block; }
+      #blockTabsRow .floatingCTA{
+        display:block !important;
+        width:auto; max-width:480px; box-sizing:border-box;
+        margin:8px auto 12px;
+        text-align:center; font-size:13px;
+        padding:10px 14px; border-radius:8px;
+        position: static !important; top:auto; right:auto; height:auto;
+      }
 
-/* Make wrapper the SAME size as the chart on mobile */
-.abc-wrap{
-  width: min(86vw, 360px);
-  margin: 0 auto;           /* center the wrapper */
-  --overlay-nudge-y: 10px;   /* push overlay DOWN */
-  --overlay-scale:   1.045;  /* make overlay slightly bigger */
+      /* First card spacing & scroll targets */
+      .main{ padding-top: var(--headerH); }
+      .main > *:first-child{ margin-top: 18px !important; }
+      .scrollTarget { scroll-margin-top: calc(var(--headerH) + 18px); }
 
-  /* 👇 tells charts.js to move the donut SVG by the same amount */
-  --donut-nudge-y:   10px;   /* keep this equal to --overlay-nudge-y */
-}
-.abc-wrap .donut{ --outer-radius: 43.5%; }
-
-
-  /* Prevent sideways scroll */
-  html, body{ overflow-x:hidden; }
-  .panel, .wrap, .tabsRow, #blockTabsRow{ overflow-x:clip; }
-
-  /* ✅ First block starts exactly 18px below the header */
-  .main{ padding-top: var(--headerH); }
-  .main > *:first-child{ margin-top: 18px !important; }
-
-  /* ✅ Scroll targets align beneath header with 18px gap */
-  .scrollTarget { scroll-margin-top: calc(var(--headerH) + 18px); }
-}
+      /* Prevent sideways scroll */
+      html, body{ overflow-x:hidden; }
+      .panel, .wrap, .tabsRow, #blockTabsRow{ overflow-x:clip; }
+    }
 
     /* === Growth: Block #1 desktop layout (1 : 2) === */
     #block-gs-overview .bfGrid{
@@ -560,20 +531,3 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
