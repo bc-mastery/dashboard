@@ -234,7 +234,7 @@ document.querySelectorAll(".abc-wrap").forEach((wrapper) => {
   const host = wrapper.querySelector(".donut");
 
   // Center-lock first
-  centerLockChart({ wrapper, host });
+  centerLockChart({ wrapper, host, mobileYOffset: -20 });
 
   // Add or remove the CSS nudge class on mobile
   if (window.matchMedia("(max-width: 860px)").matches) {
@@ -244,6 +244,7 @@ document.querySelectorAll(".abc-wrap").forEach((wrapper) => {
   }
 });
 }
+
 
 
 
