@@ -360,31 +360,28 @@
     position: static !important; top:auto; right:auto; height:auto;
   }
 
-  /* Donut chart sizing (square) */
+  /* ✅ Donut chart sizing + overlay alignment */
   .gsDonutChart, .donutChart{
     width: min(86vw, 360px);
     height: min(86vw, 360px);
     max-width: 100%;
     margin: 0 auto;
   }
-
-  /* ✅ Mobile donut overlay tuning */
   .abc-wrap{
-    /* shift overlay DOWN a touch and scale it up so grid lines sit exactly where they do on desktop */
-    --overlay-nudge-y: 8px;     /* try 6–12px if you need tiny tweaks */
-    --overlay-scale:   1.035;   /* try 1.02–1.05 depending on device */
+    --overlay-nudge-y: 8px;   /* push overlay DOWN */
+    --overlay-scale: 1.035;   /* make overlay slightly bigger */
   }
-  .abc-wrap .donut{ --outer-radius: 43.5%; } /* keeps the ring thickness consistent on mobile */
+  .abc-wrap .donut{ --outer-radius: 43.5%; }
 
   /* Prevent sideways scroll */
   html, body{ overflow-x:hidden; }
   .panel, .wrap, .tabsRow, #blockTabsRow{ overflow-x:clip; }
 
-  /* ✅ First block starts exactly 18px below the header (any page) */
+  /* ✅ First block starts exactly 18px below the header */
   .main{ padding-top: var(--headerH); }
   .main > *:first-child{ margin-top: 18px !important; }
 
-  /* ✅ Chip scroll targets align beneath the fixed header with the same 18px gap */
+  /* ✅ Scroll targets align beneath header with 18px gap */
   .scrollTarget { scroll-margin-top: calc(var(--headerH) + 18px); }
 }
 
@@ -555,6 +552,7 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
 
 
 
