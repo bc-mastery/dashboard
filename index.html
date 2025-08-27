@@ -263,7 +263,15 @@
         grid-template-columns: 1fr !important;
       }
     }
-  
+
+    /* Make Growth donut chart bigger */
+    .gsDonutChart{
+      width: min(80vw, 756px);   /* 1.8 × original 420px → 756px */
+      height: 576px;             /* 1.8 × original 320px → 576px */
+      max-width: 100%;
+      margin: 0 auto;            /* keep it centered */
+    }
+    
   </style>
 </head>
 
@@ -391,6 +399,7 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
 
 
 
