@@ -326,60 +326,49 @@
       .main{ padding-top: calc(var(--headerH) + 10px); }
     }
 
-/* === Mobile: 2-column hero (Title+Donut | Text) with BIG chart === */
-@media (max-width: 860px){
-
-  /* 1) Force two columns on the hero */
-  .gsHeroGrid,
-  #block-gs-overview .bfGrid{
-    display: grid;
-    grid-template-columns: 58% 42% !important;  /* left wider for the donut */
-    align-items: center;
-    gap: 14px;
-  }
-
-  /* 2) Place elements: title and donut in col 1; text in col 2 */
-  /* Title above donut */
-  .gsHeroGrid .gsLeadTitle,
-  #block-gs-overview .bfGrid .sectionTitle,
-  #block-gs-overview .bfGrid .gsLeadTitle{
-    grid-column: 1 / 2;
-    order: 0;
-    margin: 6px 0 8px;
-  }
-
-  /* Donut under the title in column 1 */
-  .gsHeroGrid .donutViz,
-  #block-gs-overview .bfGrid .donutViz{
-    grid-column: 1 / 2;
-    order: 1;
-    justify-content: center;
-  }
-
-  /* Text block in column 2 */
-  .gsHeroGrid .gsLead,
-  #block-gs-overview .bfGrid .bfText,
-  #block-gs-overview .bfGrid .gsLead{
-    grid-column: 2 / 3;
-    order: 0;
-  }
-
-  /* 3) BIG square donut that fits the left column */
-  .gsDonutChart,
-  .donutChart{
-    width: min(60vw, 420px);   /* big on phones, capped for safety */
-    height: min(60vw, 420px);  /* keep it perfectly square */
-    max-width: 100%;
-    margin: 0 auto;            /* centered in the left column */
-  }
-}
-
     /* === Growth: Block #1 desktop layout (1 : 2) === */
-#block-gs-overview .bfGrid{
-  grid-template-columns: 1fr 2fr !important; /* left: donut (1fr), right: text (2fr) */
-}
+    #block-gs-overview .bfGrid{
+      grid-template-columns: 1fr 2fr !important; /* left: donut (1fr), right: text (2fr) */
+    }
 
-    
+    /* === Growth · Block #1: clean mobile stack === */
+    @media (max-width: 860px){
+      /* one column */
+      #block-gs-overview .bfGrid{
+        grid-template-columns: 1fr !important;
+        align-items: start;
+        gap: 12px;
+      }
+
+      /* title at the very top (mobile-only) */
+      #block-gs-overview .bfGrid::before{
+        content: "Quick Scan";
+        display: block;
+        margin: 6px 0 8px;
+        font-family: 'Rokkitt', serif;
+        font-weight: 900;
+        font-size: 22px;
+        color: #30BA80;
+        line-height: 1.2;
+        order: 1;
+      }
+
+      /* donut second */
+      #block-gs-overview .bfMap{ order: 2; }
+
+      /* text third; hide the in-text title to avoid duplicate heading */
+      #block-gs-overview .bfText{ order: 3; }
+      #block-gs-overview .bfText .bfTitle{ display: none !important; }
+
+      /* override inline width/height from growth.js so the donut matches text width */
+      #block-gs-overview #gsDonut{
+        width: 100% !important;
+        max-width: none !important;
+        height: auto !important;
+        aspect-ratio: 1 / 1;
+        margin: 0 auto;
+      }
+    }
   </style>
 </head>
 
@@ -507,5 +496,3 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
-
-
