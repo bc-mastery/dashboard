@@ -225,6 +225,10 @@ function paintTargeting(api, allowFull = false) {
     setABCMap({ container: wrapper, mode: m, areas: a, overlayPath });
 
     const host = wrapper.querySelector(".donut");
-    centerLockChart({ wrapper, host });   // <-- single call does the alignment
-  });
+
+// mobile-only nudge (upwards). Tweak -6 to -4 or -8 if needed.
+const extraYOffset = window.matchMedia("(max-width: 860px)").matches ? -6 : 0;
+
+centerLockChart({ wrapper, host, extraYOffset });
 }
+
