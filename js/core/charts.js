@@ -41,6 +41,15 @@ export function injectGsStylesOnce() {
   __gsStylesInjected = true;
 }
 
+/** Utility: read CSS custom property (px) from an element or its parents */
+function readPxVar(el, name) {
+  if (!el) return null;
+  const val = getComputedStyle(el).getPropertyValue(name).trim();
+  if (!val) return null;
+  const n = parseFloat(val);
+  return Number.isFinite(n) ? n : null;
+}
+
 /** Render a Google Charts donut (expects ensureCharts() already awaited) */
 export function drawDonut(targetId, slices = [], options = {}) {
   const el = document.getElementById(targetId);
@@ -73,6 +82,42 @@ export function drawDonut(targetId, slices = [], options = {}) {
 
   const chart = new google.visualization.PieChart(el);
   chart.draw(data, opts);
+
+  // ---- BUILT-IN Y NUDGE FOR THE INNER SVG (this is the key) ----
+  const isMobile = window.matchMedia("(max-width: 860px)").matches;
+
+  // Priority of sources for Y offset:
+  // 1) CSS var --donut-nudge-y (px) on el or ancestors
+  // 2) options.svgYOffset (px) — always applied (desktop + mobile)
+  // 3) options.mobileYOffset (px) — only if mobile
+  // 4) default: 0
+  const varNudge =
+    readPxVar(el, "--donut-nudge-y") ??
+    readPxVar(el.parentElement, "--donut-nudge-y") ??
+    readPxVar(el.closest ? el.closest(".abc-wrap, .bfMap, .card, body") : null, "--donut-nudge-y");
+
+  const svgYOffset =
+    (Number.isFinite(options.svgYOffset) ? Number(options.svgYOffset) : 0) +
+    (isMobile ? (Number(options.mobileYOffset) || 0) : 0);
+
+  const nudge = Number.isFinite(varNudge) ? varNudge : svgYOffset;
+
+  const applySvgNudge = () => {
+    const svg = el.querySelector("svg");
+    if (svg) {
+      svg.style.setProperty("transform", `translateY(${nudge}px)`, "important");
+      svg.style.willChange = "transform";
+      // Nudge first <g> as an extra belt-and-suspenders for some chart builds
+      const g = svg.querySelector("g");
+      if (g) g.style.setProperty("transform", `translateY(${nudge}px)`, "important");
+    }
+  };
+
+  applySvgNudge();
+  setTimeout(applySvgNudge, 80);
+  setTimeout(applySvgNudge, 180);
+  new MutationObserver(applySvgNudge).observe(el, { childList: true, subtree: true });
+
   return chart;
 }
 
@@ -139,7 +184,6 @@ export function centerLockChart({
 
   const isMobile = () => window.matchMedia("(max-width: 860px)").matches;
 
-  // Apply transform with !important reliably
   const setTransformImportant = (el, val) => {
     if (!el) return;
     el.style.setProperty("transform", val, "important");
@@ -147,7 +191,6 @@ export function centerLockChart({
   };
 
   const applyInnerNudge = (hostEl, px) => {
-    // also push inner <svg> and first <g>, because Google Charts may rewrite layout
     const svg = hostEl.querySelector("svg");
     if (svg) setTransformImportant(svg, `translateY(${px}px)`);
     const g = svg && svg.querySelector("g");
@@ -160,7 +203,6 @@ export function centerLockChart({
     rafId = requestAnimationFrame(() => {
       const wrapRect = wrapper.getBoundingClientRect();
 
-      // detect the rendered graphic area inside the host
       let innerRect = null;
       const svg = host.querySelector("svg");
       if (svg) innerRect = svg.getBoundingClientRect();
@@ -184,16 +226,13 @@ export function centerLockChart({
 
       const totalDy = measured + (Number(extraYOffset) || 0) + nudge;
 
-      // keep X centered from CSS, adjust Y by measured delta (+ nudges)
       setTransformImportant(host, `translate(-50%, calc(-50% + ${totalDy}px))`);
 
-      // also nudge the inner graphics by the same 'nudge' only (not the measured part)
-      // so the overlay alignment is preserved while compensating chart-internal offsets
+      // keep the same 'nudge' inside the SVG to avoid Google redraws fighting it
       applyInnerNudge(host, nudge);
     });
   };
 
-  // initial + retries (async renders)
   measure();
   setTimeout(measure, 80);
   setTimeout(measure, 180);
@@ -215,12 +254,9 @@ export function nudgeChartY(hostEl, px = 0) {
       svg.style.willChange = "transform";
     }
   };
-  // initial + a couple retries in case the chart redraws async
   apply();
   setTimeout(apply, 60);
   setTimeout(apply, 160);
-
-  // keep it applied if Google Charts re-renders its DOM
   const mo = new MutationObserver(apply);
   if (hostEl) mo.observe(hostEl, { childList: true, subtree: true });
 }
