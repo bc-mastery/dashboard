@@ -80,6 +80,9 @@ export async function renderTargetingTab() {
 
     // floating call button for GS-only users
     toggleFloatingCallBtn(state.lastAccess === ACCESS.GS_ONLY);
+
+    // inject targeting styles once
+    injectTargetingStylesOnce();
   } catch (err) {
     console.error(err);
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || err)}</p></div>`;
@@ -154,9 +157,6 @@ function paintTargeting(api, allowFull = false) {
 
   contentDiv.innerHTML = html;
 
-  // Inject responsive CSS
-  injectTargetingStylesOnce();
-
   // Activate ABC map
   document.querySelectorAll(".abc-wrap").forEach((container) => {
     const m = (container.dataset.mode || "B2B").toUpperCase();
@@ -169,46 +169,52 @@ function paintTargeting(api, allowFull = false) {
   });
 }
 
-/* ------------------------------ local styles ----------------------------- */
+/* ------------------------------ styles ------------------------------ */
 function injectTargetingStylesOnce() {
   if (document.getElementById("targeting-styles")) return;
   const style = document.createElement("style");
   style.id = "targeting-styles";
   style.textContent = `
-    /* Desktop grid: 2:1 ratio */
-    #block-behavioral .bfGrid {
+    /* Desktop grid: text 2/3, map 1/3 */
+    #content .card .bfGrid {
       display: grid;
       grid-template-columns: 2fr 1fr;
       align-items: start;
       gap: 22px;
     }
 
-    /* Map wrapper keeps donut+overlay locked */
-    .abc-wrap {
+    /* Map wrapper always square */
+    #content .bfMap .abc-wrap {
       position: relative;
       width: 100%;
       max-width: 360px;
-      margin: 0 auto;
+      aspect-ratio: 1 / 1;
+      margin-left: auto;
     }
-    .abc-wrap .donut,
-    .abc-wrap .overlay {
+
+    /* Both donut and overlay lock to full container */
+    #content .bfMap .abc-wrap .donut,
+    #content .bfMap .abc-wrap .overlay {
       position: absolute;
       top: 0; left: 0;
       width: 100%;
-      height: auto;
-    }
-    .abc-wrap .donut {
-      position: relative; /* chart draws inside */
-      aspect-ratio: 1/1;  /* square container */
+      height: 100%;
+      object-fit: contain;
     }
 
-    /* Responsive stacking */
+    /* Mobile: stack text + map, center the map */
     @media (max-width: 860px) {
-      #block-behavioral .bfGrid {
+      #content .card .bfGrid {
         grid-template-columns: 1fr;
       }
-      .abc-wrap {
+      #content .bfMap {
+        display: flex;
+        justify-content: center;
+        margin-top: 16px;
+      }
+      #content .bfMap .abc-wrap {
         max-width: 280px;
+        margin-left: 0;
       }
     }
   `;
