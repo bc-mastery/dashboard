@@ -48,39 +48,38 @@ function injectTargetingStylesOnce() {
       user-select: none;
     }
 
-    /* Donut host centered */
+    /* Donut fills wrapper exactly like overlay; gradient is centered inside */
     #content .bfMap .abc-wrap .donut {
       position: absolute;
-      top: 50%;
-      left: 50%;
+      inset: 0;
       width: 100%;
       height: 100%;
-      transform: translate(-50%, -50%);
-      will-change: transform;
+      background-repeat: no-repeat;
+      background-size: contain;
+      /* vertical nudge via CSS var (default 0px). Negative = move up */
+      --donut-nudge-y: 0px;
+      background-position: 50% calc(50% + var(--donut-nudge-y));
     }
 
     /* Mobile: stack and center */
-@media (max-width: 860px) {
-  #content .card .bfGrid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-  #content .bfMap {
-    display: flex;
-    justify-content: center;
-  }
-  #content .bfMap .abc-wrap {
-    max-width: 300px;
-    margin-left: 0;
-  }
-
-  /* FORCE the host transform (center + UP nudge) */
-  /* Adjust -8px to -6 / -10 as needed */
-  #content .bfMap .abc-wrap .donut.gc-nudge-up {
-    transform: translate(-50%, calc(-50% - 16px)) !important;
-  }
-}
-
+    @media (max-width: 860px) {
+      #content .card .bfGrid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      #content .bfMap {
+        display: flex;
+        justify-content: center;
+      }
+      #content .bfMap .abc-wrap {
+        max-width: 300px;
+        margin-left: 0;
+      }
+      /* Mobile-only fine-tune: lift donut a few px */
+      #content .bfMap .abc-wrap .donut {
+        --donut-nudge-y: -6px; /* adjust -4 / -8 / -10 if needed */
+      }
+    }
   `;
   document.head.appendChild(style);
 }
@@ -244,6 +243,7 @@ document.querySelectorAll(".abc-wrap").forEach((wrapper) => {
   }
 });
 }
+
 
 
 
