@@ -22,29 +22,40 @@ function injectTargetingStylesOnce() {
     /* Prevent any horizontal scroll only within the content area */
     #content { overflow-x: hidden; }
 
-    /* ✅ Restore original proportions: map column is "auto", text is flexible */
+    /* ✅ Desktop proportions: text flexible on the left, map auto on the right */
     #content .card .bfGrid {
       display: grid;
-      grid-template-columns: auto 1fr;
+      grid-template-columns: 1fr auto; /* text | map */
       align-items: start;
       gap: 22px;
     }
 
-    /* Desktop map sizing like before (tweak 480px if you used another cap) */
+    /* Map column container */
     #content .bfMap { max-width: 100%; overflow: hidden; }
+
+    /* Map wrapper: width looks like your original (tweak 480px if needed) */
     #content .bfMap .abc-wrap {
       position: relative;
-      width: min(44vw, 480px); /* ← looks like your original sizing */
+      width: min(44vw, 480px); /* original-ish desktop size */
       max-width: 100%;
-      aspect-ratio: 1 / 1;     /* keep it a perfect square so donut+overlay lock */
-      margin-left: auto;       /* hugs the right on desktop */
+      margin-left: auto;       /* hug the right on desktop */
       overflow: hidden;
     }
 
-    /* Donut & overlay must fill the exact same square */
-    #content .abc-wrap .donut {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%;
+    /* Square ratio hack: ensures the wrapper always has height */
+    #content .bfMap .abc-wrap::before {
+      content: "";
+      display: block;
+      padding-top: 100%; /* 1:1 square */
+    }
+
+    /* Donut & overlay absolutely fill the square */
+    #content .abc-wrap .donut,
+    #content .abc-wrap img.overlay {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
     }
     #content .abc-wrap .donut > * {
       width: 100% !important;
@@ -52,13 +63,12 @@ function injectTargetingStylesOnce() {
       display: block;
     }
     #content .abc-wrap img.overlay {
-      position: absolute; inset: 0;
-      width: 100%; height: 100%;
       object-fit: contain;
-      pointer-events: none; user-select: none;
+      pointer-events: none;
+      user-select: none;
     }
 
-    /* 📱 Mobile/tablet: stack and center the map, full width inside card */
+    /* 📱 Mobile: stack and center the map under the text, full width in card */
     @media (max-width: 860px) {
       #content .card .bfGrid {
         grid-template-columns: 1fr;  /* stack */
@@ -66,8 +76,8 @@ function injectTargetingStylesOnce() {
       }
       #content .bfMap .abc-wrap {
         width: 100%;
-        max-width: 520px;   /* sensible cap so it doesn't explode on phablets */
-        margin: 0 auto;     /* center under the text */
+        max-width: 520px;   /* sensible cap; adjust if you want */
+        margin: 0 auto;     /* center */
       }
     }
 
@@ -91,6 +101,7 @@ function lockAbcSizing(container) {
     const child = donut.firstElementChild;
     if (!child) return;
 
+    // enforce size for common renderers
     child.style.width = "100%";
     child.style.height = "100%";
 
@@ -98,12 +109,13 @@ function lockAbcSizing(container) {
     if (svg) {
       svg.setAttribute("width", "100%");
       svg.setAttribute("height", "100%");
-      // add a viewBox if missing so it scales cleanly
-      if (!svg.getAttribute("viewBox")) {
-        const bb = svg.getBBox?.();
-        if (bb && bb.width && bb.height) {
-          svg.setAttribute("viewBox", `0 0 ${bb.width} ${bb.height}`);
-        }
+      if (!svg.getAttribute("viewBox") && svg.getBBox) {
+        try {
+          const bb = svg.getBBox();
+          if (bb && bb.width && bb.height) {
+            svg.setAttribute("viewBox", `0 0 ${bb.width} ${bb.height}`);
+          }
+        } catch {}
       }
     }
 
@@ -112,8 +124,9 @@ function lockAbcSizing(container) {
       const rect = donut.getBoundingClientRect();
       canvas.style.width = "100%";
       canvas.style.height = "100%";
-      canvas.width = Math.round(rect.width);
-      canvas.height = Math.round(rect.height);
+      // set backing size so it stays crisp
+      canvas.width = Math.max(1, Math.round(rect.width));
+      canvas.height = Math.max(1, Math.round(rect.height));
     }
   };
 
