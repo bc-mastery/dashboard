@@ -190,7 +190,7 @@ function injectTargetingStylesOnce() {
       max-width: 360px;
       aspect-ratio: 1 / 1; /* square container so overlay & donut share a box */
       margin-left: auto;
-      --donut-nudge-y: -4px; /* default: no nudge */
+      --donut-nudge-y: -8px; /* default: no nudge */
     }
 
     /* Overlay fills container and is centered by its own box */
@@ -234,5 +234,6 @@ function injectTargetingStylesOnce() {
   `;
   document.head.appendChild(style);
 }
+
 
 
