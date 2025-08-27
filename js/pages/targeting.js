@@ -228,9 +228,10 @@ function injectTargetingStylesOnce() {
       #content .bfMap .abc-wrap {
         max-width: 300px;
         margin-left: 0;
-        --donut-nudge-y: 6px; /* <- adjust 4–10px if needed per device */
+        --donut-nudge-y: 2px; /* <- adjust 4–10px if needed per device */
       }
     }
   `;
   document.head.appendChild(style);
 }
+
