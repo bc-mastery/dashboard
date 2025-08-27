@@ -14,13 +14,25 @@ export function setTitleAndIcon(tab) {
     const isPrimary = !btn.classList.contains("blockBtn");
     const isActive =
       btn.dataset.tab === tab || btn.dataset.target === "#block-" + tab;
-    btn.style.border = isActive ? "2px solid #024D4F" : "none";
+
+    // toggle CSS class for active tab
+    btn.classList.toggle("tab-active", isActive);
+
+    // reset default styles
     if (isPrimary) {
       btn.style.backgroundColor = "white";
       btn.style.color = "#024D4F";
     } else {
       btn.style.backgroundColor = "#B4FDE5";
       btn.style.color = "#024D4F";
+    }
+
+    // if active, apply dark style
+    if (isActive) {
+      btn.style.backgroundColor = "#333333";
+      btn.style.color = "#FFFFFF";
+    } else {
+      btn.style.border = "none";
     }
   });
 }
@@ -112,6 +124,10 @@ export function enforceDownloadProtection() {
 export function updateFloatingCTA(tab) {
   const btn = document.getElementById("downloadBtn");
   if (!btn) return;
+
+  // ✅ Set default background + text color
+  btn.style.backgroundColor = "#024D4F";
+  btn.style.color = "#FFFFFF";
 
   const labelSpan = btn.querySelector("#downloadText");
   const icon = btn.querySelector(".download-icon");
@@ -232,6 +248,11 @@ export function initDownloadButtonIsolation() {
   // Replace node to clear any attached listeners
   const clean = btn.cloneNode(true);
   clean.id = btn.id;
+
+  // ✅ Set default background + text color
+  clean.style.backgroundColor = "#024D4F";
+  clean.style.color = "#FFFFFF";
+
   btn.replaceWith(clean);
 
   clean.addEventListener("click", (e) => {
@@ -248,13 +269,11 @@ export function initDownloadButtonIsolation() {
         offer: "O_STRATEGY_OUTPUT",
         marketing: "M_STRATEGY_OUTPUT",
         sales: "S_STRATEGY_OUTPUT",
-        // Growth uses GS_OUTPUT (NC); keep a fallback to the old key if present
         growth: "GS_OUTPUT",
         mentoring: "MENTORING_STRATEGY_OUTPUT",
         knowledge: "KNOWLEDGE_STRATEGY_OUTPUT",
       };
 
-      // Fallback for any legacy/alternate key names
       const fallbacks = {
         growth: ["GS_OUTPUT", "GROWTH_STRATEGY_OUTPUT"],
         knowledge: ["KNOWLEDGE_OUTPUT", "K_MASTER_PDF", "KNOWLEDGE_PDF", "KNOWLEDGE_STRATEGY_OUTPUT"],
