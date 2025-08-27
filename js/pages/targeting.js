@@ -221,26 +221,28 @@ function paintTargeting(api, allowFull = false) {
   contentDiv.innerHTML = html;
 
   // Render + center-lock the donut vs overlay
-  document.querySelectorAll(".abc-wrap").forEach((wrapper) => {
-    const m = (wrapper.dataset.mode || "B2B").toUpperCase();
-    const a = (wrapper.dataset.areas || "")
-      .split("|")
-      .map((s) => s.trim())
-      .filter(Boolean);
-    const overlayPath = wrapper.dataset.overlay || IMAGES.abcFrame;
+document.querySelectorAll(".abc-wrap").forEach((wrapper) => {
+  const m = (wrapper.dataset.mode || "B2B").toUpperCase();
+  const a = (wrapper.dataset.areas || "")
+    .split("|")
+    .map((s) => s.trim())
+    .filter(Boolean);
+  const overlayPath = wrapper.dataset.overlay || IMAGES.abcFrame;
 
-    setABCMap({ container: wrapper, mode: m, areas: a, overlayPath });
+  setABCMap({ container: wrapper, mode: m, areas: a, overlayPath });
 
-    const host = wrapper.querySelector(".donut");
+  const host = wrapper.querySelector(".donut");
 
-    // Center-lock first (auto measured)
-    const extraYOffset = window.matchMedia("(max-width: 860px)").matches ? -6 : 0;
-    centerLockChart({ wrapper, host, extraYOffset });
+  // Center-lock first
+  centerLockChart({ wrapper, host });
 
-    // Then nudge the *inner* svg on mobile for the final fine-tune
-    if (window.matchMedia("(max-width: 860px)").matches) {
-      nudgeChartY(host, -6); // tweak to -4 / -8 to taste on your device
-    }
-  });
+  // Add or remove the CSS nudge class on mobile
+  if (window.matchMedia("(max-width: 860px)").matches) {
+    host.classList.add("gc-nudge-up");
+  } else {
+    host.classList.remove("gc-nudge-up");
+  }
+});
 }
+
 
