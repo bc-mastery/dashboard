@@ -34,24 +34,63 @@ function buildUrlWithToken(baseUrl, token, extraParams = {}) {
   return `${baseUrl}${sep}${qs.toString()}`;
 }
 
-/* ------------------------------ local styles for the help icon/bubble & overlay ------------------------------ */
+/* ------------------------------ local styles (Block #1 layout + help bubble/overlay) ------------------------------ */
+function injectGrowthOverviewStylesOnce() {
+  if (document.getElementById("gs-overview-styles")) return;
+  const style = document.createElement("style");
+  style.id = "gs-overview-styles";
+  style.textContent = `
+    /* Block #1: 1fr (donut) : 2fr (text) */
+    #block-gs-overview .bfGrid{
+      display:grid;
+      grid-template-columns: 1fr 2fr;
+      align-items:start;
+      gap:22px;
+    }
+    /* Center the donut box in its column */
+    #block-gs-overview .bfMap{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    /* Donut size on desktop */
+    #block-gs-overview #gsDonut{
+      width:100%;
+      max-width:360px;
+      height:360px; /* explicit height keeps Google Charts crisp */
+    }
+
+    /* Mobile: stack + slightly smaller donut */
+    @media (max-width: 860px){
+      #block-gs-overview .bfGrid{
+        grid-template-columns: 1fr;
+        gap:16px;
+      }
+      #block-gs-overview #gsDonut{
+        max-width:300px;
+        height:300px;
+        margin:0 auto;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+/* Keep your existing help bubble + overlay styles */
 function injectPillarHelpStylesOnce() {
   if (document.getElementById("gs-pillar-help-styles")) return;
   const style = document.createElement("style");
   style.id = "gs-pillar-help-styles";
   style.textContent = `
-    /* Header line that holds the title and the help icon (keeps spacing equal to section padding) */
     #block-gs-pillars .sectionHeader {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      position: relative; /* bubble anchors to this */
+      position: relative;
     }
-
-    /* Green circular ? icon */
     .gsHelpWrap {
-      position: static;   /* let the bubble position against .sectionHeader */
+      position: static;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -76,21 +115,19 @@ function injectPillarHelpStylesOnce() {
       outline: 2px solid #024D4F;
       outline-offset: 2px;
     }
-
-    /* Tooltip bubble */
     .gsHelpBubble {
       position: absolute;
-      left: 24px;              /* align with the card’s inner left padding */
-      right: 0;                /* end at the icon/right edge */
+      left: 24px;
+      right: 0;
       top: calc(100% + 8px);
       width: auto;
-      max-width: none;         /* remove previous cap */
-      background: #333333;     /* dark bubble per your last version */
+      max-width: none;
+      background: #333333;
       border: 1px solid #E5E7EB;
       border-radius: 12px;
       padding: 12px 14px;
       box-shadow: 0 10px 20px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.06);
-      z-index: 1001;           /* above overlay */
+      z-index: 1001;
       display: none;
     }
     .gsHelpBubble p {
@@ -101,34 +138,23 @@ function injectPillarHelpStylesOnce() {
       font-family: 'Inter', sans-serif;
     }
     .gsHelpBubble p:last-child { margin-bottom: 0; }
-
-    /* Show on hover/focus (desktop) */
     .gsHelpWrap:hover .gsHelpBubble,
     .gsHelpWrap:has(.gsHelpBtn:focus) .gsHelpBubble {
       display: block;
     }
-    /* Show when toggled open (mobile tap / explicit click) */
     .gsHelpWrap.open .gsHelpBubble { display: block; }
-
-    /* Screen dimmer behind the tooltip (for click/tap open) */
     #gsOverlay {
       position: fixed;
       inset: 0;
-      background: rgba(2, 77, 79, 0.25);   /* teal-ish grey */
+      background: rgba(2, 77, 79, 0.25);
       backdrop-filter: blur(2px);
       -webkit-backdrop-filter: blur(2px);
-      z-index: 900;                         /* below bubble, above page */
+      z-index: 900;
       display: none;
     }
     #gsOverlay.show { display: block; }
-
-    /* Keep bubble visible while hovering, even if overlay is on top */
     .gsHelpWrap.openHover .gsHelpBubble { display: block; }
-    
-    /* Overlay should not intercept pointer on hover mode (prevents flicker) */
     #gsOverlay.hover { pointer-events: none; }
-
-    
   `;
   document.head.appendChild(style);
 }
@@ -192,19 +218,22 @@ export async function renderGrowthTab() {
     const oRate = toPercent(d.GS_O_RATE);
     const mRate = toPercent(d.GS_M_RATE);
     const sRate = toPercent(d.GS_S_RATE);
-    // Growth Potential can be a fuzzy range like "~80–85%". If so, show it as-is.
+
     const rawGP = String(d.GS_GROWTH_POTENTIAL ?? "");
     const isRange = /~?\s*\d+(\.\d+)?\s*[–-]\s*\d+(\.\d+)?\s*%?/.test(rawGP);
-    const growthPotential = toPercent(d.GS_GROWTH_POTENTIAL); // keep numeric in case it’s exact
+    const growthPotential = toPercent(d.GS_GROWTH_POTENTIAL);
     const growthPotentialLabel = isRange ? rawGP : pctLabel(growthPotential);
+
+    /* styles must exist before we paint */
+    injectGrowthOverviewStylesOnce();
 
     // HTML
     contentDiv.innerHTML = `
       <!-- Block 1 -->
       <section class="card scrollTarget" id="block-gs-overview">
-        <div class="bfGrid" style="grid-template-columns: auto 1fr; align-items:start; gap:22px;">
+        <div class="bfGrid">
           <div class="bfMap">
-            <div id="gsDonut" style="width:min(44vw,420px); max-width:100%; height:320px;"></div>
+            <div id="gsDonut"></div>
           </div>
           <div class="bfText">
             <div class="bfTitle">Quick Scan</div>
@@ -282,11 +311,7 @@ export async function renderGrowthTab() {
       <section class="card scrollTarget" id="block-gs-targeting">
         <div class="sectionTitle">Targeting Scan</div>
         <p class="preserve">${esc(d.GS_T_DESC || "")}</p>
-
-        <!-- green divider -->
         <div style="height:3px; background:#30BA80; width:100%; border-radius:2px; margin:16px 0 14px;"></div>
-
-        <!-- Targeting: universal follow-up -->
         <p style="margin:10px 0 6px; color:#024D4F; font-weight:700;">Core aspects to understand in your Targeting:</p>
         <ul style="margin:0; padding-left:18px; list-style-position:outside;">
           <li style="margin:0;">Behavioral Factors</li>
@@ -304,11 +329,7 @@ export async function renderGrowthTab() {
       <section class="card scrollTarget" id="block-gs-offer">
         <div class="sectionTitle">Offer Scan</div>
         <p class="preserve">${esc(d.GS_O_DESC || "")}</p>
-
-        <!-- green divider -->
         <div style="height:3px; background:#30BA80; width:100%; border-radius:2px; margin:16px 0 14px;"></div>
-
-        <!-- Offer: universal follow-up -->
         <p style="margin:10px 0 6px; color:#024D4F; font-weight:700;">Core elements to keep aligned in your Offer:</p>
         <ul style="margin:0; padding-left:18px; list-style-position:outside;">
           <li style="margin:0;">Offer Concept</li>
@@ -331,11 +352,7 @@ export async function renderGrowthTab() {
       <section class="card scrollTarget" id="block-gs-marketing">
         <div class="sectionTitle">Marketing Scan</div>
         <p class="preserve">${esc(d.GS_M_DESC || "")}</p>
-
-        <!-- green divider -->
         <div style="height:3px; background:#30BA80; width:100%; border-radius:2px; margin:16px 0 14px;"></div>
-
-        <!-- Marketing: universal follow-up -->
         <p style="margin:10px 0 6px; color:#024D4F; font-weight:700;">Core elements to keep aligned in your Marketing:</p>
         <ul style="margin:0; padding-left:18px; list-style-position:outside;">
           <li style="margin:0;">Preferred Channels</li>
@@ -358,11 +375,7 @@ export async function renderGrowthTab() {
       <section class="card scrollTarget" id="block-gs-sales">
         <div class="sectionTitle">Sales Scan</div>
         <p class="preserve">${esc(d.GS_S_DESC || "")}</p>
-
-        <!-- green divider -->
         <div style="height:3px; background:#30BA80; width:100%; border-radius:2px; margin:16px 0 14px;"></div>
-
-        <!-- Sales: universal follow-up -->
         <p style="margin:10px 0 6px; color:#024D4F; font-weight:700;">Core elements to keep aligned in your Sales:</p>
         <ul style="margin:0; padding-left:18px; list-style-position:outside;">
           <li style="margin:0;">Prospecting &amp; Lead Flow</li>
@@ -395,7 +408,7 @@ export async function renderGrowthTab() {
     updateFloatingCTA("growth");
 
     injectGsStylesOnce();
-    injectPillarHelpStylesOnce(); // <-- styles for the help icon/bubble & overlay
+    injectPillarHelpStylesOnce();
     await ensureCharts();
 
     drawDonut(
@@ -439,15 +452,14 @@ export async function renderGrowthTab() {
       };
     
       const open = () => {
-        // click/tap open: real modal-like state
-        wrap.classList.remove("openHover");       // switch from hover state if present
+        wrap.classList.remove("openHover");
         wrap.classList.add("open");
         btn.setAttribute("aria-expanded", "true");
         if (overlay) {
           overlay.classList.add("show");
-          overlay.classList.remove("hover");      // clickable overlay
+          overlay.classList.remove("hover");
         }
-        document.body.style.overflow = "hidden";  // lock scroll
+        document.body.style.overflow = "hidden";
       };
     
       const toggle = (e) => {
@@ -455,23 +467,19 @@ export async function renderGrowthTab() {
         wrap.classList.contains("open") ? close() : open();
       };
     
-      // Click/tap toggles bubble + overlay
       btn.addEventListener("click", toggle, { passive: false });
     
-      // 🔹 Hover should also show overlay without stealing pointer (no flicker)
       wrap.addEventListener("mouseenter", () => {
-        // only if not already "open" by click
         if (!wrap.classList.contains("open")) {
-          wrap.classList.add("openHover");          // keep bubble forced open
+          wrap.classList.add("openHover");
           if (overlay) {
             overlay.classList.add("show");
-            overlay.classList.add("hover");         // pointer-events:none
+            overlay.classList.add("hover");
           }
         }
       });
     
       wrap.addEventListener("mouseleave", () => {
-        // if not opened via click, remove hover overlay/state
         if (!wrap.classList.contains("open")) {
           wrap.classList.remove("openHover");
           if (overlay) {
@@ -481,23 +489,10 @@ export async function renderGrowthTab() {
         }
       });
     
-      // Keyboard close
-      btn.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") close();
-      });
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") close();
-      });
-    
-      // Click outside to close
-      document.addEventListener("click", (e) => {
-        if (!wrap.contains(e.target)) close();
-      });
-    
-      // Prevent immediate close when interacting inside the help area
+      btn.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+      document.addEventListener("click", (e) => { if (!wrap.contains(e.target)) close(); });
       wrap.addEventListener("click", (e) => e.stopPropagation());
-    
-      // Clicking the overlay closes too (only meaningful in non-hover mode)
       if (overlay) overlay.addEventListener("click", close);
     }
 
@@ -507,12 +502,3 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
-
-
-
-
-
-
-
-
-
