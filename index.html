@@ -479,52 +479,52 @@ html, body { overflow-x: hidden; width: 100%; }
 
 /* =================== FOOTER FIXES =================== */
 
-/* 1) Make Services a clean vertical list */
-.footer-middle{
-  display:flex;
-  flex-direction:column;
-  align-items:flex-start;
-  gap:10px;               /* even spacing between items (desktop & mobile) */
-  min-width:0;
+/* 1) Prevent any horizontal overflow (mobile + desktop) */
+*, *::before, *::after { box-sizing: border-box; }
+img, svg, canvas, video { max-width: 100%; height: auto; }
+
+html, body { overflow-x: hidden; width: 100%; }
+.wrap, .panel, .tabsRow, #blockTabsRow, .main { max-width: 100vw; overflow-x: hidden; }
+.card, .footerCard { overflow: hidden; }
+
+#tabs, .footer-inner, .footer-left, .footer-middle, .footer-right,
+.main, #content { min-width: 0; }
+
+.footer-inner { gap: 20px; }
+.footer-left, .footer-middle, .footer-right { min-width: 0; }
+.footer-middle a { word-break: break-word; }
+
+/* 2) Service links: make spacing consistent */
+.footer-middle a {
+  display: block;
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(0,0,0,0.1);
+}
+.footer-middle a:last-child { margin-bottom: 0; }
+
+/* 3) Logo & badge sizing */
+.footer-logo {
+  max-width: 160px;   /* limit BC logo */
+  height: auto;
+}
+.badge-logos img {
+  max-width: 120px;   /* limit EDIH/Stevie badges */
+  height: auto;
 }
 
-/* stop the old full-width pseudo underline */
-.footer-middle a::after{ content:none !important; }
-
-/* draw a short underline just under the text */
-.footer-middle a{
-  display:inline-block;   /* shrink to text width */
-  text-decoration:none;
-  padding-bottom:2px;
-  border-bottom:1px solid rgba(2,77,79,.28);
-  line-height:1.35;       /* avoid text overlap */
-  word-break: normal;     /* keep words intact */
-}
-.footer-middle a:hover{ border-bottom-color: rgba(2,77,79,.9); }
-
-/* those <br> tags aren’t needed once links are blocks */
-.footer-middle br{ display:none !important; }
-
-/* 2) Keep footer images tidy and non-overflowing */
-.badge-logos img{
-  max-width:180px;
-  width:100%;
-  height:auto;
-  object-fit:contain;
-}
-
-/* 3) Prevent any horizontal overflow, footer included (keeps your earlier fix) */
-*, *::before, *::after { box-sizing:border-box; }
-img, svg, canvas, video { max-width:100%; height:auto; }
-html, body { overflow-x:hidden; width:100%; }
-.wrap, .panel, .tabsRow, #blockTabsRow, .main { max-width:100vw; overflow-x:hidden; }
-.card, .footerCard { overflow:hidden; }
-#tabs, .footer-inner, .footer-left, .footer-middle, .footer-right, .main, #content { min-width:0; }
-
-/* mobile tweaks */
-@media (max-width:640px){
-  .footer-inner{ grid-template-columns:1fr; gap:16px; }
-  .badge-logos img{ max-width:60%; }  /* calmer sizing on phones */
+/* 4) Mobile stacking */
+@media (max-width: 640px){
+  .footer-inner {
+    grid-template-columns: 1fr !important;
+    text-align: center;
+    gap: 18px;
+  }
+  .footer-left, .footer-middle, .footer-right {
+    align-items: center;
+    text-align: center;
+  }
+  .badge-logos img { max-width: 80px; }
 }
     
   </style>
@@ -651,4 +651,5 @@ html, body { overflow-x:hidden; width:100%; }
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
 
