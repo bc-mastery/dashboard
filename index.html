@@ -232,10 +232,7 @@
     }
     .donutViz{ display:flex; align-items:center; justify-content:center; }
     .donutChart{ width:100%; max-width:340px; aspect-ratio:1/1; }
-    @media (max-width: 740px){
-      .gsHeroGrid{ grid-template-columns: 1fr; }
-      .donutChart{ max-width: 380px; margin: 0 auto; }
-    }
+    
     .gsLeadTitle{ font-family:'Rokkitt', serif; font-weight:900; color:#30BA80; font-size:22px; margin:6px 0 10px; }
     .gsLead p{ margin:6px 0; }
     .gsHighlightGreen{ color:#30BA80; font-weight:700; }
@@ -328,6 +325,55 @@
       /* Ensure content never tucks under the header */
       .main{ padding-top: calc(var(--headerH) + 10px); }
     }
+
+/* === Mobile: 2-column hero (Title+Donut | Text) with BIG chart === */
+@media (max-width: 860px){
+
+  /* 1) Force two columns on the hero */
+  .gsHeroGrid,
+  #block-gs-overview .bfGrid{
+    display: grid;
+    grid-template-columns: 58% 42% !important;  /* left wider for the donut */
+    align-items: center;
+    gap: 14px;
+  }
+
+  /* 2) Place elements: title and donut in col 1; text in col 2 */
+  /* Title above donut */
+  .gsHeroGrid .gsLeadTitle,
+  #block-gs-overview .bfGrid .sectionTitle,
+  #block-gs-overview .bfGrid .gsLeadTitle{
+    grid-column: 1 / 2;
+    order: 0;
+    margin: 6px 0 8px;
+  }
+
+  /* Donut under the title in column 1 */
+  .gsHeroGrid .donutViz,
+  #block-gs-overview .bfGrid .donutViz{
+    grid-column: 1 / 2;
+    order: 1;
+    justify-content: center;
+  }
+
+  /* Text block in column 2 */
+  .gsHeroGrid .gsLead,
+  #block-gs-overview .bfGrid .bfText,
+  #block-gs-overview .bfGrid .gsLead{
+    grid-column: 2 / 3;
+    order: 0;
+  }
+
+  /* 3) BIG square donut that fits the left column */
+  .gsDonutChart,
+  .donutChart{
+    width: min(60vw, 420px);   /* big on phones, capped for safety */
+    height: min(60vw, 420px);  /* keep it perfectly square */
+    max-width: 100%;
+    margin: 0 auto;            /* centered in the left column */
+  }
+}
+    
   </style>
 </head>
 
@@ -455,3 +501,4 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
