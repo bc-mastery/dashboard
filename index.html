@@ -249,87 +249,89 @@
     .gsBar.v2 .gsTicks { position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:1; background: repeating-linear-gradient( to right, transparent 0, transparent calc(10% - 1px), rgba(2,77,79,0.14) calc(10% - 1px), rgba(2,77,79,0.14) 10% ); }
 
     /* ====================== MOBILE-ONLY OVERRIDES ====================== */
-    @media (max-width: 768px){
-      /* Make header non-obtrusive & smaller on mobile */
-      .siteHeader{ position: sticky; top: 0; }
+@media (max-width: 768px){
+  /* Make header non-obtrusive & smaller on mobile */
+  .siteHeader{ position: sticky; top: 0; }
 
-      /* Hide BC logo on mobile */
-      .headerLogo{ display:none !important; }
+  /* Hide BC logo on mobile */
+  .headerLogo{ display:none !important; }
 
-      /* Header grid becomes: title (left) | brand (right) */
-      .bar{ grid-template-columns: 1fr 1fr; }
+  /* Header grid becomes: title (left) | brand (right) */
+  .bar{ grid-template-columns: 1fr 1fr; }
 
-      .brandName{
-        font-size:12px; line-height:1.2;
-        max-width:42vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-        justify-self:end;
-      }
+  .brandName{
+    font-size:12px; line-height:1.2;
+    max-width:42vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+    justify-self:end;
+  }
 
-      .titleBlock img{ width:24px; height:24px; }
-      .pageTitle{
-        font-size: clamp(18px, 4.6vw, 22px);
-        max-width:50vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-      }
+  .titleBlock img{ width:24px; height:24px; }
+  .pageTitle{
+    font-size: clamp(18px, 4.6vw, 22px);
+    max-width:50vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
 
-      /* Reduce computed header height so main padding isn’t excessive */
-      :root{
-        --headerBarH: 44px;
-        --headerTabsH: 0px;      /* we hide chips below */
-        --headerH: calc(var(--headerBarH) + 16px);
-      }
+  /* Reduce computed header height so main padding isn’t excessive */
+  :root{
+    --headerBarH: 44px;
+    --headerTabsH: 0px;      /* we hide chips below */
+    --headerH: calc(var(--headerBarH) + 16px);
+  }
 
-      /* Primary tabs → 3 per row, smaller buttons */
-      #tabs{
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
-        width:100%;
-        overflow-x: clip;
-      }
-      #tabs .tabBtn{
-        width: 100%;
-        height: 40px;
-        padding: 10px 6px;
-        font-size: 12px;
-        border-radius: 10px;
-        flex: 0 0 auto;
-      }
+  /* Primary tabs → 3 per row, smaller buttons */
+  #tabs{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    width:100%;
+    overflow-x: clip;
+  }
+  #tabs .tabBtn{
+    width: 100%;
+    height: 40px;
+    padding: 10px 6px;
+    font-size: 12px;
+    border-radius: 10px;
+    flex: 0 0 auto;
+  }
 
-      /* Hide all secondary chips on mobile, keep the Download CTA visible */
-      #blockTabs .blockBtn{ display:none !important; }
+  /* Hide all secondary chips on mobile, keep the Download CTA visible */
+  #blockTabs .blockBtn{ display:none !important; }
 
-      /* Download CTA on its own centered row (not full-bleed) */
-      #blockTabsRow{ display:block; padding-top:0; overflow-x:clip; }
-      #blockTabs{ display:block; }
-      #blockTabsRow .floatingCTA{
-        display:block !important;
-        width:auto; max-width:480px; box-sizing:border-box;
-        margin:8px auto 12px;
-        text-align:center; font-size:13px;
-        padding:10px 14px; border-radius:8px;
-        position: static !important; top:auto; right:auto; height:auto;
-      }
+  /* Download CTA on its own centered row (not full-bleed) */
+  #blockTabsRow{ display:block; padding-top:0; overflow-x:clip; }
+  #blockTabs{ display:block; }
+  #blockTabsRow .floatingCTA{
+    display:block !important;
+    width:auto; max-width:480px; box-sizing:border-box;
+    margin:8px auto 12px;
+    text-align:center; font-size:13px;
+    padding:10px 14px; border-radius:8px;
+    position: static !important; top:auto; right:auto; height:auto;
+  }
 
-      /* Donut chart sizing (square) */
-      .gsDonutChart, .donutChart{
-        width: min(86vw, 360px);
-        height: min(86vw, 360px);
-        max-width: 100%;
-        margin: 0 auto;
-      }
+  /* Donut chart sizing (square) */
+  .gsDonutChart, .donutChart{
+    width: min(86vw, 360px);
+    height: min(86vw, 360px);
+    max-width: 100%;
+    margin: 0 auto;
+  }
 
-      /* Prevent sideways scroll */
-      html, body{ overflow-x:hidden; }
-      .panel, .wrap, .tabsRow, #blockTabsRow{ overflow-x:clip; }
+  /* Prevent sideways scroll */
+  html, body{ overflow-x:hidden; }
+  .panel, .wrap, .tabsRow, #blockTabsRow{ overflow-x:clip; }
 
-      /* Ensure content never tucks under the header */
-      .main{
-  padding-top: var(--headerH);   /* just enough to clear the header */
+  /* Ensure content never tucks under the header */
+  .main{
+    padding-top: var(--headerH) !important;  /* header only, no extra gap */
+  }
+
+  /* First block should sit just below header with equal spacing */
+  #content > .card:first-child{
+    margin-top: 24px !important;
+  }
 }
-.card:first-of-type{
-  margin-top: 24px;              /* same spacing as between cards */
-}
-
     /* === Growth: Block #1 desktop layout (1 : 2) === */
     #block-gs-overview .bfGrid{
       grid-template-columns: 1fr 2fr !important; /* left: donut (1fr), right: text (2fr) */
@@ -500,4 +502,5 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
 
