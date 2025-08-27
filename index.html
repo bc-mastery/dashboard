@@ -435,6 +435,49 @@
         aspect-ratio: 1 / 1;
         margin: 0 auto;
       }
+
+/* =================== FIXES (append at end) =================== */
+
+/* 1) Donut + overlay: keep sizes in sync on mobile */
+@media (max-width: 768px){
+  .abc-wrap{
+    width: min(86vw, 360px);
+    margin: 0 auto;
+    /* keep these two equal so overlay & Google chart move together */
+    --overlay-nudge-y: 10px;
+    --donut-nudge-y:   10px;
+    /* slight visual scale so the ring covers the overlay slice exactly */
+    --overlay-scale: 1.045;
+  }
+  .abc-wrap .donut{ --outer-radius: 43.5%; }
+}
+
+/* 2) Kill any chance of horizontal overflow (mobile & desktop) */
+*, *::before, *::after { box-sizing: border-box; }
+img, svg, canvas, video { max-width: 100%; height: auto; }
+
+/* never allow wide children to force the page wider than viewport */
+html, body { overflow-x: hidden; width: 100%; }
+.wrap, .panel, .tabsRow, #blockTabsRow, .main { max-width: 100vw; overflow-x: hidden; }
+.card, .footerCard { overflow: hidden; }      /* keep rogue content inside cards */
+
+/* prevent grid items from overflowing their tracks (affects footer too) */
+#tabs, .footer-inner, .footer-left, .footer-middle, .footer-right,
+.main, #content { min-width: 0; }
+
+/* footer: make sure long text/links wrap and don’t stretch the grid */
+.footer-inner { gap: 20px; }
+.footer-left, .footer-middle, .footer-right { min-width: 0; }
+.footer-middle a { word-break: break-word; }
+
+/* primary tabs on small screens: allow wrapping without forcing width */
+#tabs { min-width: 0; }
+#tabs .tabBtn { min-width: 0; }
+
+/* OPTIONAL: if any image in content was overflowing, this ensures it can’t */
+.main img { display: block; max-width: 100%; height: auto; }
+
+      
     }
   </style>
 </head>
@@ -560,4 +603,5 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
 
