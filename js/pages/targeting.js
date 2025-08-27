@@ -46,19 +46,18 @@ function injectTargetingStylesOnce() {
       object-fit: contain;
       pointer-events: none;
       user-select: none;
+      display: block;
     }
 
-    /* Donut fills wrapper exactly like overlay; gradient is centered inside */
+    /* Donut fills the wrapper (conic-gradient painted in JS) */
     #content .bfMap .abc-wrap .donut {
       position: absolute;
       inset: 0;
       width: 100%;
       height: 100%;
-      background-repeat: no-repeat;
-      background-size: contain;
-      /* vertical nudge via CSS var (default 0px). Negative = move up */
+      /* default: no nudge */
+      --donut-nudge-x: 0px;
       --donut-nudge-y: 0px;
-      background-position: 50% calc(50% + var(--donut-nudge-y));
     }
 
     /* Mobile: stack and center */
@@ -75,9 +74,9 @@ function injectTargetingStylesOnce() {
         max-width: 300px;
         margin-left: 0;
       }
-      /* Mobile-only fine-tune: lift donut a few px */
+      /* Mobile-only fine-tune: lift donut a few px (negative = up) */
       #content .bfMap .abc-wrap .donut {
-        --donut-nudge-y: 8px; /* adjust -4 / -8 / -10 if needed */
+        --donut-nudge-y: -8px; /* try -6 / -10 to taste */
       }
     }
   `;
@@ -243,6 +242,7 @@ document.querySelectorAll(".abc-wrap").forEach((wrapper) => {
   }
 });
 }
+
 
 
 
