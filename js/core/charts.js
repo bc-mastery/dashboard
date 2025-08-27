@@ -131,7 +131,7 @@ export function centerLockChart({
   wrapper,
   host,
   extraYOffset = 0,
-  mobileYOffset = -40,
+  mobileYOffset = -8,
 }) {
   if (!wrapper || !host) return;
 
@@ -222,4 +222,5 @@ export function nudgeChartY(hostEl, px = 0) {
   const mo = new MutationObserver(apply);
   if (hostEl) mo.observe(hostEl, { childList: true, subtree: true });
 }
+
 
