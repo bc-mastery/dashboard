@@ -67,6 +67,7 @@ export function drawDonut(targetId, slices = [], options = {}) {
     pieSliceText: "none",
     backgroundColor: "transparent",
     slices: sliceOpts,
+    // Centered and proportional chart area (no fixed px offsets)
     chartArea: options.chartArea || { left: "5%", top: "5%", width: "90%", height: "90%" },
     tooltip: { text: "percentage" },
   };
@@ -130,11 +131,18 @@ export function centerLockChart({
   wrapper,
   host,
   extraYOffset = 0,
-  mobileYOffset = -20,
+  mobileYOffset = -12,
 }) {
   if (!wrapper || !host) return;
 
   const isMobile = () => window.matchMedia("(max-width: 860px)").matches;
+
+  // Apply transform with !important reliably
+  const setTransformImportant = (el, val) => {
+    if (!el) return;
+    el.style.setProperty("transform", val, "important");
+    el.style.willChange = "transform";
+  };
 
   let rafId = 0;
   const measure = () => {
@@ -142,10 +150,10 @@ export function centerLockChart({
     rafId = requestAnimationFrame(() => {
       const wrapRect = wrapper.getBoundingClientRect();
 
-      // detect the rendered graphic area inside the host
+      // 1) Find the actually drawn graphic box inside the host
       let innerRect = null;
-      const svg = host.querySelector("svg");
-      if (svg) innerRect = svg.getBoundingClientRect();
+      let svgNode = host.querySelector("svg");
+      if (svgNode) innerRect = svgNode.getBoundingClientRect();
       if (!innerRect) {
         const canvas = host.querySelector("canvas");
         if (canvas) innerRect = canvas.getBoundingClientRect();
@@ -156,30 +164,29 @@ export function centerLockChart({
       }
       if (!innerRect) return;
 
+      // 2) Compute delta to vertically center
       const wrapCY  = wrapRect.top + wrapRect.height / 2;
       const innerCY = innerRect.top + innerRect.height / 2;
       const measured = wrapCY - innerCY;
 
+      // 3) Total host Y offset (measured + optional nudges)
       const totalDy =
         measured +
         (Number(extraYOffset) || 0) +
         (isMobile() ? (Number(mobileYOffset) || 0) : 0);
 
-      // keep X centered from CSS, adjust Y by measured delta
-      host.style.setProperty(
-        "transform",
-        `translate(-50%, calc(-50% + ${totalDy}px))`,
-        "important"
-      );
+      // 4) Apply to the host (keeps X centered)
+      setTransformImportant(host, `translate(-50%, calc(-50% + ${totalDy}px))`);
 
-      // --- force inner <svg> nudge on mobile ---
-      if (svg && isMobile()) {
-        svg.style.setProperty(
-          "transform",
-          `translateY(${Number(mobileYOffset) || 0}px)`,
-          "important"
-        );
-        svg.style.willChange = "transform";
+      // 5) Also force the inner <svg> to move (some chart builds reapply transforms)
+      //    If there is a <g> inside, nudge it too.
+      if (isMobile()) {
+        const svgY = Number(mobileYOffset) || 0;
+        if (svgNode) {
+          setTransformImportant(svgNode, `translateY(${svgY}px)`);
+          const g = svgNode.querySelector("g");
+          if (g) setTransformImportant(g, `translateY(${svgY}px)`);
+        }
       }
     });
   };
@@ -215,4 +222,3 @@ export function nudgeChartY(hostEl, px = 0) {
   const mo = new MutationObserver(apply);
   if (hostEl) mo.observe(hostEl, { childList: true, subtree: true });
 }
-
