@@ -13,11 +13,77 @@ import {
 } from "../core/ui.js";
 import { finalBlockContent } from "../components/blocks.js";
 
+/* ------------------------------ style fix (scoped) ------------------------------ */
+function injectTargetingStylesOnce() {
+  if (document.getElementById("tgt-mobile-fixes")) return;
+  const style = document.createElement("style");
+  style.id = "tgt-mobile-fixes";
+  style.textContent = `
+    /* Prevent any horizontal scroll only within the content area */
+    #content { overflow-x: hidden; }
+
+    /* Make our 2-col layout responsive */
+    #content .card .bfGrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: start;
+      gap: 22px;
+    }
+    @media (max-width: 860px) {
+      #content .card .bfGrid {
+        grid-template-columns: 1fr;  /* stack on mobile */
+        gap: 16px;
+      }
+    }
+
+    /* Keep images/canvas/svg responsive */
+    #content .abc-wrap,
+    #content .bfMap {
+      max-width: 100%;
+      overflow: hidden; /* nothing can poke out horizontally */
+    }
+    #content .abc-wrap img,
+    #content .bfMap img,
+    #content .bfMap canvas,
+    #content .bfMap svg {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Donut container: responsive square-ish area that scales down */
+    #content .abc-wrap .donut {
+      width: 100%;
+      max-width: 520px;       /* desktop cap inside the card */
+      height: min(62vw, 360px); /* mobile-friendly height */
+      margin: 0 auto;
+    }
+
+    /* If abc overlay is absolutely positioned in your base CSS, ensure it scales */
+    #content .abc-wrap img.overlay {
+      width: 100%;
+      height: auto;
+    }
+
+    /* Safety: wrap long tokens in text blocks */
+    #content .card p,
+    #content .card li,
+    #content .card .preserve {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 /* ------------------------------ main render ------------------------------ */
 export async function renderTargetingTab() {
   setCurrentTab("targeting");
   document.body.setAttribute("data-current-tab", "targeting");
   clearUpgradeBlock();
+
+  // Inject mobile/responsiveness fixes once
+  injectTargetingStylesOnce();
 
   const contentDiv = document.getElementById("content");
   if (!contentDiv) return;
@@ -109,6 +175,11 @@ function paintTargeting(api, allowFull = false) {
                data-mode="${esc(mode)}"
                data-areas="${areas.map(String).map(esc).join("|")}"
                data-overlay="${esc(IMAGES.abcFrame)}">
+            <!--
+              The donut container is responsive via CSS (width:100%, max-width, height:min(…))
+              set in injectTargetingStylesOnce(). We keep this div empty; setABCMap
+              will render into it without forcing a fixed width.
+            -->
             <div class="donut"></div>
             <img class="overlay" src="${IMAGES.abcFrame}" alt="ABC overlay">
           </div>
@@ -162,6 +233,9 @@ function paintTargeting(api, allowFull = false) {
       .map((s) => s.trim())
       .filter(Boolean);
     const overlayPath = container.dataset.overlay || IMAGES.abcFrame;
+
+    // Ensure setABCMap renders responsively into the .donut container
+    // (it should respect the current width of .donut which is capped in CSS)
     setABCMap({ container, mode: m, areas: a, overlayPath });
   });
 }
