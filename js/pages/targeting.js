@@ -77,7 +77,7 @@ function injectTargetingStylesOnce() {
       }
       /* Mobile-only fine-tune: lift donut a few px */
       #content .bfMap .abc-wrap .donut {
-        --donut-nudge-y: -6px; /* adjust -4 / -8 / -10 if needed */
+        --donut-nudge-y: 8px; /* adjust -4 / -8 / -10 if needed */
       }
     }
   `;
@@ -243,6 +243,7 @@ document.querySelectorAll(".abc-wrap").forEach((wrapper) => {
   }
 });
 }
+
 
 
 
