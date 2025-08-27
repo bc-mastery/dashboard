@@ -131,6 +131,35 @@
     .bfSub{ font-weight:700; color:#024D4F; }
     .bfDesc{ color:#333333; font-weight:400; }
 
+    /* Donut + overlay wrapper (desktop/base) */
+    .abc-wrap{
+      position: relative;
+      width: min(28.5vw, 315px);
+      max-width: 100%;
+      aspect-ratio: 1 / 1;
+      margin-left: 22px;
+    }
+    
+    .abc-wrap .overlay{
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: contain;
+      object-position: 50% calc(50% + var(--overlay-nudge-y, 0px)); /* vertical nudge */
+      pointer-events: none; z-index: 2;
+      transform: scale(var(--overlay-scale, 1));  /* allow slight sizing tweak */
+      transform-origin: 50% 50%;
+    }
+    
+    .abc-wrap .donut{
+      position: absolute; inset: 0;
+      background: conic-gradient(from -90deg, transparent 0 360deg);
+      --outer-radius: 44%;
+      -webkit-mask: radial-gradient(circle at 50% 50%, #000 0 var(--outer-radius),
+                      transparent calc(var(--outer-radius) + 1px) 100%);
+              mask: radial-gradient(circle at 50% 50%, #000 0 var(--outer-radius),
+                      transparent calc(var(--outer-radius) + 1px) 100%);
+      z-index: 1; transition: background 200ms ease;
+    }
+    
     /* ✅ Restored base .abc-wrap — needed for correct absolute positioning */
     .abc-wrap{
       position: relative;
@@ -531,3 +560,4 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
