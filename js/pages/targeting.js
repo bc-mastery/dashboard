@@ -12,7 +12,7 @@ import {
   clearUpgradeBlock,
 } from "../core/ui.js";
 import { finalBlockContent } from "../components/blocks.js";
-import { centerLockChart } from "../core/charts.js";   /* <-- NEW import */
+import { centerLockChart, nudgeChartY } from "../core/charts.js";
 
 /* ------------------------------ styles ------------------------------ */
 function injectTargetingStylesOnce() {
@@ -226,9 +226,13 @@ function paintTargeting(api, allowFull = false) {
 
     const host = wrapper.querySelector(".donut");
 
-// mobile-only nudge (upwards). Tweak -6 to -4 or -8 if needed.
-const extraYOffset = window.matchMedia("(max-width: 860px)").matches ? -6 : 0;
+    // Center-lock first (auto measured)
+    const extraYOffset = window.matchMedia("(max-width: 860px)").matches ? -6 : 0;
+    centerLockChart({ wrapper, host, extraYOffset });
 
-centerLockChart({ wrapper, host, extraYOffset });
+    // Then nudge the *inner* svg on mobile for the final fine-tune
+    if (window.matchMedia("(max-width: 860px)").matches) {
+      nudgeChartY(host, -6); // tweak to -4 / -8 to taste on your device
+    }
+  });
 }
-
