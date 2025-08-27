@@ -119,15 +119,15 @@ export function drawSegmentedBars(targetId, pillars = []) {
 /*  Use this anywhere you need donut (or other chart) visually centered.  */
 /* ---------------------------------------------------------------------- */
 
+// Add/replace this in /js/core/charts.js
+
 /**
- * centerLockChart({ wrapper, host })
- * - wrapper: the square container that overlay uses (e.g., .abc-wrap)
- * - host:    the element that holds the chart DOM (e.g., .donut)
- *
- * We measure the inner rendered node (svg/canvas) and translate the host so
- * its visual center matches the wrapper center. Re-runs on resize/mutations.
+ * centerLockChart({ wrapper, host, extraYOffset })
+ * - wrapper: square container that overlay uses (e.g., .abc-wrap)
+ * - host:    element that holds the chart DOM (e.g., .donut)
+ * - extraYOffset: optional px nudge applied after centering (default 0)
  */
-export function centerLockChart({ wrapper, host }) {
+export function centerLockChart({ wrapper, host, extraYOffset = 0 }) {
   if (!wrapper || !host) return;
 
   let rafId = 0;
@@ -136,6 +136,7 @@ export function centerLockChart({ wrapper, host }) {
     rafId = requestAnimationFrame(() => {
       const wrapRect = wrapper.getBoundingClientRect();
 
+      // try to detect the actual rendered graphic area inside host
       let innerRect = null;
       const svg = host.querySelector("svg");
       if (svg) innerRect = svg.getBoundingClientRect();
@@ -151,14 +152,13 @@ export function centerLockChart({ wrapper, host }) {
 
       const wrapCY  = wrapRect.top + wrapRect.height / 2;
       const innerCY = innerRect.top + innerRect.height / 2;
-      const dy = wrapCY - innerCY;
+      const dy = (wrapCY - innerCY) + (Number(extraYOffset) || 0);
 
-      // Keep X centering from CSS, adjust Y by measured delta
       host.style.transform = `translate(-50%, calc(-50% + ${dy}px))`;
     });
   };
 
-  // Initial + a couple retries to cover async chart render
+  // initial + retries (async renders)
   measure();
   setTimeout(measure, 80);
   setTimeout(measure, 180);
