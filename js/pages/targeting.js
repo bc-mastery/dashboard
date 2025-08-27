@@ -12,7 +12,7 @@ import {
   clearUpgradeBlock,
 } from "../core/ui.js";
 import { finalBlockContent } from "../components/blocks.js";
-import { centerLockChart, nudgeChartY } from "../core/charts.js";
+import { centerLockChart } from "../core/charts.js"; // keep this if you want the measurement-centering
 
 /* ------------------------------ styles ------------------------------ */
 function injectTargetingStylesOnce() {
@@ -48,7 +48,7 @@ function injectTargetingStylesOnce() {
       user-select: none;
     }
 
-    /* Donut host centered; Y corrected by centerLockChart() at runtime */
+    /* Donut host centered */
     #content .bfMap .abc-wrap .donut {
       position: absolute;
       top: 50%;
@@ -72,6 +72,13 @@ function injectTargetingStylesOnce() {
       #content .bfMap .abc-wrap {
         max-width: 300px;
         margin-left: 0;
+      }
+
+      /* >>> FORCE NUDGE ON MOBILE (override Google Charts) <<< */
+      /* Tune the -6px below to -4px / -8px if needed */
+      #content .bfMap .abc-wrap .donut.gc-nudge-up > div,
+      #content .bfMap .abc-wrap .donut.gc-nudge-up svg {
+        transform: translateY(-6px) !important; /* negative = move up */
       }
     }
   `;
@@ -236,3 +243,4 @@ function paintTargeting(api, allowFull = false) {
     }
   });
 }
+
