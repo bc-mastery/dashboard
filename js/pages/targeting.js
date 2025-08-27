@@ -192,23 +192,27 @@ function injectTargetingStylesOnce() {
       margin-left: auto;
     }
 
-    /* Overlay fills the whole container */
+    /* Overlay fills container */
 #content .bfMap .abc-wrap .overlay {
   position: absolute;
-  top: 0; left: 0;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
-/* Donut is smaller but centered inside overlay */
+/* Donut also fills container, centers like overlay */
 #content .bfMap .abc-wrap .donut {
   position: absolute;
-  top: 50%; left: 50%;
+  top: 50%;
+  left: 50%;
   transform: translate(-50%, -50%);
-  width: 80%;   /* tweak: try 75–85% until perfect */
-  height: 80%;
+  width: 100%;
+  height: 100%;
 }
+
 
     /* Mobile: stack text + map, center the map */
     @media (max-width: 860px) {
@@ -228,4 +232,5 @@ function injectTargetingStylesOnce() {
   `;
   document.head.appendChild(style);
 }
+
 
