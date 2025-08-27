@@ -165,7 +165,7 @@
     }
 
     @media (max-width: 680px){
-  .abc-wrap{ width:min(70vw, 380px); }
+  .abc-wrap{ width: min(86vw, 360px); }   /* match chart size */
   .abc-wrap .donut{ --outer-radius: 43.5%; }
 }
 
@@ -361,17 +361,25 @@
   }
 
   /* ✅ Donut chart sizing + overlay alignment */
-  .gsDonutChart, .donutChart{
-    width: min(86vw, 360px);
-    height: min(86vw, 360px);
-    max-width: 100%;
-    margin: 0 auto;
-  }
-  .abc-wrap{
-    --overlay-nudge-y: 8px;   /* push overlay DOWN */
-    --overlay-scale: 1.035;   /* make overlay slightly bigger */
-  }
-  .abc-wrap .donut{ --outer-radius: 43.5%; }
+.gsDonutChart, .donutChart{
+  width: min(86vw, 360px);
+  height: min(86vw, 360px);
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+/* Make wrapper the SAME size as the chart on mobile */
+.abc-wrap{
+  width: min(86vw, 360px);
+  margin: 0 auto;           /* center the wrapper */
+  --overlay-nudge-y: 10px;   /* push overlay DOWN */
+  --overlay-scale:   1.045;  /* make overlay slightly bigger */
+
+  /* 👇 tells charts.js to move the donut SVG by the same amount */
+  --donut-nudge-y:   10px;   /* keep this equal to --overlay-nudge-y */
+}
+.abc-wrap .donut{ --outer-radius: 43.5%; }
+
 
   /* Prevent sideways scroll */
   html, body{ overflow-x:hidden; }
@@ -552,6 +560,7 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
 
 
 
