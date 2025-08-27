@@ -12,6 +12,7 @@ import {
   clearUpgradeBlock,
 } from "../core/ui.js";
 import { finalBlockContent } from "../components/blocks.js";
+import { centerLockChart } from "../core/charts.js";   /* <-- NEW import */
 
 /* ------------------------------ styles ------------------------------ */
 function injectTargetingStylesOnce() {
@@ -27,7 +28,7 @@ function injectTargetingStylesOnce() {
       gap: 22px;
     }
 
-    /* Map wrapper (square) */
+    /* Map wrapper (square, shared by overlay + donut host) */
     #content .bfMap .abc-wrap {
       position: relative;
       width: 100%;
@@ -47,18 +48,18 @@ function injectTargetingStylesOnce() {
       user-select: none;
     }
 
-    /* Donut host fills wrapper and is centered; final Y offset set by JS */
+    /* Donut host centered; Y corrected by centerLockChart() at runtime */
     #content .bfMap .abc-wrap .donut {
       position: absolute;
       top: 50%;
       left: 50%;
       width: 100%;
       height: 100%;
-      transform: translate(-50%, -50%); /* JS will add a px tweak after measuring */
+      transform: translate(-50%, -50%);
       will-change: transform;
     }
 
-    /* Mobile: stack and center the map */
+    /* Mobile: stack and center */
     @media (max-width: 860px) {
       #content .card .bfGrid {
         grid-template-columns: 1fr;
@@ -75,64 +76,6 @@ function injectTargetingStylesOnce() {
     }
   `;
   document.head.appendChild(style);
-}
-
-/* ------------------------------ donut/overlay auto-align ------------------------------ */
-/**
- * Ensures the donut's *rendered* inner graphics (svg/canvas) are vertically centered
- * with the wrapper/overlay. Google Charts leaves internal padding, especially on mobile.
- * We measure and apply an exact translateY correction on the host.
- */
-function autoAlignDonut(container) {
-  const host = container.querySelector(".donut");
-  if (!host) return;
-
-  const measureAndAlign = () => {
-    // Wrapper we want to center against
-    const wrapRect = container.getBoundingClientRect();
-
-    // Try to find the actual rendered graphic bounds
-    let innerRect = null;
-
-    // Google Charts: an inner <div> with an <svg>
-    const svg = host.querySelector("svg");
-    if (svg) innerRect = svg.getBoundingClientRect();
-
-    // Fallback for canvas renderers
-    if (!innerRect) {
-      const canvas = host.querySelector("canvas");
-      if (canvas) innerRect = canvas.getBoundingClientRect();
-    }
-
-    // Last resort: first child element
-    if (!innerRect) {
-      const first = host.firstElementChild;
-      if (first) innerRect = first.getBoundingClientRect();
-    }
-
-    if (!innerRect) return;
-
-    const wrapCenterY = wrapRect.top + wrapRect.height / 2;
-    const innerCenterY = innerRect.top + innerRect.height / 2;
-    const dy = wrapCenterY - innerCenterY; // positive means the donut is too high (needs to go down)
-
-    // Apply correction (keep X centering intact)
-    host.style.transform = `translate(-50%, calc(-50% + ${dy}px))`;
-  };
-
-  // Initial attempts (render is async)
-  measureAndAlign();
-  setTimeout(measureAndAlign, 0);
-  setTimeout(measureAndAlign, 100);
-  setTimeout(measureAndAlign, 300);
-
-  // Re-align on size changes and on DOM mutations inside the host
-  const ro = new ResizeObserver(measureAndAlign);
-  ro.observe(container);
-  ro.observe(host);
-
-  const mo = new MutationObserver(measureAndAlign);
-  mo.observe(host, { childList: true, subtree: true });
 }
 
 /* ------------------------------ main render ------------------------------ */
@@ -163,12 +106,10 @@ export async function renderTargetingTab() {
       return;
     }
 
-    // cache + access
     state.lastApiByTab.targeting = { ...api, data: { ...api.data } };
     const d = api.data || {};
     state.lastAccess = inferAccess(d);
 
-    // header brand
     const brandEl = document.getElementById("brandName");
     if (brandEl) {
       const full = String(d.Brand || "");
@@ -177,7 +118,6 @@ export async function renderTargetingTab() {
       brandEl.title = full;
     }
 
-    // PDF link from T_STRATEGY_OUTPUT
     const view = d.T_STRATEGY_OUTPUT || "";
     if (view) {
       state.dynamicPdfLinks.targeting = toDownloadLink(view);
@@ -185,24 +125,19 @@ export async function renderTargetingTab() {
     }
 
     const allowFull = !!d.TS_PAID || !!d["4PBS_PAID"];
-
-    // paint page
     paintTargeting(api, allowFull);
 
-    // chips + CTA refresh
     const blockTabsRow = document.getElementById("blockTabsRow");
     if (blockTabsRow) blockTabsRow.style.display = "block";
     populateBlockTabsFromPage();
     updateFloatingCTA("targeting");
 
-    // upgrade block only for preview users
     maybeInsertUniversalUpgradeBlock({
       tab: "targeting",
       isPreviewOnly: !allowFull,
       content: finalBlockContent.targeting,
     });
 
-    // floating call button for GS-only users
     toggleFloatingCallBtn(state.lastAccess === ACCESS.GS_ONLY);
   } catch (err) {
     console.error(err);
@@ -278,18 +213,18 @@ function paintTargeting(api, allowFull = false) {
 
   contentDiv.innerHTML = html;
 
-  // Activate ABC map and then auto-align donut vs overlay
-  document.querySelectorAll(".abc-wrap").forEach((container) => {
-    const m = (container.dataset.mode || "B2B").toUpperCase();
-    const a = (container.dataset.areas || "")
+  // Render + center-lock the donut vs overlay
+  document.querySelectorAll(".abc-wrap").forEach((wrapper) => {
+    const m = (wrapper.dataset.mode || "B2B").toUpperCase();
+    const a = (wrapper.dataset.areas || "")
       .split("|")
       .map((s) => s.trim())
       .filter(Boolean);
-    const overlayPath = container.dataset.overlay || IMAGES.abcFrame;
+    const overlayPath = wrapper.dataset.overlay || IMAGES.abcFrame;
 
-    setABCMap({ container, mode: m, areas: a, overlayPath });
+    setABCMap({ container: wrapper, mode: m, areas: a, overlayPath });
 
-    // Align after the chart renders (and keep it aligned)
-    autoAlignDonut(container);
+    const host = wrapper.querySelector(".donut");
+    centerLockChart({ wrapper, host });   // <-- single call does the alignment
   });
 }
