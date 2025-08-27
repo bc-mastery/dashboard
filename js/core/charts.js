@@ -67,7 +67,6 @@ export function drawDonut(targetId, slices = [], options = {}) {
     pieSliceText: "none",
     backgroundColor: "transparent",
     slices: sliceOpts,
-    // Centered and proportional chart area (no fixed px offsets)
     chartArea: options.chartArea || { left: "5%", top: "5%", width: "90%", height: "90%" },
     tooltip: { text: "percentage" },
   };
@@ -131,7 +130,7 @@ export function centerLockChart({
   wrapper,
   host,
   extraYOffset = 0,
-  mobileYOffset = -24,
+  mobileYOffset = -12,
 }) {
   if (!wrapper || !host) return;
 
@@ -166,12 +165,22 @@ export function centerLockChart({
         (Number(extraYOffset) || 0) +
         (isMobile() ? (Number(mobileYOffset) || 0) : 0);
 
-      // keep X centered from CSS, adjust Y by measured delta (+ nudges), and make it authoritative
+      // keep X centered from CSS, adjust Y by measured delta
       host.style.setProperty(
         "transform",
         `translate(-50%, calc(-50% + ${totalDy}px))`,
         "important"
       );
+
+      // --- force inner <svg> nudge on mobile ---
+      if (svg && isMobile()) {
+        svg.style.setProperty(
+          "transform",
+          `translateY(${Number(mobileYOffset) || 0}px)`,
+          "important"
+        );
+        svg.style.willChange = "transform";
+      }
     });
   };
 
@@ -206,4 +215,3 @@ export function nudgeChartY(hostEl, px = 0) {
   const mo = new MutationObserver(apply);
   if (hostEl) mo.observe(hostEl, { childList: true, subtree: true });
 }
-
