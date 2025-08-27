@@ -334,6 +334,41 @@
         padding-top: calc(var(--headerH) + 10px);
       }
     }
+
+/* ===== Fixes for: too-wide download button, brand alignment, sideways scroll ===== */
+@media (max-width: 768px){
+
+  /* 1) Download button not edge-to-edge & never wider than the panel */
+  #blockTabsRow .floatingCTA{
+    /* previously: width:100%; margin:8px 0 12px; */
+    width: auto;                     /* only as wide as needed */
+    max-width: 480px;                /* cap size on large phones */
+    box-sizing: border-box;          /* include borders in width calc */
+    margin: 8px auto 12px;           /* center it on its own row */
+    padding-left: 14px;              /* keep it comfy but compact */
+    padding-right: 14px;
+  }
+
+  /* 2) Brand name: single line, right-aligned, never overflows */
+  .brandName{
+    font-size: 12px;                 /* matches secondary tab size */
+    line-height: 1.2;
+    max-width: 42vw;                 /* stay inside the right third */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    justify-self: end;               /* keep it right in the grid cell */
+  }
+
+  /* 3) Prevent horizontal scrolling on mobile */
+  html, body{ overflow-x: hidden; }
+  .panel, .wrap, .tabsRow, #tabs, #blockTabsRow{ overflow-x: clip; }
+
+  /* Safety: grid tabs can’t exceed container width */
+  #tabs{ width: 100%; }
+}
+
+    
   </style>
 </head>
 
@@ -461,3 +496,4 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
