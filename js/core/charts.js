@@ -72,7 +72,10 @@ export function drawDonut(targetId, slices = [], options = {}) {
     pieSliceText: "none",
     backgroundColor: "transparent",
     slices: sliceOpts,
+
+    // Center the chart area (no fixed px offsets)
     chartArea: options.chartArea || { left: "5%", top: "5%", width: "90%", height: "90%" },
+
     tooltip: { text: "percentage" },
   };
 
@@ -119,6 +122,3 @@ export function drawSegmentedBars(targetId, pillars = []) {
     });
   });
 }
-
-
-
