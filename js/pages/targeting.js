@@ -22,57 +22,53 @@ function injectTargetingStylesOnce() {
     /* Prevent any horizontal scroll only within the content area */
     #content { overflow-x: hidden; }
 
-    /* Make our 2-col layout responsive */
+    /* ✅ Restore original proportions: map column is "auto", text is flexible */
     #content .card .bfGrid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: auto 1fr;
       align-items: start;
       gap: 22px;
     }
-    @media (max-width: 860px) {
-      #content .card .bfGrid {
-        grid-template-columns: 1fr;  /* stack on mobile */
-        gap: 16px;
-      }
-    }
 
-    /* Wrapper of the map/chart area */
+    /* Desktop map sizing like before (tweak 480px if you used another cap) */
     #content .bfMap { max-width: 100%; overflow: hidden; }
-
-    /* ABC map wrapper = single source of truth for size (perfect square) */
-    #content .abc-wrap {
+    #content .bfMap .abc-wrap {
       position: relative;
-      width: 100%;
-      max-width: 520px;       /* desktop cap; tweak if you like */
-      margin: 0 auto;
-      aspect-ratio: 1 / 1;    /* force a perfect square */
+      width: min(44vw, 480px); /* ← looks like your original sizing */
+      max-width: 100%;
+      aspect-ratio: 1 / 1;     /* keep it a perfect square so donut+overlay lock */
+      margin-left: auto;       /* hugs the right on desktop */
       overflow: hidden;
     }
 
-    /* The chart container fills the square */
+    /* Donut & overlay must fill the exact same square */
     #content .abc-wrap .donut {
-      position: absolute;
-      inset: 0;               /* top/right/bottom/left: 0 */
-      width: 100%;
-      height: 100%;
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
     }
-
-    /* Whatever the chart lib renders (svg/canvas/div), make it fill the square */
     #content .abc-wrap .donut > * {
       width: 100% !important;
       height: 100% !important;
       display: block;
     }
-
-    /* The overlay covers the same square exactly */
     #content .abc-wrap img.overlay {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
       object-fit: contain;
-      pointer-events: none;   /* clicks go through */
-      user-select: none;
+      pointer-events: none; user-select: none;
+    }
+
+    /* 📱 Mobile/tablet: stack and center the map, full width inside card */
+    @media (max-width: 860px) {
+      #content .card .bfGrid {
+        grid-template-columns: 1fr;  /* stack */
+        gap: 16px;
+      }
+      #content .bfMap .abc-wrap {
+        width: 100%;
+        max-width: 520px;   /* sensible cap so it doesn't explode on phablets */
+        margin: 0 auto;     /* center under the text */
+      }
     }
 
     /* Safety: wrap long tokens in text blocks */
@@ -91,27 +87,28 @@ function lockAbcSizing(container) {
   const donut = container.querySelector(".donut");
   if (!donut) return;
 
-  // Helper that resizes any immediate child to fill the square
   const fit = () => {
     const child = donut.firstElementChild;
     if (!child) return;
-    // Force sizing for common cases (div>svg, canvas, etc.)
+
     child.style.width = "100%";
     child.style.height = "100%";
-    // Google Charts sometimes nests <div><svg> — grab svg if present
-    const svg = child.tagName === "SVG" ? child : child.querySelector && child.querySelector("svg");
+
+    const svg = child.tagName === "SVG" ? child : child.querySelector?.("svg");
     if (svg) {
       svg.setAttribute("width", "100%");
       svg.setAttribute("height", "100%");
-      // If it has viewBox, let it scale cleanly
-      if (!svg.getAttribute("viewBox") && svg.viewBox && svg.viewBox.baseVal) {
-        const vb = svg.viewBox.baseVal;
-        svg.setAttribute("viewBox", `0 0 ${vb.width || 100} ${vb.height || 100}`);
+      // add a viewBox if missing so it scales cleanly
+      if (!svg.getAttribute("viewBox")) {
+        const bb = svg.getBBox?.();
+        if (bb && bb.width && bb.height) {
+          svg.setAttribute("viewBox", `0 0 ${bb.width} ${bb.height}`);
+        }
       }
     }
-    const canvas = child.tagName === "CANVAS" ? child : child.querySelector && child.querySelector("canvas");
+
+    const canvas = child.tagName === "CANVAS" ? child : child.querySelector?.("canvas");
     if (canvas) {
-      // Match canvas CSS size; some libs read width/height attributes for raster size
       const rect = donut.getBoundingClientRect();
       canvas.style.width = "100%";
       canvas.style.height = "100%";
@@ -120,16 +117,13 @@ function lockAbcSizing(container) {
     }
   };
 
-  // Run now and after a brief delay (for async chart render)
   fit();
   setTimeout(fit, 0);
   setTimeout(fit, 100);
 
-  // Observe future mutations (chart re-render)
   const mo = new MutationObserver(() => fit());
   mo.observe(donut, { childList: true, subtree: true });
 
-  // Keep in sync on resize
   const ro = new ResizeObserver(() => fit());
   ro.observe(donut);
 }
@@ -140,7 +134,6 @@ export async function renderTargetingTab() {
   document.body.setAttribute("data-current-tab", "targeting");
   clearUpgradeBlock();
 
-  // Inject mobile/responsiveness fixes once
   injectTargetingStylesOnce();
 
   const contentDiv = document.getElementById("content");
@@ -291,7 +284,7 @@ function paintTargeting(api, allowFull = false) {
     // Render chart
     setABCMap({ container, mode: m, areas: a, overlayPath });
 
-    // Enforce fill/lock so overlay + chart stay aligned
+    // Enforce fill/lock so overlay + chart stay aligned at every size
     lockAbcSizing(container);
   });
 }
