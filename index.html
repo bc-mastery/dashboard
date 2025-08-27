@@ -272,6 +272,68 @@
       margin: 0 auto;            /* keep it centered */
     }
     
+    /* ====================== MOBILE-ONLY OVERRIDES ====================== */
+    @media (max-width: 768px){
+      /* Make header non-obtrusive & smaller on mobile */
+      .siteHeader{
+        position: sticky;
+        top: 0;
+      }
+      .headerLogo{ justify-self:center; }
+      .headerLogo img{ height:20px; }
+      .brandName{ font-size:12px; line-height:1.2; }
+      .titleBlock img{ width:24px; height:24px; }
+      .pageTitle{ font-size: clamp(18px, 4.6vw, 22px); }
+
+      /* Reduce computed header height so main padding isn’t excessive */
+      :root{
+        --headerBarH: 44px;
+        --headerTabsH: 0px;      /* we’ll visually suppress chips below */
+        --headerH: calc(var(--headerBarH) + 16px);
+      }
+
+      /* Primary tabs → 3 per row, smaller buttons */
+      #tabs{
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+      }
+      #tabs .tabBtn{
+        width: 100%;
+        height: 40px;
+        padding: 10px 6px;
+        font-size: 12px;
+        border-radius: 10px;
+        flex: 0 0 auto; /* ignore the fixed var width */
+      }
+
+      /* Hide all secondary chips on mobile, keep the Download CTA visible */
+      #blockTabs .blockBtn{ display:none !important; }
+
+      /* Turn the existing download button into a full-width row */
+      #blockTabsRow{
+        display:block;          /* show the row (chips hidden) */
+        padding-top: 0;
+      }
+      #blockTabs{ display:block; }
+      #blockTabsRow .floatingCTA{
+        display:block !important;
+        width:100%;
+        margin:8px 0 12px;
+        text-align:center;
+        font-size:13px;
+        padding:10px 12px;
+        border-radius:8px;
+        position: static !important;
+        top:auto; right:auto;
+        height:auto;
+      }
+
+      /* Ensure content never tucks under the header */
+      .main{
+        padding-top: calc(var(--headerH) + 10px);
+      }
+    }
   </style>
 </head>
 
@@ -399,9 +461,3 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
-
-
-
-
-
-
