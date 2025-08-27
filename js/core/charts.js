@@ -119,13 +119,23 @@ export function drawSegmentedBars(targetId, pillars = []) {
 /* ---------------------------------------------------------------------- */
 
 /**
- * centerLockChart({ wrapper, host, extraYOffset })
+ * centerLockChart({ wrapper, host, extraYOffset, mobileYOffset })
  * - wrapper: square container that overlay uses (e.g., .abc-wrap)
  * - host:    element that holds the chart DOM (e.g., .donut)
- * - extraYOffset: optional px nudge applied after centering (default 0)
+ * - extraYOffset: additional px nudge (added on top of measured delta)
+ * - mobileYOffset: extra px applied on mobile only (default -12)
+ *
+ * Total vertical offset = measuredDelta + extraYOffset + (isMobile ? mobileYOffset : 0)
  */
-export function centerLockChart({ wrapper, host, extraYOffset = 0 }) {
+export function centerLockChart({
+  wrapper,
+  host,
+  extraYOffset = 0,
+  mobileYOffset = -12,
+}) {
   if (!wrapper || !host) return;
+
+  const isMobile = () => window.matchMedia("(max-width: 860px)").matches;
 
   let rafId = 0;
   const measure = () => {
@@ -149,10 +159,19 @@ export function centerLockChart({ wrapper, host, extraYOffset = 0 }) {
 
       const wrapCY  = wrapRect.top + wrapRect.height / 2;
       const innerCY = innerRect.top + innerRect.height / 2;
-      const dy = (wrapCY - innerCY) + (Number(extraYOffset) || 0);
+      const measured = wrapCY - innerCY;
 
-      // keep X centered from CSS, adjust Y by measured delta (+ optional nudge)
-      host.style.transform = `translate(-50%, calc(-50% + ${dy}px))`;
+      const totalDy =
+        measured +
+        (Number(extraYOffset) || 0) +
+        (isMobile() ? (Number(mobileYOffset) || 0) : 0);
+
+      // keep X centered from CSS, adjust Y by measured delta (+ nudges), and make it authoritative
+      host.style.setProperty(
+        "transform",
+        `translate(-50%, calc(-50% + ${totalDy}px))`,
+        "important"
+      );
     });
   };
 
