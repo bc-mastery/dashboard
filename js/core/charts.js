@@ -3,14 +3,11 @@
 /** Load Google Charts corechart package (idempotent) */
 export function ensureCharts() {
   return new Promise((resolve, reject) => {
-    // Already loaded?
     if (window.google && google.charts) {
       google.charts.load("current", { packages: ["corechart"] });
       google.charts.setOnLoadCallback(resolve);
       return;
     }
-
-    // Inject loader then load
     const s = document.createElement("script");
     s.src = "https://www.gstatic.com/charts/loader.js";
     s.onload = () => {
@@ -49,14 +46,12 @@ export function drawDonut(targetId, slices = [], options = {}) {
   const el = document.getElementById(targetId);
   if (!el || !(window.google && google.visualization)) return null;
 
-  // Build DataTable: ["Label","Value"]
   const rows = slices.map(s => [String(s.label ?? ""), Number(s.value ?? 0)]);
   const data = google.visualization.arrayToDataTable([
     ["Status", "Value"],
     ...rows,
   ]);
 
-  // Slice colors
   const sliceOpts = {};
   slices.forEach((s, i) => {
     const color = s.color || (i === 0 ? "#30BA80" : "#D34B4B");
@@ -72,10 +67,8 @@ export function drawDonut(targetId, slices = [], options = {}) {
     pieSliceText: "none",
     backgroundColor: "transparent",
     slices: sliceOpts,
-
-    // Center the chart area (no fixed px offsets)
+    // Centered and proportional chart area (no fixed px offsets)
     chartArea: options.chartArea || { left: "5%", top: "5%", width: "90%", height: "90%" },
-
     tooltip: { text: "percentage" },
   };
 
@@ -89,7 +82,6 @@ export function drawSegmentedBars(targetId, pillars = []) {
   const root = document.getElementById(targetId);
   if (!root) return;
 
-  // Decide color by value
   const colorFor = (v) => {
     if (v <= 60) return "#FF0040";
     if (v <= 80) return "#333333";
@@ -114,11 +106,67 @@ export function drawSegmentedBars(targetId, pillars = []) {
     })
     .join("");
 
-  // Animate fills
   requestAnimationFrame(() => {
     root.querySelectorAll(".gsFill").forEach((el) => {
       const w = el.getAttribute("data-width");
       el.style.width = w;
     });
   });
+}
+
+/* ---------------------------------------------------------------------- */
+/*  Universal center-lock helper for Google Charts / canvas / svg outputs */
+/*  Use this anywhere you need donut (or other chart) visually centered.  */
+/* ---------------------------------------------------------------------- */
+
+/**
+ * centerLockChart({ wrapper, host })
+ * - wrapper: the square container that overlay uses (e.g., .abc-wrap)
+ * - host:    the element that holds the chart DOM (e.g., .donut)
+ *
+ * We measure the inner rendered node (svg/canvas) and translate the host so
+ * its visual center matches the wrapper center. Re-runs on resize/mutations.
+ */
+export function centerLockChart({ wrapper, host }) {
+  if (!wrapper || !host) return;
+
+  let rafId = 0;
+  const measure = () => {
+    cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(() => {
+      const wrapRect = wrapper.getBoundingClientRect();
+
+      let innerRect = null;
+      const svg = host.querySelector("svg");
+      if (svg) innerRect = svg.getBoundingClientRect();
+      if (!innerRect) {
+        const canvas = host.querySelector("canvas");
+        if (canvas) innerRect = canvas.getBoundingClientRect();
+      }
+      if (!innerRect) {
+        const first = host.firstElementChild;
+        if (first) innerRect = first.getBoundingClientRect();
+      }
+      if (!innerRect) return;
+
+      const wrapCY  = wrapRect.top + wrapRect.height / 2;
+      const innerCY = innerRect.top + innerRect.height / 2;
+      const dy = wrapCY - innerCY;
+
+      // Keep X centering from CSS, adjust Y by measured delta
+      host.style.transform = `translate(-50%, calc(-50% + ${dy}px))`;
+    });
+  };
+
+  // Initial + a couple retries to cover async chart render
+  measure();
+  setTimeout(measure, 80);
+  setTimeout(measure, 180);
+
+  const ro = new ResizeObserver(measure);
+  ro.observe(wrapper);
+  ro.observe(host);
+
+  const mo = new MutationObserver(measure);
+  mo.observe(host, { childList: true, subtree: true });
 }
