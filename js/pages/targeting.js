@@ -81,7 +81,7 @@ export async function renderTargetingTab() {
     // floating call button for GS-only users
     toggleFloatingCallBtn(state.lastAccess === ACCESS.GS_ONLY);
 
-    // inject targeting styles once
+    // inject responsive/locking styles
     injectTargetingStylesOnce();
   } catch (err) {
     console.error(err);
@@ -175,7 +175,7 @@ function injectTargetingStylesOnce() {
   const style = document.createElement("style");
   style.id = "targeting-styles";
   style.textContent = `
-    /* Desktop grid: text 2/3, map 1/3 */
+    /* Desktop: 2:1 text:map */
     #content .card .bfGrid {
       display: grid;
       grid-template-columns: 2fr 1fr;
@@ -183,55 +183,54 @@ function injectTargetingStylesOnce() {
       gap: 22px;
     }
 
-    /* Map wrapper always square */
+    /* Map wrapper (square) */
     #content .bfMap .abc-wrap {
       position: relative;
       width: 100%;
       max-width: 360px;
-      aspect-ratio: 1 / 1;
+      aspect-ratio: 1 / 1; /* square container so overlay & donut share a box */
       margin-left: auto;
+      --donut-nudge-y: 0px; /* default: no nudge */
     }
 
-    /* Overlay fills container */
-#content .bfMap .abc-wrap .overlay {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
+    /* Overlay fills container and is centered by its own box */
+    #content .bfMap .abc-wrap .overlay {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+    }
 
-//* Donut centered & nudged */
-#content .bfMap .abc-wrap .donut {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -48%); /* <-- shift slightly down */
-  width: 100%;
-  height: 100%;
-}
+    /* Donut also fills container and is centered by its own box.
+       We add a small adjustable Y nudge for mobile engines that render a few px off. */
+    #content .bfMap .abc-wrap .donut {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 100%;
+      height: 100%;
+      transform: translate(-50%, calc(-50% + var(--donut-nudge-y)));
+    }
 
-
-    /* Mobile: stack text + map, center the map */
+    /* Mobile: stack and center the map, with a gentle nudge to perfectly align */
     @media (max-width: 860px) {
       #content .card .bfGrid {
         grid-template-columns: 1fr;
+        gap: 16px;
       }
       #content .bfMap {
         display: flex;
         justify-content: center;
-        margin-top: 16px;
       }
       #content .bfMap .abc-wrap {
-        max-width: 280px;
+        max-width: 300px;
         margin-left: 0;
+        --donut-nudge-y: 6px; /* <- adjust 4–10px if needed per device */
       }
     }
   `;
   document.head.appendChild(style);
 }
-
-
-
