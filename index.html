@@ -410,6 +410,31 @@
 
     /* Make long domain/email break nicely */
     .footer-company a, .footer-right, .footer-middle { word-break: break-word; }
+
+          /* === Click-through guard rails for header === */
+      
+      /* Let the header panel itself be transparent to mouse events */
+      .siteHeader .panel { pointer-events: none; }
+      
+      /* But re-enable pointer events on the interactive elements inside it */
+      #tabs,
+      #tabs .tabBtn,
+      #blockTabsRow,
+      #blockTabs,
+      #blockTabs .blockBtn,
+      #blockTabsRow .floatingCTA {
+        pointer-events: auto;
+      }
+      
+      /* Make sure the chips are the topmost thing in the header area */
+      #blockTabsRow,
+      #blockTabs {
+        position: relative;
+        z-index: 2001;  /* higher than any fixed/absolute siblings */
+      }
+      #blockTabs .blockBtn { z-index: 2002; }
+
+    
   </style>
 </head>
 
@@ -550,3 +575,4 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
