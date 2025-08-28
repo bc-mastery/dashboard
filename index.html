@@ -313,34 +313,45 @@
     /* ====================== MOBILE-ONLY OVERRIDES ====================== */
 @media (max-width: 768px){
 
-  /* === ABC map: single source of truth (tweak here) ===
-     Positive nudge moves BOTH donut & overlay DOWN.
-     Increase radius if the donut ring looks smaller than the overlay circle.
+  /* === ABC map controls (overlay stays fixed) ===
+     Adjust ONLY these three to align on mobile:
+       • --abc-mb-donut-shift-x : px → left/right (positive = right)
+       • --abc-mb-donut-shift-y : px → up/down   (positive = down)
+       • --abc-mb-donut-radius  : %  → ring radius to match overlay circle
   */
   :root{
-    --abc-mb-nudge-x: 0px;
-    --abc-mb-nudge-y: -18px;     /* ← adjust ± to align vertically */
-    --abc-mb-radius: 44.8%;    /* ← adjust to match overlay circle */
-    --abc-mb-overlay-scale: 1; /* usually keep 1; raise slightly only if art needs it */
+    --abc-mb-donut-shift-x: 0px;
+    --abc-mb-donut-shift-y: 6px;    /* tweak ± to line up vertically */
+    --abc-mb-donut-radius:  44.8%;  /* tweak to match overlay’s circle */
   }
 
-  /* Match wrapper & chart sizes; apply the controls above */
+  /* Match wrapper size and center it */
   .abc-wrap{
     width: min(86vw, 360px);
     margin: 0 auto;
 
-    /* feed JS/CSS with our mobile controls */
-    --donut-nudge-x: var(--abc-mb-nudge-x);
-    --donut-nudge-y: var(--abc-mb-nudge-y);
-    --overlay-scale: var(--abc-mb-overlay-scale);
+    /* IMPORTANT: freeze the conic center — no ellipse artifacts */
+    --donut-nudge-x: 0px;
+    --donut-nudge-y: 0px;
+
+    /* overlay is the fixed frame; keep its scale neutral */
+    --overlay-scale: 1;
   }
 
-  /* Donut ring thickness/outer size */
+  /* Donut: move & size WITHOUT changing its center */
   .abc-wrap .donut{
-    --outer-radius: var(--abc-mb-radius);
+    --outer-radius: var(--abc-mb-donut-radius);
+    transform: translate(var(--abc-mb-donut-shift-x), var(--abc-mb-donut-shift-y));
+    transform-origin: 50% 50%;
   }
 
-  /* Keep Google Charts donuts sized nicely when present */
+  /* Overlay: keep perfectly centered and unscaled (fixed frame) */
+  .abc-wrap .overlay{
+    object-position: 50% 50% !important;
+    transform: none !important;
+  }
+
+  /* Google Charts donuts (if used elsewhere) */
   .gsDonutChart, .donutChart{
     width: min(86vw, 360px);
     height: min(86vw, 360px);
@@ -348,7 +359,7 @@
     margin: 0 auto;
   }
 
-  /* ===== existing mobile UI/layout from your block (unchanged) ===== */
+  /* ===== existing mobile UI/layout (unchanged) ===== */
 
   /* Make header non-obtrusive & smaller on mobile */
   .siteHeader{ position: sticky; top: 0; }
@@ -653,6 +664,7 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
 
 
 
