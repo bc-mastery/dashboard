@@ -20,6 +20,9 @@
       --headerBarH: 60px;
       --headerTabsH: 40px;
       --headerH: calc(var(--headerBarH) + var(--headerTabsH) + 44px);
+
+      /* Primary tabs */
+      --primaryTabW: 128px; --primaryTabH: 28px;
     }
 
     .preserve { white-space: pre-line; }
@@ -32,7 +35,7 @@
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color: var(--bc-dark);
       background: linear-gradient(to left, var(--bc-teal) 0%, var(--bc-green) 50%, var(--bc-green) 100%);
-      overflow-x: hidden; /* global safety */
+      overflow-x: hidden;
       width: 100%;
     }
 
@@ -40,31 +43,34 @@
     *, *::before, *::after { box-sizing: border-box; }
     img, svg, canvas, video { max-width: 100%; height: auto; display:block; }
     .wrap, .panel, .tabsRow, #blockTabsRow, .main { max-width: 100vw; overflow-x: hidden; }
-    .footerCard { overflow: hidden; } /* keep footer’s bg crop; allow bubbles elsewhere */
     #tabs, .footer-inner, .footer-left, .footer-middle, .footer-right, .main, #content { min-width: 0; }
 
     .wrap{ max-width:1100px; margin:0 auto; padding:0 20px; }
 
+    /* ====================== HEADER ====================== */
     .siteHeader{
-      position: fixed; inset: 0 0 auto 0; z-index: 1000;
+      position: fixed; inset: 0 0 auto 0; z-index: 3000;
       background: transparent; color: var(--bc-white);
     }
-
     .siteHeader .panel{
-      background: linear-gradient(to left, rgba(2,77,79,0.96) 0%, rgba(48,186,128,0.96) 50%, rgba(48,186,128,0.96) 100%);
+      background: linear-gradient(to left,
+        rgba(2,77,79,0.96) 0%,
+        rgba(48,186,128,0.96) 50%,
+        rgba(48,186,128,0.96) 100%);
       -webkit-backdrop-filter: saturate(140%) blur(18px);
       backdrop-filter: saturate(140%) blur(18px);
       box-shadow: 0 10px 26px rgba(0,0,0,.18);
-      border: 1px solid rgba(255,255,255,0.18);
+      border: none; /* kill the hairline */
       border-bottom-left-radius: 14px;
       border-bottom-right-radius: 14px;
-      padding-bottom: 0px !important;
+      padding-bottom: 0 !important;
+      background-clip: padding-box;
     }
 
     .bar{
       height: var(--headerBarH);
       display:grid; grid-template-columns: 1fr auto 1fr; align-items:center; gap:16px;
-      padding-bottom: 0px;
+      padding-bottom: 0;
     }
     .titleBlock{ display:flex; align-items:center; gap:12px; min-width:0; }
     .titleBlock img{ width:36px; height:36px; object-fit:contain; }
@@ -81,7 +87,9 @@
       -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-height:1.25;
     }
 
-    .tabsRow { display:flex; flex-direction:column; gap:6px; padding-top:2px; padding-bottom:0; }
+    .tabsRow { display:flex; flex-direction:column; gap:6px; padding-top:2px; padding-bottom:0; position:relative; z-index:3100; }
+    #tabs, #blockTabsRow { position:relative; z-index:3100; }
+    .tabBtn { position:relative; z-index:3101; }
 
     .tabBtn {
       appearance: none; border: 2px solid #ddd; cursor: pointer; background: var(--bc-white); color: var(--bc-teal);
@@ -89,18 +97,6 @@
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), 0 4px 8px rgba(0,0,0,0.15), 0 1px 0 rgba(0,0,0,0.04);
       transition: transform 0.05s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s;
     }
-    /* Active primary tab (clicked) */
-    .tabBtn.tab-active {
-      position: relative;
-      border: 2px solid transparent;
-      background-color: var(--bc-dark);
-      color: var(--bc-white);
-      background-clip: padding-box;
-    }
-    .tabBtn:hover { background:#e0e0e0; }
-    .tabBtn:active { transform:translateY(1px); background:#d5d5d5; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2), 0 1px 1px rgba(0,0,0,0.08); }
-
-    /* Support legacy .active too */
     .tabBtn.tab-active,
     #tabs .tabBtn.active {
       position: relative;
@@ -122,11 +118,14 @@
               mask-composite: exclude;
       pointer-events: none;
     }
+    .tabBtn:hover { background:#e0e0e0; }
+    .tabBtn:active { transform:translateY(1px); background:#d5d5d5; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2), 0 1px 1px rgba(0,0,0,0.08); }
 
+    /* ====================== PAGE BODY ====================== */
     .main{ padding-top: calc(var(--headerH) + 10px); padding-bottom: 18px; max-width:1100px; margin:0 auto; padding-left:20px; padding-right:20px; }
 
     .card{
-      position: relative;                           /* anchor for the bubble */
+      position: relative; /* anchors the tooltip bubble */
       background:var(--bc-white); border-radius:14px; padding:22px 22px 8px;
       box-shadow:0 20px 40px rgba(0,0,0,.18); border:1px solid rgba(2,77,79,.1); margin-bottom:18px;
     }
@@ -141,7 +140,7 @@
     .bfSub{ font-weight:700; color:#024D4F; }
     .bfDesc{ color:#333333; font-weight:400; }
 
-    /* Donut + overlay wrapper (desktop/base) */
+    /* ====================== ABC MAP (desktop base) ====================== */
     .abc-wrap{
       position: relative;
       width: min(28.5vw, 315px);
@@ -152,12 +151,9 @@
     .abc-wrap .overlay{
       position: absolute; inset: 0; width: 100%; height: 100%;
       object-fit: contain;
-      /* Overlay uses the SAME nudge vars as the donut so they move together */
-      object-position:
-        calc(50% + var(--donut-nudge-x, 0px))
-        calc(50% + var(--donut-nudge-y, 0px));
+      object-position: 50% 50%;
       pointer-events: none; z-index: 2;
-      transform: scale(var(--overlay-scale, 1));
+      transform: none;
       transform-origin: 50% 50%;
     }
     .abc-wrap .donut{
@@ -171,7 +167,7 @@
       z-index: 1; transition: background 200ms ease;
     }
 
-    /* Secondary tabs row (chips + CTA) */
+    /* ====================== Secondary tabs / CTA ====================== */
     #blockTabsRow { min-height:42px; display:flex; align-items:center; flex-wrap:wrap; padding-top:2px; padding-bottom:0; gap:6px; visibility:visible; }
     #blockTabs{ display:flex; flex-wrap:wrap; gap:4px; justify-content:flex-start; }
 
@@ -184,7 +180,7 @@
     .blockBtn:hover { background:#b4fde5; }
 
     .floatingCTA {
-      position: fixed; top: calc(var(--headerBarH) + 4px); right: 8px; z-index: 1100;
+      position: fixed; top: calc(var(--headerBarH) + 4px); right: 8px; z-index: 3102;
       display:flex; align-items:center; justify-content:center; height:20px; padding:0 10px;
       border:2px solid #30BA80; border-radius:12px; background:#333333; color:var(--bc-white);
       font-size:12px; font-weight:600; letter-spacing:0.2px; cursor:pointer; text-decoration:none;
@@ -202,7 +198,7 @@
 
     .scrollTarget { scroll-margin-top: calc(var(--headerH) + 11px); }
 
-    /* Footer layout */
+    /* ====================== Footer ====================== */
     body { display:flex; min-height:100vh; flex-direction:column; }
     .main { flex:1; }
 
@@ -218,7 +214,6 @@
     .footer-inner { display:grid; grid-template-columns: 1.2fr 1fr 1.2fr; gap:20px; align-items:start; }
     .footer-left { display:flex; flex-direction:column; align-items:flex-start; gap:10px; }
 
-    /* Business Canvas logo — shrink to ~40% */
     .footer-logo {
       height: 44px !important;
       width: auto !important;
@@ -232,58 +227,39 @@
     .footer-company a:hover { text-decoration:underline; }
 
     .footer-heading{
-  margin:0 0 6px;
-  font-family:'Rokkitt', serif;
-  font-weight:900;
-  font-size:16px;
-  color:var(--bc-green);
-}
-
-.footer-middle a{
-  position: static;          /* no positioning tricks */
-  display: inline-block;     /* tidy wrapping */
-  margin: 6px 0;
-  color: var(--bc-dark);
-  font-size: 14px;
-  text-decoration: none;     /* no pseudo underline */
-}
-
-.footer-middle a:hover,
-.footer-middle a:focus{
-  text-decoration: underline;
-}
-
-    /* Equal-width primary tabs */
-    :root{ --primaryTabW: 128px; --primaryTabH: 28px; }
-    #tabs{ display:flex; gap:6px; flex-wrap:wrap; }
-    #tabs .tabBtn{ display:inline-flex; align-items:center; justify-content:center; flex:0 0 var(--primaryTabW); width:var(--primaryTabW); height:var(--primaryTabH); padding:0 12px; line-height:1; font-size:13px; text-align:center; }
-    @media (max-width: 520px){ #tabs .tabBtn{ flex:0 0 var(--primaryTabW); width:var(--primaryTabW); } }
-
-    /* Upgrade Block */
-    .upgradeBlock .sectionTitle { margin-bottom:8px; }
-    .upgradeBlock p { margin:8px 0; }
-    .upgrade-ctaRow { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
-    .btn { display:inline-flex; align-items:center; justify-content:center; border-radius:10px; padding:8px 12px; font-size:13px; font-weight:600; text-decoration:none; cursor:pointer; border:2px solid transparent; transition: transform .05s, box-shadow .2s, background .2s, border-color .2s, color .2s; box-shadow:0 2px 6px rgba(0,0,0,.06); }
-    .btn:active { transform: translateY(1px); }
-    .btn-primary { background:var(--bc-green); color:var(--bc-white); border-color:var(--bc-green); }
-    .btn-primary:hover { background:#24a771; }
-    .btn-outline { background:var(--bc-white); color:var(--bc-teal); border-color:var(--bc-teal); }
-    .btn-outline:hover { background:#f0fbf8; }
-
-    /* Floating Calendly button */
-    .floatingCallBtn {
-      position: fixed; right: 14px; bottom: 18px; z-index: 1100;
-      width: 44px; height: 44px; border-radius: 50%;
-      background: var(--bc-green); color: var(--bc-white);
-      display: none; align-items: center; justify-content: center;
-      box-shadow: 0 10px 26px rgba(0,0,0,.18);
-      border: 2px solid rgba(255,255,255,0.85);
+      margin:0 0 6px;
+      font-family:'Rokkitt', serif;
+      font-weight:900;
+      font-size:16px;
+      color:var(--bc-green);
+    }
+    .footer-middle a{
+      position: static;
+      display: inline-block;
+      margin: 6px 0;
+      color: var(--bc-dark);
+      font-size: 14px;
       text-decoration: none;
     }
-    .floatingCallBtn:hover { filter: brightness(0.95); }
-    .floatingCallBtn img { width: 22px; height: 22px; display: block; }
-    .floatingCallBtn[aria-hidden="false"] { display: inline-flex; }
-    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    .footer-middle a:hover,
+    .footer-middle a:focus{ text-decoration: underline; }
+
+    .badge-text{ font-size: 14px; line-height: 1.5; color: var(--bc-dark); margin: 8px 0; }
+    .badge-logos{ display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 4px 0 10px; }
+    .badge-logos img{ height: auto; max-width: 180px; object-fit: contain; }
+
+    @media (max-width: 900px){
+      .footer-inner{ grid-template-columns: 1fr; }
+      .footer-right{ grid-column: auto; }
+    }
+    @media (max-width: 640px){
+      .footer-inner{ gap: 16px; }
+      .footer-left, .footer-middle, .footer-right{ text-align: left; }
+      .badge-logos{ justify-content: flex-start; }
+      .badge-logos img{ max-width: 120px; }
+      .footer-company a{ margin: 1px 0; }
+    }
+    .footer-company a, .footer-right, .footer-middle { word-break: break-word; }
 
     /* ===================== Growth Scan components ===================== */
     .gsHeroGrid{
@@ -294,7 +270,6 @@
     }
     .donutViz{ display:flex; align-items:center; justify-content:center; }
     .donutChart{ width:100%; max-width:340px; aspect-ratio:1/1; }
-    
     .gsLeadTitle{ font-family:'Rokkitt', serif; font-weight:900; color:#30BA80; font-size:22px; margin:6px 0 10px; }
     .gsLead p{ margin:6px 0; }
     .gsHighlightGreen{ color:#30BA80; font-weight:700; }
@@ -311,76 +286,130 @@
     .gsBar.v2 .gsTicks { position:absolute; inset:0; border-radius:inherit; pointer-events:none; z-index:1; background: repeating-linear-gradient( to right, transparent 0, transparent calc(10% - 1px), rgba(2,77,79,0.14) calc(10% - 1px), rgba(2,77,79,0.14) 10% ); }
 
     /* ====================== MOBILE-ONLY OVERRIDES ====================== */
-@media (max-width: 768px){
+    @media (max-width: 768px){
+      /* Header becomes sticky & compact */
+      .siteHeader{ position: sticky; top: 0; }
+      .headerLogo{ display:none !important; }
+      .bar{ grid-template-columns: 1fr 1fr; }
 
-  /* ABC map controls — overlay fixed, move the donut by shifting its CENTER.
-     Adjust these to fine-tune on mobile. */
-  :root{
-    --abc-mb-donut-shift-x: 0px;    /* +right / –left  */
-    --abc-mb-donut-shift-y: 16px;  /* +down  / –up    (your default) */
-    --abc-mb-donut-radius:  36.8%;  /* ring radius to match overlay circle */
-  }
+      .brandName{
+        font-size:12px; line-height:1.2;
+        max-width:42vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+        justify-self:end;
+      }
+      .titleBlock img{ width:24px; height:24px; }
+      .pageTitle{
+        font-size: clamp(18px, 4.6vw, 22px);
+        max-width:50vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      }
+      :root{
+        --headerBarH: 44px;
+        --headerTabsH: 0px;
+        --headerH: calc(var(--headerBarH) + 16px);
+      }
 
-  /* Wrapper: square and centered */
-  .abc-wrap{
-    width:  min(86vw, 360px);
-    height: min(86vw, 360px) !important;     /* lock width == height */
-    aspect-ratio: 1 / 1;
-    margin: 0 auto;
+      /* Primary tabs → 3 per row */
+      #tabs{
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        width:100%;
+        overflow-x: clip;
+      }
+      #tabs .tabBtn{
+        width: 100%;
+        height: 40px;
+        padding: 10px 6px;
+        font-size: 12px;
+        border-radius: 10px;
+        -webkit-appearance: none;
+        appearance: none;
+        overflow: hidden;
+        white-space: normal;
+        text-overflow: clip;
+      }
 
-    /* feed center offsets (shared by conic + mask) */
-    --donut-nudge-x: var(--abc-mb-donut-shift-x);
-    --donut-nudge-y: var(--abc-mb-donut-shift-y);
+      /* Chips row: hide chips, keep CTA */
+      #blockTabs .blockBtn{ display:none !important; }
+      #blockTabsRow{ display:block; padding-top:0; overflow-x:clip; }
+      #blockTabs{ display:block; }
+      #blockTabsRow .floatingCTA{
+        display:block !important;
+        width:auto; max-width:480px; box-sizing:border-box;
+        margin:8px auto 12px;
+        text-align:center; font-size:13px;
+        padding:10px 14px; border-radius:8px;
+        position: static !important; top:auto; right:auto; height:auto;
+        z-index: 3102;
+      }
 
-    /* overlay stays the fixed frame */
-    --overlay-scale: 1;
-  }
+      /* First card spacing & scroll targets */
+      .main{ padding-top: var(--headerH); }
+      .main > *:first-child{ margin-top: 18px !important; }
+      .scrollTarget { scroll-margin-top: calc(var(--headerH) + 18px); }
 
-  /* Donut: NO transform. We shift the center of BOTH the conic and the mask,
-     so the ring remains a perfect circle while moving under the overlay. */
-  .abc-wrap .donut{
-    --outer-radius: var(--abc-mb-donut-radius) !important;
+      /* =================== ABC map — MOBILE (overlay fixed) ===================
+         Tweak ONLY these variables to align on mobile:
+           --abc-mb-donut-shift-x : px  (+ right / – left)
+           --abc-mb-donut-shift-y : px  (+ down  / – up)
+           --abc-mb-donut-radius  : %   (ring radius vs overlay circle)
+      */
+      :root{
+        --abc-mb-donut-shift-x: 0px;
+        --abc-mb-donut-shift-y: 0px;     /* set positive to move down (e.g., 16px) */
+        --abc-mb-donut-radius:  44.2%;   /* tune 44.0–45.0% as needed */
+      }
 
-    /* re-center the mask using the same offsets as the conic gradient */
-    -webkit-mask: radial-gradient(
-      circle at calc(50% + var(--donut-nudge-x, 0px))
-                calc(50% + var(--donut-nudge-y, 0px)),
-      #000 0 var(--outer-radius),
-      transparent calc(var(--outer-radius) + 1px) 100%
-    ) !important;
-            mask: radial-gradient(
-      circle at calc(50% + var(--donut-nudge-x, 0px))
-                calc(50% + var(--donut-nudge-y, 0px)),
-      #000 0 var(--outer-radius),
-      transparent calc(var(--outer-radius) + 1px) 100%
-    ) !important;
-  }
+      .abc-wrap{
+        width:  min(86vw, 360px);
+        height: min(86vw, 360px) !important;   /* lock square */
+        aspect-ratio: 1 / 1;
+        margin: 0 auto;
 
-  /* Overlay: fixed, perfectly centered */
-  .abc-wrap .overlay{
-    object-position: 50% 50% !important;
-    transform: none !important;
-  }
+        /* share center offsets between conic paint & mask to keep circle */
+        --donut-nudge-x: var(--abc-mb-donut-shift-x);
+        --donut-nudge-y: var(--abc-mb-donut-shift-y);
+      }
 
-  /* (rest of your mobile layout stays as-is) */
-}
+      /* Donut: move by changing its CENTER (no transform scaling) */
+      .abc-wrap .donut{
+        --outer-radius: var(--abc-mb-donut-radius) !important;
+        -webkit-mask: radial-gradient(
+          circle at calc(50% + var(--donut-nudge-x, 0px))
+                    calc(50% + var(--donut-nudge-y, 0px)),
+          #000 0 var(--outer-radius),
+          transparent calc(var(--outer-radius) + 1px) 100%
+        ) !important;
+                mask: radial-gradient(
+          circle at calc(50% + var(--donut-nudge-x, 0px))
+                    calc(50% + var(--donut-nudge-y, 0px)),
+          #000 0 var(--outer-radius),
+          transparent calc(var(--outer-radius) + 1px) 100%
+        ) !important;
+        background-position: calc(50% + var(--donut-nudge-x, 0px)) calc(50% + var(--donut-nudge-y, 0px));
+        background-origin: padding-box;
+      }
 
-    
-    /* ============================== Growth: Block #1 desktop layout (1 : 2) ============================== */
-    #block-gs-overview .bfGrid{
-      grid-template-columns: 1fr 2fr !important; /* left: donut (1fr), right: text (2fr) */
+      /* Overlay stays perfectly centered as a fixed frame */
+      .abc-wrap .overlay{
+        object-position: 50% 50% !important;
+        transform: none !important;
+      }
+
+      /* Prevent sideways scroll in header rows */
+      .panel, .wrap, .tabsRow, #blockTabsRow{ overflow-x:clip; }
     }
 
-    /* === Growth · Block #1: clean mobile stack === */
+    /* =================== Growth: Block #1 (desktop layout 1:2) =================== */
+    #block-gs-overview .bfGrid{
+      grid-template-columns: 1fr 2fr !important;
+    }
     @media (max-width: 860px){
-      /* one column */
       #block-gs-overview .bfGrid{
         grid-template-columns: 1fr !important;
         align-items: start;
         gap: 12px;
       }
-
-      /* title at the very top (mobile-only) */
       #block-gs-overview .bfGrid::before{
         content: "Quick Scan";
         display: block;
@@ -392,15 +421,9 @@
         line-height: 1.2;
         order: 1;
       }
-
-      /* donut second */
       #block-gs-overview .bfMap{ order: 2; }
-
-      /* text third; hide the in-text title to avoid duplicate heading */
       #block-gs-overview .bfText{ order: 3; }
       #block-gs-overview .bfTitle{ display: none !important; }
-
-      /* override inline width/height from growth.js so the donut matches text width */
       #block-gs-overview #gsDonut{
         width: 100% !important;
         max-width: none !important;
@@ -409,69 +432,6 @@
         margin: 0 auto;
       }
     }
-
-    /* FOOTER — tidy spacing and image sizes */
-    .siteFooter.footerCard { padding: 22px; }
-    .footer-inner{
-      display: grid;
-      grid-template-columns: 1.2fr 1fr 1.2fr;
-      align-items: start;
-      gap: 24px;
-    }
-    .footer-left,
-    .footer-middle,
-    .footer-right{ min-width: 0; }
-
-    .footer-company{ font-size: 14px; line-height: 1.5; color: var(--bc-dark); }
-    .footer-company .company-name{ font-weight: 600; color: var(--bc-teal); margin-bottom: 4px; }
-    .footer-company a{
-      display:inline-block;
-      margin: 2px 0;
-      color: var(--bc-teal);
-      text-decoration: none;
-    }
-    .footer-company a:hover{ text-decoration: underline; }
-
-    .footer-heading{
-      margin: 0 0 8px;
-      font-family: 'Rokkitt', serif;
-      font-weight: 900;
-      font-size: 16px;
-      color: var(--bc-green);
-    }
-
-    .footer-middle a{
-      position: static;
-      display: inline-block;
-      margin: 6px 0;
-      text-decoration: none;
-      color: var(--bc-dark);
-    }
-    .footer-middle a:hover{ text-decoration: underline; }
-
-    .badge-text{ font-size: 14px; line-height: 1.5; color: var(--bc-dark); margin: 8px 0; }
-    .badge-logos{ display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 4px 0 10px; }
-    .badge-logos img{
-      height: auto;
-      max-width: 180px;
-      object-fit: contain;
-    }
-
-    /* Mobile footer stack */
-    @media (max-width: 900px){
-      .footer-inner{ grid-template-columns: 1fr; }
-      .footer-right{ grid-column: auto; }
-    }
-    @media (max-width: 640px){
-      .footer-inner{ gap: 16px; }
-      .footer-left, .footer-middle, .footer-right{ text-align: left; }
-      .badge-logos{ justify-content: flex-start; }
-      .badge-logos img{ max-width: 120px; }
-      .footer-company a{ margin: 1px 0; }
-    }
-
-    /* make long domain/email break nicely */
-    .footer-company a, .footer-right, .footer-middle { word-break: break-word; }
   </style>
 </head>
 
@@ -596,19 +556,3 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
