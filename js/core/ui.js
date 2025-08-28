@@ -210,14 +210,13 @@ export function populateBlockTabsFromPage() {
     const id = block.id;
     if (title && id) {
       const btn = document.createElement("button");
-      btn.className = "tabBtn blockBtn";
+      btn.className = "blockBtn";           // ⬅️ remove 'tabBtn' so global tab handler ignores these
+      btn.type = "button";
       btn.dataset.target = `#${id}`;
       btn.textContent = title;
-
-      btn.addEventListener("click", () => {
-        const el = document.querySelector(`#${id}`);
-        if (el) scrollToTarget(el);
-      });
+      const btn = document.createElement("button");
+      btn.className = "blockBtn";           // ⬅️ remove 'tabBtn' so global tab handler ignores these
+      btn.type = "button";
 
       blockTabs.appendChild(btn);
     }
@@ -308,3 +307,4 @@ export function initDownloadButtonIsolation() {
     }
   });
 }
+
