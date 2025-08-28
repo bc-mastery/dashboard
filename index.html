@@ -250,6 +250,26 @@
     .badge-logos{ display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 4px 0 10px; }
     .badge-logos img{ height: auto; max-width: 180px; object-fit: contain; }
 
+    /* === Desktop/tablet: equal-width primary tabs === */
+    @media (min-width: 769px){
+      #tabs{
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+      #tabs .tabBtn{
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 var(--primaryTabW);
+        width: var(--primaryTabW);
+        height: var(--primaryTabH);
+        padding: 0 12px;
+        line-height: 1;
+        text-align: center;
+      }
+    }
+    
     /* ====================== MOBILE-ONLY OVERRIDES ====================== */
     @media (max-width: 768px){
       /* Mobile header behavior */
@@ -411,28 +431,29 @@
     /* Make long domain/email break nicely */
     .footer-company a, .footer-right, .footer-middle { word-break: break-word; }
 
-          /* === Click-through guard rails for header === */
-      
-      /* Let the header panel itself be transparent to mouse events */
-      .siteHeader .panel { pointer-events: none; }
-      
-      /* But re-enable pointer events on the interactive elements inside it */
-      #tabs,
-      #tabs .tabBtn,
-      #blockTabsRow,
-      #blockTabs,
-      #blockTabs .blockBtn,
-      #blockTabsRow .floatingCTA {
-        pointer-events: auto;
-      }
-      
-      /* Make sure the chips are the topmost thing in the header area */
-      #blockTabsRow,
-      #blockTabs {
-        position: relative;
-        z-index: 2001;  /* higher than any fixed/absolute siblings */
-      }
-      #blockTabs .blockBtn { z-index: 2002; }
+          /* === Click-through guard rails for header (fixed) === */
+
+/* Keep header above cards & bubbles and fully interactive */
+.siteHeader { z-index: 4000; }
+.siteHeader .panel { pointer-events: auto; }
+
+/* Explicitly allow pointer events on interactive header elements */
+#tabs,
+#tabs .tabBtn,
+#blockTabsRow,
+#blockTabs,
+#blockTabs .blockBtn,
+#blockTabsRow .floatingCTA {
+  pointer-events: auto;
+}
+
+/* Make sure chips row sits above nearby content */
+#blockTabsRow,
+#blockTabs {
+  position: relative;
+  z-index: 4001;
+}
+#blockTabs .blockBtn { z-index: 4002; }
 
     
   </style>
@@ -575,4 +596,5 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
 
