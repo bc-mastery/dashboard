@@ -313,28 +313,29 @@
     /* ====================== MOBILE-ONLY OVERRIDES ====================== */
 @media (max-width: 768px){
 
-  /* ABC map — overlay fixed, move/size DONUT only */
+  /* ABC map (overlay fixed; move donut only) */
   :root{
-    --abc-mb-donut-shift-x: 0px;     /* + right / – left  */
-    --abc-mb-donut-shift-y: -24px;   /* ↑ default: higher than before (-16) */
-    --abc-mb-donut-radius:  45.6%;   /* bigger ring to match overlay circle */
+    --abc-mb-donut-shift-x: 0px;     /* +right / –left  */
+    --abc-mb-donut-shift-y: -16px;   /* +down  / –up    (default per your request) */
+    --abc-mb-donut-radius:  44.8%;   /* ring radius to match overlay circle */
   }
 
+  /* Force a perfect square so the ring can never look elliptical */
   .abc-wrap{
     width:  min(86vw, 360px);
-    height: min(86vw, 360px) !important;  /* force perfect square */
+    height: min(86vw, 360px) !important;  /* lock height = width */
     aspect-ratio: 1 / 1;
     margin: 0 auto;
 
-    /* keep conic center dead-center → prevents ellipse look */
-    --donut-nudge-x: 0px;
-    --donut-nudge-y: 0px;
+    /* kill any center-shift from earlier rules */
+    --donut-nudge-x: 0px !important;
+    --donut-nudge-y: 0px !important;
 
-    /* overlay is the fixed frame on mobile */
+    /* overlay is a fixed frame */
     --overlay-scale: 1;
   }
 
-  /* Donut: translate & resize only (center unchanged) */
+  /* Donut: resize and move, but keep center unchanged (no ellipse) */
   .abc-wrap .donut{
     --outer-radius: var(--abc-mb-donut-radius) !important;
     transform: translate(var(--abc-mb-donut-shift-x), var(--abc-mb-donut-shift-y)) !important;
@@ -342,22 +343,15 @@
     will-change: transform;
   }
 
-  /* Overlay stays perfectly centered */
+  /* Overlay: stay perfectly centered, no transforms */
   .abc-wrap .overlay{
     object-position: 50% 50% !important;
     transform: none !important;
   }
 
-  /* If you render Google Charts donuts elsewhere */
-  .gsDonutChart, .donutChart{
-    width:  min(86vw, 360px);
-    height: min(86vw, 360px);
-    max-width: 100%;
-    margin: 0 auto;
-  }
-
-  /* (rest of your mobile layout rules unchanged) */
+  /* (the rest of your mobile UI rules stay as-is) */
 }
+
 
     /* ============================== Growth: Block #1 desktop layout (1 : 2) ============================== */
     #block-gs-overview .bfGrid{
@@ -589,6 +583,7 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
 
 
 
