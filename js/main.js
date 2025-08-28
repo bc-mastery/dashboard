@@ -73,9 +73,12 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  // Wire primary navigation tabs
-  document.querySelectorAll(".tabBtn").forEach((tabBtn) => {
-    tabBtn.addEventListener("click", () => {
+  // Wire ONLY the PRIMARY navigation tabs (top strip).
+  // This avoids binding to mint chips generated in #blockTabs.
+  document.querySelectorAll("#tabs .tabBtn").forEach((tabBtn) => {
+    tabBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+
       const tabName = (tabBtn.dataset.tab || "growth").toLowerCase();
       state.currentTab = tabName;
 
