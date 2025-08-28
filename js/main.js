@@ -6,8 +6,6 @@ import {
   initDownloadButtonIsolation,
 } from "./core/ui.js";
 import { state } from "./core/state.js";
-
-// ⬇️ NEW: bring in the fixed token from config.js
 import { token } from "./core/config.js";
 
 // Page renderers
@@ -67,14 +65,12 @@ function loadTab(tabName) {
 
 /* ----------------------------- bootstrap --------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
-  // ✅ Centralized token check before anything else
   if (!token) {
     alert("Token missing in URL");
     return;
   }
 
-  // Wire ONLY the PRIMARY navigation tabs (top strip).
-  // This avoids binding to mint chips generated in #blockTabs.
+  // Wire ONLY the PRIMARY navigation tabs (top strip)
   document.querySelectorAll("#tabs .tabBtn").forEach((tabBtn) => {
     tabBtn.addEventListener("click", (e) => {
       e.preventDefault();
