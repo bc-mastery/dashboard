@@ -203,6 +203,8 @@
     .download-icon { width:12px; height:12px; margin-right:6px; flex-shrink:0; display:inline-block; }
 
     .scrollTarget { scroll-margin-top: calc(var(--headerH) + 11px); }
+    /* NEW: ensure any id that starts with "block-" offsets under the fixed header */
+    [id^="block-"] { scroll-margin-top: calc(var(--headerH) + 11px); }
 
     /* Footer layout */
     body { display:flex; min-height:100vh; flex-direction:column; }
@@ -410,7 +412,7 @@
     .footer-company a{
       display:inline-block;
       margin: 2px 0;
-      color: var(--bc-teal);
+      color:var(--bc-teal);
       text-decoration: none;
     }
     .footer-company a:hover{ text-decoration: underline; }
@@ -592,9 +594,62 @@
     })();
   </script>
 
+  <!-- Small, guarded inline helper so mint chips jump to their blocks even if modules aren't updated yet.
+       If you later move this logic to /js/core/ui.js and call it from main.js, delete this block. -->
+  <script>
+    (function () {
+      if (window.__bcBlockScrollBound) return; // guard against double-binding
+      window.__bcBlockScrollBound = true;
+
+      // Compute header offset from CSS variable --headerH
+      const HEADER_OFFSET = (() => {
+        const raw = getComputedStyle(document.documentElement).getPropertyValue('--headerH').trim();
+        const n = parseFloat(raw);
+        return Number.isFinite(n) ? n + 11 : 0;
+      })();
+
+      function scrollToBlock(id) {
+        const el = id && document.getElementById(id);
+        if (!el) return;
+        const y = el.getBoundingClientRect().top + window.pageYOffset - HEADER_OFFSET;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+
+      // Delegate clicks from mint chips; capture phase beats overly-broad handlers
+      document.addEventListener('click', function (e) {
+        const chip = e.target.closest('#blockTabs .blockBtn');
+        if (!chip) return;
+
+        let targetId = '';
+        const href = (chip.getAttribute('href') || '').trim();
+        if (href.startsWith('#') && href.length > 1) {
+          targetId = href.slice(1);
+        } else {
+          targetId = chip.dataset.target || chip.dataset.blockId || chip.dataset.block || '';
+          if (targetId && !/^block-/.test(targetId)) targetId = 'block-' + targetId;
+        }
+        if (!targetId) return;
+
+        e.preventDefault();
+        scrollToBlock(targetId);
+
+        // visual active state
+        document.querySelectorAll('#blockTabs .blockBtn.active').forEach(el => el.classList.remove('active'));
+        chip.classList.add('active');
+
+        // sync hash without native jump
+        try { history.replaceState(null, '', '#' + targetId); } catch {}
+      }, true);
+
+      // If page opens with a hash, align it correctly under the fixed header
+      if (location.hash.length > 1) {
+        const id = location.hash.slice(1);
+        requestAnimationFrame(() => scrollToBlock(id));
+      }
+    })();
+  </script>
+
   <!-- ES modules entrypoint (replaces the old app.js) -->
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
-
-
