@@ -39,7 +39,12 @@
     /* Global safety */
     *, *::before, *::after { box-sizing: border-box; }
     img, svg, canvas, video { max-width: 100%; height: auto; display:block; }
-    .wrap, .panel, .tabsRow, #blockTabsRow, .main { max-width: 100vw; overflow-x: hidden; }
+    /* keep wrappers from creating a nested scroll area on desktop */
+    .wrap, .panel, .tabsRow, #blockTabsRow, .main { max-width: 100%; overflow-x: clip; }
+    
+    /* keep the page’s scrollbar on the outer edge and prevent “jumps” */
+    html { scrollbar-gutter: stable; }
+
     .footerCard { overflow: hidden; } /* keep footer’s bg crop; allow bubbles elsewhere */
     #tabs, .footer-inner, .footer-left, .footer-middle, .footer-right, .main, #content { min-width: 0; }
 
@@ -174,6 +179,15 @@
     /* Secondary tabs row (chips + CTA) */
     #blockTabsRow { min-height:42px; display:flex; align-items:center; flex-wrap:wrap; padding-top:2px; padding-bottom:0; gap:6px; visibility:visible; }
     #blockTabs{ display:flex; flex-wrap:wrap; gap:4px; justify-content:flex-start; }
+
+        /* ensure the chips are on top and clickable */
+    #blockTabsRow { position: relative; z-index: 5; }
+    #blockTabs { position: relative; z-index: 5; }
+    #blockTabs .blockBtn { position: relative; z-index: 6; pointer-events: auto; }
+    
+    /* keep the CTA under the chips in this row only */
+    #blockTabsRow .floatingCTA { z-index: 4; }
+
 
     .blockBtn {
       font-size:10px; padding:4px 8px; background: var(--bc-mint); color: var(--bc-teal);
@@ -600,7 +614,24 @@
     <span class="sr-only">Book a strategic call</span>
   </a>
 
+  <script>
+  // Progressive enhancement: show the small floating Calendly button on mobile
+  (function () {
+    const btn = document.getElementById('floatingCallBtn');
+    const url = (document.body.dataset.calendlyUrl || '').trim();
+    const isPlaceholder = /REPLACE_WITH_YOUR_LINK/i.test(url);
+    const isMobile = window.matchMedia('(max-width: 768px)').matches;
+
+    if (btn && url && !isPlaceholder && isMobile) {
+      btn.href = url;
+      btn.setAttribute('aria-hidden', 'false');  // CSS shows it only when aria-hidden="false"
+      btn.title = 'Book a strategic call';
+    }
+  })();
+</script>
+  
   <!-- ES modules entrypoint (replaces the old app.js) -->
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
