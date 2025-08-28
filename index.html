@@ -187,7 +187,7 @@
       border:2px solid transparent; border-radius:10px; box-shadow:0 2px 6px rgba(0,0,0,.06);
       cursor:pointer; transition:border-color 0.2s;
     }
-    .blockBtn.active { border:2px solid var(--bc-teal); }
+    .blockBtn.active { border-color: transparent; } /* keep look, no visible border */
     .blockBtn:hover { background:#b4fde5; }
 
     .floatingCTA {
@@ -597,59 +597,92 @@
   <!-- Small, guarded inline helper so mint chips jump to their blocks even if modules aren't updated yet.
        If you later move this logic to /js/core/ui.js and call it from main.js, delete this block. -->
   <script>
-    (function () {
-      if (window.__bcBlockScrollBound) return; // guard against double-binding
-      window.__bcBlockScrollBound = true;
+(function () {
+  if (window.__bcBlockScrollBoundV2) return; // guard against double-binding
+  window.__bcBlockScrollBoundV2 = true;
 
-      // Compute header offset from CSS variable --headerH
-      const HEADER_OFFSET = (() => {
-        const raw = getComputedStyle(document.documentElement).getPropertyValue('--headerH').trim();
-        const n = parseFloat(raw);
-        return Number.isFinite(n) ? n + 11 : 0;
-      })();
+  const HEADER_OFFSET = (() => {
+    const raw = getComputedStyle(document.documentElement).getPropertyValue('--headerH').trim();
+    const n = parseFloat(raw);
+    return Number.isFinite(n) ? n + 11 : 0;
+  })();
 
-      function scrollToBlock(id) {
-        const el = id && document.getElementById(id);
-        if (!el) return;
-        const y = el.getBoundingClientRect().top + window.pageYOffset - HEADER_OFFSET;
-        window.scrollTo({ top: y, behavior: 'smooth' });
+  const toSlug = s => (s || '').toString().trim()
+    .toLowerCase()
+    .replace(/[^\w\- ]+/g, '')
+    .replace(/\s+/g, '-');
+
+  function resolveTargetFromChip(chip){
+    // 1) href="#..." first
+    const href = (chip.getAttribute('href') || '').trim();
+    if (href.startsWith('#') && href.length > 1) {
+      const id = href.slice(1);
+      const el = document.getElementById(id) || document.getElementById('block-' + id);
+      if (el) return { el, id: el.id || id };
+    }
+    // 2) fall back to common data-* names
+    const keys = ['target','block','blockId','section','anchor','scroll','id','key','name'];
+    for (const k of keys) {
+      let v = chip.dataset[k];
+      if (!v) continue;
+      v = v.replace(/^#/, '');
+      let el = document.getElementById(v) || document.getElementById('block-' + v);
+      if (!el) el = document.querySelector(
+        `[data-block="${v}"],[data-block-id="${v}"],[data-section="${v}"],[data-anchor="${v}"]`
+      );
+      if (el) return { el, id: el.id || v };
+    }
+    // 3) last resort: slugify button text
+    const guess = toSlug(chip.textContent);
+    if (guess) {
+      for (const id of ['block-' + guess, guess]) {
+        const el = document.getElementById(id);
+        if (el) return { el, id };
       }
+    }
+    return null;
+  }
 
-      // Delegate clicks from mint chips; capture phase beats overly-broad handlers
-      document.addEventListener('click', function (e) {
-        const chip = e.target.closest('#blockTabs .blockBtn');
-        if (!chip) return;
+  function scrollToEl(el){
+    const y = el.getBoundingClientRect().top + window.pageYOffset - HEADER_OFFSET;
+    window.scrollTo({ top: y, behavior: 'smooth' });
+  }
 
-        let targetId = '';
-        const href = (chip.getAttribute('href') || '').trim();
-        if (href.startsWith('#') && href.length > 1) {
-          targetId = href.slice(1);
-        } else {
-          targetId = chip.dataset.target || chip.dataset.blockId || chip.dataset.block || '';
-          if (targetId && !/^block-/.test(targetId)) targetId = 'block-' + targetId;
-        }
-        if (!targetId) return;
+  // Delegate clicks from mint chips; capture phase to beat broad SPA handlers
+  document.addEventListener('click', function (e) {
+    const chip = e.target.closest('#blockTabs .blockBtn');
+    if (!chip) return;
 
-        e.preventDefault();
-        scrollToBlock(targetId);
+    const target = resolveTargetFromChip(chip);
+    if (!target) return; // nothing resolvable, bail
 
-        // visual active state
-        document.querySelectorAll('#blockTabs .blockBtn.active').forEach(el => el.classList.remove('active'));
-        chip.classList.add('active');
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
 
-        // sync hash without native jump
-        try { history.replaceState(null, '', '#' + targetId); } catch {}
-      }, true);
+    scrollToEl(target.el);
 
-      // If page opens with a hash, align it correctly under the fixed header
-      if (location.hash.length > 1) {
-        const id = location.hash.slice(1);
-        requestAnimationFrame(() => scrollToBlock(id));
-      }
-    })();
-  </script>
+    // visual state (no border due to CSS change above)
+    document.querySelectorAll('#blockTabs .blockBtn.active').forEach(el => el.classList.remove('active'));
+    chip.classList.add('active');
+
+    // update URL hash without native jump
+    try { history.replaceState(null, '', '#' + (target.el.id || target.id)); } catch {}
+  }, true);
+
+  // If page opens with a hash, align target under fixed header
+  if (location.hash.length > 1) {
+    requestAnimationFrame(() => {
+      const id = location.hash.slice(1);
+      const el = document.getElementById(id) || document.getElementById('block-' + id);
+      if (el) scrollToEl(el);
+    });
+  }
+})();
+</script>
 
   <!-- ES modules entrypoint (replaces the old app.js) -->
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
