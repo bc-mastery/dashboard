@@ -63,7 +63,8 @@ export function detectMode(areaList = []) {
   return b2c > b2b ? "B2C" : "B2B";
 }
 
-export const ANGLE_START = 0;
+/** Align with overlay artwork: 12 o’clock = 0deg */
+export const ANGLE_START = -90;
 
 /**
  * Paints the donut segments and sets the overlay image
@@ -108,11 +109,11 @@ export function setABCMap({ container, mode = "B2B", areas = [], overlayPath } =
   if (cursor < 360) stops.push(`transparent ${cursor}deg 360deg`);
 
   // Center of the gradient: allow per-page nudges through CSS variables
-  // Use percentages + px delta: calc(50% + var(--donut-nudge-x, 0px)) etc.
   const centerX = `calc(50% + var(--donut-nudge-x, 0px))`;
   const centerY = `calc(50% + var(--donut-nudge-y, 0px))`;
 
-  donut.style.background = `conic-gradient(from ${ANGLE_START}deg at ${centerX} ${centerY}, ${stops.join(",")})`;
+  donut.style.background =
+    `conic-gradient(from ${ANGLE_START}deg at ${centerX} ${centerY}, ${stops.join(",")})`;
 
   // Set overlay if provided
   if (overlay && overlayPath && overlay.src !== overlayPath) {
