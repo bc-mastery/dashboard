@@ -432,6 +432,35 @@
         margin: 0 auto;
       }
     }
+
+    /* ===== EMERGENCY FIX: lock the floating Calendly button ===== */
+#floatingCallBtn,
+.floatingCallBtn{
+  position: fixed !important;
+  right: 14px !important;
+  bottom: 18px !important;
+  width: 44px !important;
+  height: 44px !important;
+  display: none !important;                     /* hidden by default */
+  align-items: center !important;
+  justify-content: center !important;
+  border-radius: 50% !important;
+  background: var(--bc-green) !important;
+  z-index: 1100 !important;
+}
+
+.floatingCallBtn[aria-hidden="false"]{
+  display: inline-flex !important;              /* show when JS toggles it */
+}
+
+.floatingCallBtn img{
+  width: 22px !important;
+  height: 22px !important;
+  max-width: none !important;                   /* ignore global img rule */
+  max-height: none !important;
+  display: block !important;
+}
+    
   </style>
 </head>
 
@@ -556,3 +585,4 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
