@@ -230,11 +230,27 @@
     .footer-company a { color:var(--bc-teal); text-decoration:none; }
     .footer-company a:hover { text-decoration:underline; }
 
-    .footer-heading { margin:0 0 6px; font-family:'Rokkitt', serif; font-weight:900; font-size:16px; color:var(--bc-green); }
-    .footer-middle a { position:relative; color:var(--bc-dark); font-size:14px; text-decoration:none; }
-    .footer-middle a::after { content:""; position:absolute; left:0; bottom:-2px; width:100%; height:1px; background:currentColor; opacity:.75; transition: height 180ms, opacity 180ms; }
-    .footer-middle a:hover::after, .footer-middle a:focus::after { height:2px; opacity:1; }
-    @media (prefers-reduced-motion: reduce) { .footer-middle a::after { transition:none; } }
+    .footer-heading{
+  margin:0 0 6px;
+  font-family:'Rokkitt', serif;
+  font-weight:900;
+  font-size:16px;
+  color:var(--bc-green);
+}
+
+.footer-middle a{
+  position: static;          /* no positioning tricks */
+  display: inline-block;     /* tidy wrapping */
+  margin: 6px 0;
+  color: var(--bc-dark);
+  font-size: 14px;
+  text-decoration: none;     /* no pseudo underline */
+}
+
+.footer-middle a:hover,
+.footer-middle a:focus{
+  text-decoration: underline;
+}
 
     /* Equal-width primary tabs */
     :root{ --primaryTabW: 128px; --primaryTabH: 28px; }
@@ -613,3 +629,4 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
