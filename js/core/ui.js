@@ -10,7 +10,7 @@ export function setTitleAndIcon(tab) {
   if (titleEl) titleEl.textContent = TAB_TITLES[tab] || "Strategy Dashboard";
   if (iconEl)  iconEl.src         = TAB_ICONS[tab]   || TAB_ICONS.growth;
 
-  document.querySelectorAll(".tabBtn").forEach((btn) => {
+  document.querySelectorAll("#tabs .tabBtn").forEach((btn) => {
     const isPrimary = !btn.classList.contains("blockBtn");
     const isActive =
       btn.dataset.tab === tab || btn.dataset.target === "#block-" + tab;
@@ -217,7 +217,7 @@ export function populateBlockTabsFromPage() {
     chip.dataset.target = `#${id}`;
     chip.textContent = title;
 
-    // Make the chip reliably clickable (wins over broad handlers)
+    // Per-chip click (works even without the global delegate)
     chip.addEventListener(
       "click",
       (ev) => {
@@ -316,6 +316,44 @@ export function initDownloadButtonIsolation() {
       console.warn("No valid PDF data returned for tab:", tab);
     }
   });
+}
+
+// Global delegated click handler for secondary chips.
+// Ensures clicks work even if chips get re-rendered or replaced.
+export function initBlockChipDelegation() {
+  if (window.__bcBlockChipDelegated) return;
+  window.__bcBlockChipDelegated = true;
+
+  // Click (capture) so we outrun any broad handlers
+  document.addEventListener(
+    "click",
+    (e) => {
+      const chip = e.target.closest("#blockTabs .blockBtn");
+      if (!chip) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      const sel = (chip.dataset.target || chip.getAttribute("href") || "").trim();
+      const id = sel.replace(/^#/, "");
+      if (!id) return;
+      const el = document.getElementById(id);
+      if (el) scrollToTarget(el);
+    },
+    true
+  );
+
+  // Keyboard support
+  document.addEventListener(
+    "keydown",
+    (e) => {
+      if ((e.key !== "Enter" && e.key !== " ") || !e.target.closest("#blockTabs .blockBtn")) return;
+      e.preventDefault();
+      e.stopPropagation();
+      e.target.click();
+    },
+    true
+  );
 }
 
 
