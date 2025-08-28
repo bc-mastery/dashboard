@@ -365,6 +365,15 @@
   /* (rest of your mobile layout stays as-is) */
 }
 
+    /* === Mobile donut tweak: smaller & 16px lower === */
+    @media (max-width: 768px){
+      :root{
+        --abc-mb-donut-shift-y: 0px;   /* was -16px → move DOWN ~16px */
+        --abc-mb-donut-radius:  44.2%; /* slightly smaller ring (tune 44.0–44.4%) */
+      }
+    }
+
+    
     /* ============================== Growth: Block #1 desktop layout (1 : 2) ============================== */
     #block-gs-overview .bfGrid{
       grid-template-columns: 1fr 2fr !important; /* left: donut (1fr), right: text (2fr) */
@@ -595,6 +604,7 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
 
 
 
