@@ -208,18 +208,28 @@ export function populateBlockTabsFromPage() {
       block.querySelector(".sectionTitle")?.textContent?.trim() ||
       block.querySelector(".bfTitle")?.textContent?.trim();
     const id = block.id;
-    if (title && id) {
-      const btn = document.createElement("button");
-      btn.className = "blockBtn";           // ⬅️ remove 'tabBtn' so global tab handler ignores these
-      btn.type = "button";
-      btn.dataset.target = `#${id}`;
-      btn.textContent = title;
-      const btn = document.createElement("button");
-      btn.className = "blockBtn";           // ⬅️ remove 'tabBtn' so global tab handler ignores these
-      btn.type = "button";
+    if (!title || !id) return;
 
-      blockTabs.appendChild(btn);
-    }
+    // Important: do NOT add 'tabBtn' here → keeps chips separate from PRIMARY tabs
+    const chip = document.createElement("button");
+    chip.className = "blockBtn";
+    chip.type = "button";
+    chip.dataset.target = `#${id}`;
+    chip.textContent = title;
+
+    // Robust click: capture + stopPropagation to beat broad document handlers
+    chip.addEventListener(
+      "click",
+      (ev) => {
+        ev.preventDefault();
+        ev.stopPropagation();
+        const el = document.getElementById(id);
+        if (el) scrollToTarget(el);
+      },
+      { capture: true }
+    );
+
+    blockTabs.appendChild(chip);
   });
 
   // Ensure CTA is at the end
@@ -307,4 +317,5 @@ export function initDownloadButtonIsolation() {
     }
   });
 }
+
 
