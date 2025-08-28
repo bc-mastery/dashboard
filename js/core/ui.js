@@ -210,14 +210,14 @@ export function populateBlockTabsFromPage() {
     const id = block.id;
     if (!title || !id) return;
 
-    // Important: do NOT add 'tabBtn' here → keeps chips separate from PRIMARY tabs
+    // Chips are NOT primary tabs → do NOT include 'tabBtn'
     const chip = document.createElement("button");
     chip.className = "blockBtn";
     chip.type = "button";
     chip.dataset.target = `#${id}`;
     chip.textContent = title;
 
-    // Robust click: capture + stopPropagation to beat broad document handlers
+    // Make the chip reliably clickable (wins over broad handlers)
     chip.addEventListener(
       "click",
       (ev) => {
@@ -317,5 +317,6 @@ export function initDownloadButtonIsolation() {
     }
   });
 }
+
 
 
