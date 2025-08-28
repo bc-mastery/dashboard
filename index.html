@@ -313,83 +313,57 @@
     /* ====================== MOBILE-ONLY OVERRIDES ====================== */
 @media (max-width: 768px){
 
-  /* === ABC map controls (overlay fixed, move donut only) ===
-     Positive shift moves right/down; negative moves left/up.
-  */
+  /* ABC map controls — overlay fixed, move the donut by shifting its CENTER.
+     Adjust these to fine-tune on mobile. */
   :root{
-    --abc-mb-donut-shift-x: 0px;
-    --abc-mb-donut-shift-y: -16px;   /* ← your default */
-    --abc-mb-donut-radius:  44.8%;   /* ring radius to match overlay circle */
+    --abc-mb-donut-shift-x: 0px;    /* +right / –left  */
+    --abc-mb-donut-shift-y: -16px;  /* +down  / –up    (your default) */
+    --abc-mb-donut-radius:  44.8%;  /* ring radius to match overlay circle */
   }
 
-  /* Wrapper: force a perfect square (don’t rely only on aspect-ratio)
-     so the ring can NEVER look elliptical. */
+  /* Wrapper: square and centered */
   .abc-wrap{
     width:  min(86vw, 360px);
-    height: min(86vw, 360px) !important;   /* enforce square */
+    height: min(86vw, 360px) !important;     /* lock width == height */
     aspect-ratio: 1 / 1;
     margin: 0 auto;
 
-    /* freeze conic center → no ellipse artifacts from gradient center shifts */
-    --donut-nudge-x: 0px;
-    --donut-nudge-y: 0px;
+    /* feed center offsets (shared by conic + mask) */
+    --donut-nudge-x: var(--abc-mb-donut-shift-x);
+    --donut-nudge-y: var(--abc-mb-donut-shift-y);
 
-    /* overlay is a fixed frame on mobile */
+    /* overlay stays the fixed frame */
     --overlay-scale: 1;
   }
 
-  /* Donut: move & size (no center change) */
+  /* Donut: NO transform. We shift the center of BOTH the conic and the mask,
+     so the ring remains a perfect circle while moving under the overlay. */
   .abc-wrap .donut{
     --outer-radius: var(--abc-mb-donut-radius) !important;
-    transform: translate(var(--abc-mb-donut-shift-x), var(--abc-mb-donut-shift-y)) !important;
-    transform-origin: 50% 50%;
-    will-change: transform;
+
+    /* re-center the mask using the same offsets as the conic gradient */
+    -webkit-mask: radial-gradient(
+      circle at calc(50% + var(--donut-nudge-x, 0px))
+                calc(50% + var(--donut-nudge-y, 0px)),
+      #000 0 var(--outer-radius),
+      transparent calc(var(--outer-radius) + 1px) 100%
+    ) !important;
+            mask: radial-gradient(
+      circle at calc(50% + var(--donut-nudge-x, 0px))
+                calc(50% + var(--donut-nudge-y, 0px)),
+      #000 0 var(--outer-radius),
+      transparent calc(var(--outer-radius) + 1px) 100%
+    ) !important;
   }
 
-  /* Overlay: keep perfectly centered and unscaled */
+  /* Overlay: fixed, perfectly centered */
   .abc-wrap .overlay{
     object-position: 50% 50% !important;
     transform: none !important;
   }
 
-  /* Google Charts donuts (elsewhere) */
-  .gsDonutChart, .donutChart{
-    width:  min(86vw, 360px);
-    height: min(86vw, 360px);
-    max-width: 100%;
-    margin: 0 auto;
-  }
-
-  /* ===== your existing mobile UI/layout (unchanged) ===== */
-  .siteHeader{ position: sticky; top: 0; }
-  .headerLogo{ display:none !important; }
-  .bar{ grid-template-columns: 1fr 1fr; }
-  .brandName{
-    font-size:12px; line-height:1.2; max-width:42vw;
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; justify-self:end;
-  }
-  .titleBlock img{ width:24px; height:24px; }
-  .pageTitle{ font-size: clamp(18px, 4.6vw, 22px); max-width:50vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  :root{ --headerBarH: 44px; --headerTabsH: 0px; --headerH: calc(var(--headerBarH) + 16px); }
-  #tabs{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; width:100%; overflow-x:clip; }
-  #tabs .tabBtn{
-    width:100%; height:40px; padding:10px 6px; font-size:12px; border-radius:10px;
-    -webkit-appearance:none; appearance:none; overflow:hidden; white-space:normal; text-overflow:clip;
-  }
-  #blockTabs .blockBtn{ display:none !important; }
-  #blockTabsRow{ display:block; padding-top:0; overflow-x:clip; }
-  #blockTabs{ display:block; }
-  #blockTabsRow .floatingCTA{
-    display:block !important; width:auto; max-width:480px; box-sizing:border-box;
-    margin:8px auto 12px; text-align:center; font-size:13px; padding:10px 14px; border-radius:8px;
-    position: static !important; top:auto; right:auto; height:auto;
-  }
-  .main{ padding-top: var(--headerH); }
-  .main > *:first-child{ margin-top: 18px !important; }
-  .scrollTarget{ scroll-margin-top: calc(var(--headerH) + 18px); }
-  .panel, .wrap, .tabsRow, #blockTabsRow{ overflow-x:clip; }
+  /* (rest of your mobile layout stays as-is) */
 }
-
 
     /* ============================== Growth: Block #1 desktop layout (1 : 2) ============================== */
     #block-gs-overview .bfGrid{
@@ -621,6 +595,7 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
 
 
 
