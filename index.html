@@ -313,124 +313,80 @@
     /* ====================== MOBILE-ONLY OVERRIDES ====================== */
 @media (max-width: 768px){
 
-  /* === ABC map controls (overlay stays fixed) ===
-     Adjust ONLY these three to align on mobile:
-       • --abc-mb-donut-shift-x : px → left/right (positive = right)
-       • --abc-mb-donut-shift-y : px → up/down   (positive = down)
-       • --abc-mb-donut-radius  : %  → ring radius to match overlay circle
+  /* === ABC map controls (overlay fixed, move donut only) ===
+     Positive shift moves right/down; negative moves left/up.
   */
   :root{
     --abc-mb-donut-shift-x: 0px;
-    --abc-mb-donut-shift-y: 6px;    /* tweak ± to line up vertically */
-    --abc-mb-donut-radius:  44.8%;  /* tweak to match overlay’s circle */
+    --abc-mb-donut-shift-y: -16px;   /* ← your default */
+    --abc-mb-donut-radius:  44.8%;   /* ring radius to match overlay circle */
   }
 
-  /* Match wrapper size and center it */
+  /* Wrapper: force a perfect square (don’t rely only on aspect-ratio)
+     so the ring can NEVER look elliptical. */
   .abc-wrap{
-    width: min(86vw, 360px);
+    width:  min(86vw, 360px);
+    height: min(86vw, 360px) !important;   /* enforce square */
+    aspect-ratio: 1 / 1;
     margin: 0 auto;
 
-    /* IMPORTANT: freeze the conic center — no ellipse artifacts */
+    /* freeze conic center → no ellipse artifacts from gradient center shifts */
     --donut-nudge-x: 0px;
-    --donut-nudge-y: -12px;
+    --donut-nudge-y: 0px;
 
-    /* overlay is the fixed frame; keep its scale neutral */
+    /* overlay is a fixed frame on mobile */
     --overlay-scale: 1;
   }
 
-  /* Donut: move & size WITHOUT changing its center */
+  /* Donut: move & size (no center change) */
   .abc-wrap .donut{
-    --outer-radius: var(--abc-mb-donut-radius);
-    transform: translate(var(--abc-mb-donut-shift-x), var(--abc-mb-donut-shift-y));
+    --outer-radius: var(--abc-mb-donut-radius) !important;
+    transform: translate(var(--abc-mb-donut-shift-x), var(--abc-mb-donut-shift-y)) !important;
     transform-origin: 50% 50%;
+    will-change: transform;
   }
 
-  /* Overlay: keep perfectly centered and unscaled (fixed frame) */
+  /* Overlay: keep perfectly centered and unscaled */
   .abc-wrap .overlay{
     object-position: 50% 50% !important;
     transform: none !important;
   }
 
-  /* Google Charts donuts (if used elsewhere) */
+  /* Google Charts donuts (elsewhere) */
   .gsDonutChart, .donutChart{
-    width: min(86vw, 360px);
+    width:  min(86vw, 360px);
     height: min(86vw, 360px);
     max-width: 100%;
     margin: 0 auto;
   }
 
-  /* ===== existing mobile UI/layout (unchanged) ===== */
-
-  /* Make header non-obtrusive & smaller on mobile */
+  /* ===== your existing mobile UI/layout (unchanged) ===== */
   .siteHeader{ position: sticky; top: 0; }
-
-  /* Hide BC logo on mobile */
   .headerLogo{ display:none !important; }
-
-  /* Header grid becomes: title (left) | brand (right) */
   .bar{ grid-template-columns: 1fr 1fr; }
-
   .brandName{
-    font-size:12px; line-height:1.2;
-    max-width:42vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    justify-self:end;
+    font-size:12px; line-height:1.2; max-width:42vw;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; justify-self:end;
   }
-
   .titleBlock img{ width:24px; height:24px; }
-  .pageTitle{
-    font-size: clamp(18px, 4.6vw, 22px);
-    max-width:50vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-  }
-
-  /* Reduce computed header height so main padding isn’t excessive */
-  :root{
-    --headerBarH: 44px;
-    --headerTabsH: 0px;      /* we hide chips below */
-    --headerH: calc(var(--headerBarH) + 16px);
-  }
-
-  /* Primary tabs → 3 per row, smaller buttons */
-  #tabs{
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    width:100%;
-    overflow-x: clip;
-  }
+  .pageTitle{ font-size: clamp(18px, 4.6vw, 22px); max-width:50vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  :root{ --headerBarH: 44px; --headerTabsH: 0px; --headerH: calc(var(--headerBarH) + 16px); }
+  #tabs{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; width:100%; overflow-x:clip; }
   #tabs .tabBtn{
-    width: 100%;
-    height: 40px;
-    padding: 10px 6px;
-    font-size: 12px;
-    border-radius: 10px;
-    -webkit-appearance: none;
-    appearance: none;
-    overflow: hidden;
-    white-space: normal;
-    text-overflow: clip;
+    width:100%; height:40px; padding:10px 6px; font-size:12px; border-radius:10px;
+    -webkit-appearance:none; appearance:none; overflow:hidden; white-space:normal; text-overflow:clip;
   }
-
-  /* Hide all secondary chips on mobile, keep the Download CTA visible */
   #blockTabs .blockBtn{ display:none !important; }
-
-  /* Download CTA on its own centered row (not full-bleed) */
   #blockTabsRow{ display:block; padding-top:0; overflow-x:clip; }
   #blockTabs{ display:block; }
   #blockTabsRow .floatingCTA{
-    display:block !important;
-    width:auto; max-width:480px; box-sizing:border-box;
-    margin:8px auto 12px;
-    text-align:center; font-size:13px;
-    padding:10px 14px; border-radius:8px;
+    display:block !important; width:auto; max-width:480px; box-sizing:border-box;
+    margin:8px auto 12px; text-align:center; font-size:13px; padding:10px 14px; border-radius:8px;
     position: static !important; top:auto; right:auto; height:auto;
   }
-
-  /* First card spacing & scroll targets */
   .main{ padding-top: var(--headerH); }
   .main > *:first-child{ margin-top: 18px !important; }
-  .scrollTarget { scroll-margin-top: calc(var(--headerH) + 18px); }
-
-  /* Prevent sideways scroll in header rows */
+  .scrollTarget{ scroll-margin-top: calc(var(--headerH) + 18px); }
   .panel, .wrap, .tabsRow, #blockTabsRow{ overflow-x:clip; }
 }
 
@@ -664,6 +620,7 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
 
 
 
