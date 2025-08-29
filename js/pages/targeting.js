@@ -232,3 +232,4 @@ function paintTargeting(api, allowFull = false) {
     }
   });
 }
+
