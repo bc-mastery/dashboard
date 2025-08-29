@@ -181,6 +181,11 @@
     .badge-logos{ display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 4px 0 10px; }
     .badge-logos img{ height: auto; max-width: 180px; object-fit: contain; }
     
+    /* --- NEW STYLE FOR AWARD LOGO --- */
+    .badge-logos .stevie-logo {
+      max-width: 90px;
+    }
+
     .floatingCallBtn {
       display: flex; align-items: center; justify-content: center;
       position: fixed; bottom: 20px; right: 20px;
@@ -269,7 +274,6 @@
       .footer-left, .footer-middle, .footer-right{ text-align: left; }
       .badge-logos{ justify-content: flex-start; }
       .badge-logos img{ max-width: 120px; }
-      .footer-company a{ margin: 1px 0; }
     }
     .footer-company a, .footer-right, .footer-middle { word-break: break-word; }
 
@@ -364,7 +368,7 @@
             Award-winning strategic method used across 3 continents.
           </div>
           <div class="badge-logos">
-            <img src="./assets/logos/stevie-gold.png" alt="Stevie Awards Gold" loading="lazy">
+            <img src="./assets/logos/stevie-gold.png" alt="Stevie Awards Gold" loading="lazy" class="stevie-logo">
           </div>
           <div class="badge-text">
             The Business Canvas method is used in EDIH business development projects.
