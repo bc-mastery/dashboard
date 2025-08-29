@@ -282,7 +282,7 @@
     }
     
     /* ====================== MOBILE-ONLY OVERRIDES ====================== */
-    @media (max-width: 768px){
+    @media (max-width: 992px){
       /* Mobile header behavior */
       .siteHeader{ position: sticky; top: 0; }
       .headerLogo{ display:none !important; }
@@ -566,7 +566,7 @@
       var btn = document.getElementById('floatingCallBtn');
       if (!btn) return;
       var url = (document.body.getAttribute('data-calendly-url') || '').trim();
-      var isMobile = window.matchMedia('(max-width: 768px)').matches;
+      var isMobile = window.matchMedia('(max-width: 992px)').matches;
       if (!isMobile) return;
       if (url && !/REPLACE_WITH/i.test(url)) btn.href = url;
       btn.setAttribute('aria-hidden', 'false');
@@ -577,5 +577,6 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
 
 
