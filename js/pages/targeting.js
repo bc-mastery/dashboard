@@ -3,7 +3,11 @@
 import { ACCESS, IMAGES } from "../core/config.js";
 import { state, setCurrentTab } from "../core/state.js";
 import { inferAccess, esc, parseAreas, toDownloadLink } from "../core/utils.js";
-import { detectMode, setABCMap } from "../core/abcMap.js";
+import {
+  buildFirstBlockHTML,
+  hydrateABCMaps, // <-- THE FIX IS HERE
+  finalBlockContent,
+} from "../components/blocks.js";
 import {
   populateBlockTabsFromPage,
   toggleFloatingCallBtn,
@@ -11,65 +15,13 @@ import {
   updateFloatingCTA,
   clearUpgradeBlock,
 } from "../core/ui.js";
-import { finalBlockContent } from "../components/blocks.js";
 import { fetchDashboardData } from "../services/api.js";
-
-/* ------------------------------ styles ------------------------------ */
-function injectTargetingStylesOnce() {
-  if (document.getElementById("targeting-styles")) return;
-  const style = document.createElement("style");
-  style.id = "targeting-styles";
-  // The conflicting mobile styles have been removed from this textContent block.
-  style.textContent = `
-    /* Desktop: 2:1 text:map */
-    #content .card .bfGrid {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      align-items: start;
-      gap: 22px;
-    }
-
-    /* Map wrapper (square, shared by overlay + donut host) */
-    #content .bfMap .abc-wrap {
-      position: relative;
-      width: 100%;
-      max-width: 360px;
-      aspect-ratio: 1 / 1;
-      margin-left: auto;
-    }
-
-    /* Overlay fills the wrapper */
-    #content .bfMap .abc-wrap .overlay {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      pointer-events: none;
-      user-select: none;
-      display: block;
-    }
-
-    /* Donut fills the wrapper (conic-gradient painted in JS) */
-    #content .bfMap .abc-wrap .donut {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      /* default: no nudge */
-      --donut-nudge-x: 0px;
-      --donut-nudge-y: 0px;
-    }
-  `;
-  document.head.appendChild(style);
-}
 
 /* ------------------------------ main render ------------------------------ */
 export async function renderTargetingTab() {
   setCurrentTab("targeting");
   document.body.setAttribute("data-current-tab", "targeting");
   clearUpgradeBlock();
-  injectTargetingStylesOnce();
 
   const contentDiv = document.getElementById("content");
   if (!contentDiv) return;
@@ -125,29 +77,14 @@ function paintTargeting(api, allowFull = false) {
 
   const d = (api && api.data) || {};
   const areas = parseAreas(d.D_AREA);
-  const mode = detectMode(areas);
 
-  let html = `
-    <div class="card scrollTarget" id="block-behavioral">
-      <div class="bfGrid">
-        <div class="bfText">
-          <div class="bfTitle">Behavioral Factors</div>
-          ${d.D_AREA ? `<p><span class="bfSub">Demand Area(s):</span> ${esc(d.D_AREA)}</p>` : ""}
-          ${d.D_DRIVER ? `<p><span class="bfSub">Driver(s):</span> ${esc(d.D_DRIVER)}</p>` : ""}
-          ${d.D_DRIVER_DESC ? `<p class="bfDesc preserve">${esc(d.D_DRIVER_DESC)}</p>` : ""}
-        </div>
-        <div class="bfMap">
-          <div class="abc-wrap"
-               data-mode="${esc(mode)}"
-               data-areas="${areas.map(String).map(esc).join("|")}"
-               data-overlay="${esc(IMAGES.abcFrame)}">
-            <div class="donut"></div>
-            <img class="overlay" src="${IMAGES.abcFrame}" alt="ABC overlay">
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
+  let html = buildFirstBlockHTML({
+    title: "Behavioral Factors",
+    subtitleLabel: "Demand Area(s)",
+    subtitleValue: d.D_AREA,
+    descText: d.D_DRIVER_DESC,
+    areas,
+  });
 
   if (allowFull) {
     html += `
