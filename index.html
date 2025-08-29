@@ -28,7 +28,7 @@
       background: linear-gradient(to left, var(--bc-teal) 0%, var(--bc-green) 50%, var(--bc-green) 100%);
       overflow-x: hidden; width: 100%;
     }
-    html { scrollbar-gutter: stable; }
+    html { scrollbar-gutter: stable; scroll-behavior: smooth; }
     *, *::before, *::after { box-sizing: border-box; }
     img, svg, canvas, video { max-width: 100%; height: auto; display:block; }
     .panel { overflow: visible; }
@@ -104,7 +104,6 @@
     .subtitle{ font-weight:700; color:#024D4F; }
     .muted{ color:#4b4b4b; }
 
-    /* --- BEHAVIORAL FACTORS BLOCK & ABC MAP STYLES (DESKTOP) --- */
     .bfGrid{ display:grid; grid-template-columns: 2fr 1fr; align-items:start; gap:22px; }
     .bfText, .bfMap { align-self:start; }
     .bfTitle{ font-family:'Rokkitt', serif; font-weight:900; color:#30BA80; font-size:22px; margin:6px 0 14px; }
@@ -220,7 +219,7 @@
       }
 
       .main{ padding-top: var(--headerH); }
-      .main > *:first-child{ margin-top: 18px !important; }
+      .main > *:first-child{ margin-top: 0 !important; } /* <-- THE FIX IS HERE */
       .scrollTarget { scroll-margin-top: calc(var(--headerH) + 18px); }
 
       /* --- FINAL, CORRECTED MOBILE STYLES FOR ABC MAP --- */
