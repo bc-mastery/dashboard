@@ -39,9 +39,11 @@
 
     .siteHeader{
       position: fixed; inset: 0 0 auto 0; z-index: 1000;
+      width: 100%;
       background: transparent; color: var(--bc-white);
     }
     .siteHeader .panel{
+      width: 100%;
       background: linear-gradient(to left, rgba(2,77,79,0.96) 0%, rgba(48,186,128,0.96) 50%, rgba(48,186,128,0.96) 100%);
       -webkit-backdrop-filter: saturate(140%) blur(18px);
       backdrop-filter: saturate(140%) blur(18px);
@@ -93,8 +95,7 @@
     }
 
     .main{
-      padding-top: calc(var(--headerH) + 10px); padding-bottom: 18px; max-width:1100px;
-      margin:0 auto; padding-left:20px; padding-right:20px;
+      padding-top: calc(var(--headerH) + 10px); padding-bottom: 18px;
     }
     .card{
       position: relative; background:var(--bc-white); border-radius:14px; padding:22px 22px 8px;
@@ -181,42 +182,20 @@
     .badge-logos{ display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 4px 0 10px; }
     .badge-logos img{ height: auto; max-width: 180px; object-fit: contain; }
     
-    /* --- FLOATING CALENDLY BUTTON STYLES --- */
     .floatingCallBtn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      background-color: var(--bc-green); /* <-- Color changed */
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2); /* <-- Shadow added */
-      z-index: 5000;
-      transition: transform 0.2s ease;
+      display: flex; align-items: center; justify-content: center;
+      position: fixed; bottom: 20px; right: 20px;
+      width: 44px; height: 44px; border-radius: 50%;
+      background-color: var(--bc-green);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 5000; transition: transform 0.2s ease;
     }
-    .floatingCallBtn:hover {
-      transform: scale(1.1);
-    }
-    .floatingCallBtn img {
-      width: 24px;
-      height: 24px;
-      filter: brightness(0) invert(1); /* <-- Makes the icon white */
-    }
+    .floatingCallBtn:hover { transform: scale(1.1); }
+    .floatingCallBtn img { width: 24px; height: 24px; filter: brightness(0) invert(1); }
     .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border-width: 0;
+      position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0;
     }
-
 
     @media (min-width: 769px){
       #tabs{ display: flex; gap: 6px; flex-wrap: wrap; }
@@ -255,33 +234,17 @@
         padding:10px 14px; border-radius:8px;
       }
 
-      .main{ padding-top: calc(var(--headerH) - 40px); }
-      .main > .card:first-child{ margin-top: 18px !important; } 
+      .main{ padding-top: calc(var(--headerH) - 40px); } /* <-- YOUR SPACING FIX IS HERE */
       .scrollTarget { scroll-margin-top: calc(var(--headerH) + 18px); }
 
-      .bfGrid {
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
-      .bfMap {
-        display: flex;
-        justify-content: center;
-      }
+      .bfGrid { grid-template-columns: 1fr; gap: 16px; }
+      .bfMap { display: flex; justify-content: center; }
       .abc-wrap {
-        width: min(86vw, 300px);
-        height: auto;
-        aspect-ratio: 1 / 1;
-        margin: 0 auto;
-        --donut-nudge-x: 0px;
-        --donut-nudge-y: 0px;
+        width: min(86vw, 300px); height: auto; aspect-ratio: 1 / 1;
+        margin: 0 auto; --donut-nudge-x: 0px; --donut-nudge-y: 0px;
       }
-      .abc-wrap .donut {
-        --outer-radius: 43.8% !important;
-      }
-      .abc-wrap .overlay{
-        object-position: 50% 50% !important;
-        transform: none !important;
-      }
+      .abc-wrap .donut { --outer-radius: 43.8% !important; }
+      .abc-wrap .overlay{ object-position: 50% 50% !important; transform: none !important; }
     }
 
     #block-gs-overview .bfGrid{ grid-template-columns: 1fr 2fr !important; }
@@ -434,4 +397,3 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
-
