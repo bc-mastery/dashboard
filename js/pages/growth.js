@@ -11,6 +11,7 @@ import {
   updateFloatingCTA,
   clearUpgradeBlock,
 } from "../core/ui.js";
+import { fetchDashboardData } from "../services/api.js"; // <-- THE ONLY CHANGE IS HERE
 
 /* ------------------------------ helpers ------------------------------ */
 function toPercent(val) {
@@ -177,10 +178,7 @@ export async function renderGrowthTab() {
   contentDiv.innerHTML = `<div class="card"><p class="muted">Loading Growth Scan…</p></div>`;
 
   try {
-    const url = buildUrlWithToken(APPS_SCRIPT_URL, token, { nocache: "1" });
-    const r = await fetch(url, { cache: "no-store" });
-    if (!r.ok) throw new Error(`HTTP ${r.status} ${r.statusText}`);
-    const api = await r.json();
+    const api = await fetchDashboardData();
 
     if (!api || !api.ok) {
       contentDiv.innerHTML = `<div class="card"><p class="muted">${(api && api.message) || "No data found."}</p></div>`;
@@ -229,10 +227,8 @@ export async function renderGrowthTab() {
 
     // HTML
     contentDiv.innerHTML = `
-      <!-- Block 1 -->
       <section class="card scrollTarget" id="block-gs-overview">
-        <div class="bfTitle">Quick Scan</div>   <!-- 🔹 Title is now at block top -->
-        <div class="bfGrid">
+        <div class="bfTitle">Quick Scan</div>   <div class="bfGrid">
           <div class="bfMap">
             <div id="gsDonut" class="gsDonutChart"></div>
           </div>
@@ -276,12 +272,10 @@ export async function renderGrowthTab() {
         </div>
       </section>
 
-      <!-- Block 2 -->
       <section class="card scrollTarget" id="block-gs-pillars" style="padding-bottom: 28px;">
         <div class="sectionHeader">
           <div class="sectionTitle">4-Pillar Snapshot</div>
 
-          <!-- Help icon + bubble -->
           <div class="gsHelpWrap" id="gsPillarHelpWrap">
             <button
               type="button"
@@ -307,7 +301,6 @@ export async function renderGrowthTab() {
         <div id="gsBars" class="gsBars" role="list" aria-label="Pillar progress"></div>
       </section>
 
-      <!-- Block 3..7 -->
       <section class="card scrollTarget" id="block-gs-targeting">
         <div class="sectionTitle">Targeting Scan</div>
         <p class="preserve">${esc(d.GS_T_DESC || "")}</p>
@@ -502,5 +495,3 @@ export async function renderGrowthTab() {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
-
-
