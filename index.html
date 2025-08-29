@@ -192,8 +192,8 @@
       width: 44px;
       height: 44px;
       border-radius: 50%;
-      background-color: var(--bc-white);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      background-color: var(--bc-green); /* <-- Color changed */
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2); /* <-- Shadow added */
       z-index: 5000;
       transition: transform 0.2s ease;
     }
@@ -203,6 +203,7 @@
     .floatingCallBtn img {
       width: 24px;
       height: 24px;
+      filter: brightness(0) invert(1); /* <-- Makes the icon white */
     }
     .sr-only {
       position: absolute;
