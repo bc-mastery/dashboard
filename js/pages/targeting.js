@@ -12,7 +12,8 @@ import {
   clearUpgradeBlock,
 } from "../core/ui.js";
 import { finalBlockContent } from "../components/blocks.js";
-import { centerLockChart } from "../core/charts.js"; // keep this if you want the measurement-centering
+import { centerLockChart } from "../core/charts.js";
+import { fetchDashboardData } from "../services/api.js"; // <-- Import the new service
 
 /* ------------------------------ styles ------------------------------ */
 function injectTargetingStylesOnce() {
@@ -74,10 +75,6 @@ function injectTargetingStylesOnce() {
         max-width: 300px;
         margin-left: 0;
       }
-      /* Mobile-only fine-tune: lift donut a few px (negative = up) */
-      #content .bfMap .abc-wrap .donut {
-        --donut-nudge-y: -18px; /* try -6 / -10 to taste */
-      }
     }
   `;
   document.head.appendChild(style);
@@ -94,17 +91,10 @@ export async function renderTargetingTab() {
   const contentDiv = document.getElementById("content");
   if (!contentDiv) return;
 
-  if (!token) {
-    contentDiv.innerHTML = `<div class="card"><p class="muted">No token provided in URL.</p></div>`;
-    return;
-  }
-
   contentDiv.innerHTML = `<div class="card"><p class="muted">Loading Targeting Strategy…</p></div>`;
 
   try {
-    const url = `${APPS_SCRIPT_URL}?token=${encodeURIComponent(token)}${nocacheFlag ? "&nocache=1" : ""}`;
-    const r = await fetch(url);
-    const api = await r.json();
+    const api = await fetchDashboardData(); // <-- Replaced old fetch logic
 
     if (!api || !api.ok) {
       contentDiv.innerHTML = `<div class="card"><p class="muted">${(api && api.message) || "No data found."}</p></div>`;
@@ -219,35 +209,26 @@ function paintTargeting(api, allowFull = false) {
   contentDiv.innerHTML = html;
 
   // Render + center-lock the donut vs overlay
-document.querySelectorAll(".abc-wrap").forEach((wrapper) => {
-  const m = (wrapper.dataset.mode || "B2B").toUpperCase();
-  const a = (wrapper.dataset.areas || "")
-    .split("|")
-    .map((s) => s.trim())
-    .filter(Boolean);
-  const overlayPath = wrapper.dataset.overlay || IMAGES.abcFrame;
+  document.querySelectorAll(".abc-wrap").forEach((wrapper) => {
+    const m = (wrapper.dataset.mode || "B2B").toUpperCase();
+    const a = (wrapper.dataset.areas || "")
+      .split("|")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const overlayPath = wrapper.dataset.overlay || IMAGES.abcFrame;
 
-  setABCMap({ container: wrapper, mode: m, areas: a, overlayPath });
+    setABCMap({ container: wrapper, mode: m, areas: a, overlayPath });
 
-  const host = wrapper.querySelector(".donut");
+    const host = wrapper.querySelector(".donut");
 
-  // Center-lock first
-  centerLockChart({ wrapper, host, mobileYOffset: -20 });
+    // Center-lock first
+    centerLockChart({ wrapper, host, mobileYOffset: -20 });
 
-  // Add or remove the CSS nudge class on mobile
-  if (window.matchMedia("(max-width: 860px)").matches) {
-    host.classList.add("gc-nudge-up");
-  } else {
-    host.classList.remove("gc-nudge-up");
-  }
-});
+    // Add or remove the CSS nudge class on mobile
+    if (window.matchMedia("(max-width: 860px)").matches) {
+      host.classList.add("gc-nudge-up");
+    } else {
+      host.classList.remove("gc-nudge-up");
+    }
+  });
 }
-
-
-
-
-
-
-
-
-
