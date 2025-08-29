@@ -28,7 +28,7 @@
       background: linear-gradient(to left, var(--bc-teal) 0%, var(--bc-green) 50%, var(--bc-green) 100%);
       overflow-x: hidden; width: 100%;
     }
-    html { scrollbar-gutter: stable; scroll-behavior: smooth; }
+    html { scrollbar-gutter: stable; }
     *, *::before, *::after { box-sizing: border-box; }
     img, svg, canvas, video { max-width: 100%; height: auto; display:block; }
     .panel { overflow: visible; }
@@ -220,7 +220,7 @@
       }
 
       .main{ padding-top: var(--headerH); }
-      .main > .card:first-child{ margin-top: 0 !important; } /* <-- THE FIX IS HERE */
+      .main > *:first-child{ margin-top: 18px !important; }
       .scrollTarget { scroll-margin-top: calc(var(--headerH) + 18px); }
 
       /* --- FINAL, CORRECTED MOBILE STYLES FOR ABC MAP --- */
@@ -233,14 +233,15 @@
         justify-content: center;
       }
       .abc-wrap {
-        width: 86vw;
-        max-width: 300px;
+        width: min(86vw, 300px);
+        height: auto;
+        aspect-ratio: 1 / 1;
         margin: 0 auto;
         --donut-nudge-x: 0px;
-        --donut-nudge-y: 16px;
+        --donut-nudge-y: 0px;
       }
       .abc-wrap .donut {
-        --outer-radius: 35.2% !important;
+        --outer-radius: 43.8% !important;
       }
       .abc-wrap .overlay{
         object-position: 50% 50% !important;
