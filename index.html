@@ -26,8 +26,7 @@
       font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color: var(--bc-dark);
       background: linear-gradient(to left, var(--bc-teal) 0%, var(--bc-green) 50%, var(--bc-green) 100%);
-      overflow-x: clip; /* <-- THE FIX IS HERE */
-      width: 100%;
+      overflow-x: hidden; width: 100%;
     }
     html { scrollbar-gutter: stable; scroll-behavior: smooth; }
     *, *::before, *::after { box-sizing: border-box; }
@@ -64,7 +63,6 @@
       font-family: 'Rokkitt', serif; font-weight: 900; letter-spacing:.3px; font-size: 28px;
       line-height:1; color: var(--bc-white); text-shadow: 0 2px 0 rgba(0,0,0,.12); margin:0;
     }
-    .headerLogo img{ height: 36px; opacity:.99; }
     .brandName{
       justify-self:end; font-weight:700; font-size:20px; color:var(--bc-white);
       text-shadow: 0 2px 0 rgba(0,0,0,.12); width:30ch; max-width:30ch; text-align:right;
@@ -210,7 +208,6 @@
     /* ====================== MOBILE-ONLY OVERRIDES ====================== */
     @media (max-width: 768px){
       .siteHeader{ position: sticky; top: 0; }
-      .headerLogo{ display:none !important; }
       .bar{ grid-template-columns: 1fr 1fr; }
       .brandName{
         font-size:12px; line-height:1.2; max-width:42vw;
@@ -293,11 +290,8 @@
       <div class="wrap">
         <div class="bar">
           <div class="titleBlock">
-            <img id="pageIcon" src="./assets/icons/Icon_gs_white.png" alt="Section icon">
-            <div id="pageTitle" class="pageTitle">Growth Scan</div>
-          </div>
-          <div class="headerLogo">
-            <img src="./assets/logos/logo-full.png" alt="Business Canvas">
+            <img id="pageIcon" src="./assets/icons/logo-icon.png" alt="Dashboard Icon">
+            <div id="pageTitle" class="pageTitle">Dashboard</div>
           </div>
           <div id="brandName" class="brandName"></div>
         </div>
