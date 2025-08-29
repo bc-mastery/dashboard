@@ -15,10 +15,8 @@ export function setTitleAndIcon(tab) {
     const isActive =
       btn.dataset.tab === tab || btn.dataset.target === "#block-" + tab;
 
-    // toggle CSS class for active tab
     btn.classList.toggle("tab-active", isActive);
 
-    // reset default styles
     if (isPrimary) {
       btn.style.backgroundColor = "white";
       btn.style.color = "#024D4F";
@@ -27,7 +25,6 @@ export function setTitleAndIcon(tab) {
       btn.style.color = "#024D4F";
     }
 
-    // if active, apply dark style
     if (isActive) {
       btn.style.backgroundColor = "#333333";
       btn.style.color = "#FFFFFF";
@@ -43,27 +40,20 @@ export function clearUpgradeBlock() {
   if (existing) existing.remove();
 }
 
-/**
- * Insert upgrade block only if:
- *  - this tab is preview-only, AND
- *  - the tab passed in matches the current tab (prevents stale async writes).
- */
 export function maybeInsertUniversalUpgradeBlock({ tab, isPreviewOnly, content }) {
   if (!isPreviewOnly) return;
 
   const current = document.body.getAttribute("data-current-tab") || state.currentTab || "";
-  if (tab && tab !== current) return; // stale call from a previous tab render
+  if (tab && tab !== current) return;
 
   const tpl = document.getElementById("universalUpgradeBlock");
   const footer = document.querySelector(".siteFooter");
   if (!tpl || !footer) return;
 
-  // Always start clean so no stale content lingers when switching to a full-access tab
   clearUpgradeBlock();
 
   const node = tpl.content.cloneNode(true);
 
-  // Wire CTA links from <body> data attributes
   const stripe4pbs = document.body.getAttribute("data-stripe-4pbs");
   const calendly   = document.body.getAttribute("data-calendly-url");
   const a4pbs = node.querySelector("#cta-4pbs");
@@ -71,13 +61,8 @@ export function maybeInsertUniversalUpgradeBlock({ tab, isPreviewOnly, content }
   if (a4pbs && stripe4pbs) a4pbs.setAttribute("href", stripe4pbs);
   if (acall && calendly)   acall.setAttribute("href", calendly);
 
-  // Optional: override title/text if provided
-  const titleEl =
-    node.querySelector(".upgradeTitle") ||
-    node.querySelector("#upgradeBlockTitle");
-  const textEl =
-    node.querySelector(".upgradeText") ||
-    node.querySelector(".upgradeBlock p.muted");
+  const titleEl = node.querySelector(".upgradeTitle") || node.querySelector("#upgradeBlockTitle");
+  const textEl = node.querySelector(".upgradeText") || node.querySelector(".upgradeBlock p.muted");
   if (titleEl && content?.title) titleEl.textContent = content.title;
   if (textEl && content?.text)   textEl.textContent  = content.text;
 
@@ -102,7 +87,6 @@ export function enforceDownloadProtection() {
   const cta = document.getElementById("downloadBtn");
   if (!cta) return;
 
-  // Always show on Growth, per requirements
   const tab = state.currentTab || document.body.getAttribute("data-current-tab") || "";
   if (tab === "growth") {
     cta.style.display = "inline-flex";
@@ -111,7 +95,6 @@ export function enforceDownloadProtection() {
     return;
   }
 
-  // Default rule for other tabs
   const chips = document.querySelectorAll("#blockTabs .blockBtn").length;
   const minTabs = getMinTabsRequiredForDownload();
   const allowed = chips >= minTabs;
@@ -125,7 +108,6 @@ export function updateFloatingCTA(tab) {
   const btn = document.getElementById("downloadBtn");
   if (!btn) return;
 
-  // ✅ Set default background + text color
   btn.style.backgroundColor = "#024D4F";
   btn.style.color = "#FFFFFF";
 
@@ -134,20 +116,18 @@ export function updateFloatingCTA(tab) {
   let pdf = state.dynamicPdfLinks[tab];
   const d = (state.lastApiByTab[tab] && state.lastApiByTab[tab].data) || {};
 
-  // For Growth, auto-populate from GS_OUTPUT if not cached yet
   if (tab === "growth" && !pdf && d && d.GS_OUTPUT) {
     pdf = toDownloadLink(d.GS_OUTPUT);
     state.dynamicPdfLinks.growth = pdf;
   }
 
-  // Access logic per tab
   let hasAccess = false;
   if (tab === "targeting") {
     hasAccess = d["TS_PAID"] || d["4PBS_PAID"];
   } else if (["offer", "marketing", "sales"].includes(tab)) {
     hasAccess = d["4PBS_PAID"];
   } else {
-    hasAccess = true; // growth, mentoring, knowledge (by default)
+    hasAccess = true;
   }
 
   const labelMap = {
@@ -180,15 +160,7 @@ export function updateFloatingCTA(tab) {
 
 /* --------------------------------- Scrolling -------------------------------- */
 export function scrollToTarget(el) {
-  const scrollMarginTop = parseInt(getComputedStyle(el).scrollMarginTop) || 0;
-  const elementPosition = el.getBoundingClientRect().top + window.scrollY;
-  const offsetPosition = elementPosition - scrollMarginTop;
-
-  const currentScroll = window.scrollY;
-  const delta = Math.abs(offsetPosition - currentScroll);
-  const adjustedOffset = delta < 5 ? offsetPosition - 1 : offsetPosition;
-
-  window.scrollTo({ top: adjustedOffset, behavior: "smooth" });
+  el.scrollIntoView({ behavior: "smooth" });
 }
 
 /* ------------------------ Build secondary chips from DOM -------------------- */
@@ -197,11 +169,9 @@ export function populateBlockTabsFromPage() {
   const blockTabs = document.getElementById("blockTabs");
   if (!blockTabsRow || !blockTabs) return;
 
-  // Keep the CTA node; remove only previous chips
   const cta = document.getElementById("downloadBtn");
   blockTabs.querySelectorAll(".blockBtn").forEach((el) => el.remove());
 
-  // Build chips from sections present in the page
   const allBlocks = document.querySelectorAll(".scrollTarget");
   allBlocks.forEach((block) => {
     const title =
@@ -210,29 +180,17 @@ export function populateBlockTabsFromPage() {
     const id = block.id;
     if (!title || !id) return;
 
-    // Chips are NOT primary tabs → do NOT include 'tabBtn'
     const chip = document.createElement("button");
     chip.className = "blockBtn";
     chip.type = "button";
     chip.dataset.target = `#${id}`;
     chip.textContent = title;
-
-    // Per-chip click (works even without the global delegate)
-    chip.addEventListener(
-      "click",
-      (ev) => {
-        ev.preventDefault();
-        ev.stopPropagation();
-        const el = document.getElementById(id);
-        if (el) scrollToTarget(el);
-      },
-      { capture: true }
-    );
+    
+    // The redundant click listener that was here has been removed.
 
     blockTabs.appendChild(chip);
   });
 
-  // Ensure CTA is at the end
   if (cta && cta.parentElement === blockTabs) {
     blockTabs.appendChild(cta);
   }
@@ -248,17 +206,14 @@ export function initDownloadButtonIsolation() {
   const btn = document.getElementById("downloadBtn");
   if (!btn) return;
 
-  // Strip any tab-like behavior
   btn.classList.remove("tabBtn");
   btn.removeAttribute("data-tab");
   btn.setAttribute("target", "_self");
   btn.setAttribute("rel", "noopener");
 
-  // Replace node to clear any attached listeners
   const clean = btn.cloneNode(true);
   clean.id = btn.id;
 
-  // ✅ Set default background + text color
   clean.style.backgroundColor = "#024D4F";
   clean.style.color = "#FFFFFF";
 
@@ -274,15 +229,11 @@ export function initDownloadButtonIsolation() {
     if (!link) {
       const data = state.lastApiByTab[tab]?.data || {};
       const fieldMap = {
-        targeting: "T_STRATEGY_OUTPUT",
-        offer: "O_STRATEGY_OUTPUT",
-        marketing: "M_STRATEGY_OUTPUT",
-        sales: "S_STRATEGY_OUTPUT",
-        growth: "GS_OUTPUT",
-        mentoring: "MENTORING_STRATEGY_OUTPUT",
+        targeting: "T_STRATEGY_OUTPUT", offer: "O_STRATEGY_OUTPUT",
+        marketing: "M_STRATEGY_OUTPUT", sales: "S_STRATEGY_OUTPUT",
+        growth: "GS_OUTPUT", mentoring: "MENTORING_STRATEGY_OUTPUT",
         knowledge: "KNOWLEDGE_STRATEGY_OUTPUT",
       };
-
       const fallbacks = {
         growth: ["GS_OUTPUT", "GROWTH_STRATEGY_OUTPUT"],
         knowledge: ["KNOWLEDGE_OUTPUT", "K_MASTER_PDF", "KNOWLEDGE_PDF", "KNOWLEDGE_STRATEGY_OUTPUT"],
@@ -319,15 +270,11 @@ export function initDownloadButtonIsolation() {
 }
 
 // Global delegated click handler for secondary chips.
-// Ensures clicks work even if chips get re-rendered or replaced.
 export function initBlockChipDelegation() {
   if (window.__bcBlockChipDelegated) return;
   window.__bcBlockChipDelegated = true;
 
-  // Click (capture) so we outrun any broad handlers
-  document.addEventListener(
-    "click",
-    (e) => {
+  document.addEventListener( "click", (e) => {
       const chip = e.target.closest("#blockTabs .blockBtn");
       if (!chip) return;
 
@@ -343,10 +290,7 @@ export function initBlockChipDelegation() {
     true
   );
 
-  // Keyboard support
-  document.addEventListener(
-    "keydown",
-    (e) => {
+  document.addEventListener( "keydown", (e) => {
       if ((e.key !== "Enter" && e.key !== " ") || !e.target.closest("#blockTabs .blockBtn")) return;
       e.preventDefault();
       e.stopPropagation();
@@ -355,6 +299,3 @@ export function initBlockChipDelegation() {
     true
   );
 }
-
-
-
