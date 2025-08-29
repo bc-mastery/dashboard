@@ -1,6 +1,6 @@
 // /js/pages/sales.js
 
-import { APPS_SCRIPT_URL, token, nocacheFlag, ACCESS } from "../core/config.js";
+import { ACCESS } from "../core/config.js";
 import { state } from "../core/state.js";
 import { inferAccess, parseAreas, toDownloadLink, esc } from "../core/utils.js";
 import {
@@ -14,68 +14,40 @@ import {
   maybeInsertUniversalUpgradeBlock,
   updateFloatingCTA,
 } from "../core/ui.js";
-import { fetchPdfLinks } from "../services/pdf.js";
+import { fetchDashboardData } from "../services/api.js";
 
 /* ------------------------------ main render ------------------------------ */
 export async function renderSalesTab() {
   const contentDiv = document.getElementById("content");
   if (!contentDiv) return;
 
-  if (!token) {
-    contentDiv.innerHTML = `<div class="card"><p class="muted">No token provided in URL.</p></div>`;
-    return;
-  }
-
   contentDiv.innerHTML = `<div class="card"><p class="muted">Loading Sales Strategy…</p></div>`;
 
   try {
-    const url = `${APPS_SCRIPT_URL}?token=${encodeURIComponent(token)}${nocacheFlag ? "&nocache=1" : ""}`;
-    const r = await fetch(url);
-    const api = await r.json();
+    const api = await fetchDashboardData();
 
-    if (!api || !api.ok) {
-      contentDiv.innerHTML = `<div class="card"><p class="muted">${(api && api.message) || "No data found."}</p></div>`;
-      return;
-    }
-
-    // Cache + access
     state.lastApiByTab.sales = { ...api, data: { ...api.data } };
     const d = api.data || {};
     state.lastAccess = inferAccess(d);
 
-    // Pre-fill direct PDF link (from S_STRATEGY_OUTPUT)
     const view = d.S_STRATEGY_OUTPUT || "";
     if (view) {
       state.dynamicPdfLinks.sales = toDownloadLink(view);
       updateFloatingCTA("sales");
     }
 
-    // Allow full content if SALES_PAID or 4PBS_PAID is set
     const allowFull = !!d.SALES_PAID || !!d["4PBS_PAID"];
-
-    // Paint page
     paintSales(api, allowFull);
 
-    // Secondary chips row
     const blockTabsRow = document.getElementById("blockTabsRow");
     if (blockTabsRow) blockTabsRow.style.display = "block";
     populateBlockTabsFromPage();
 
-    // Try to fetch dynamic PDF links from pdf mode, then refresh CTA
-    try {
-      await fetchPdfLinks("sales");
-      updateFloatingCTA("sales");
-    } catch (_) {
-      // ignore
-    }
-
-    // Insert upgrade block for preview users
     maybeInsertUniversalUpgradeBlock({
       isPreviewOnly: !allowFull,
       content: finalBlockContent.sales,
     });
 
-    // Floating call button for GS-only users
     toggleFloatingCallBtn(state.lastAccess === ACCESS.GS_ONLY);
   } catch (err) {
     console.error(err);
@@ -91,10 +63,7 @@ function paintSales(api, allowFull = false) {
   const d = (api && api.data) || {};
   const areas = parseAreas(d.D_AREA);
 
-  let html = "";
-
-  // First block — always shown
-  html += buildFirstBlockHTML({
+  let html = buildFirstBlockHTML({
     title: "Sales Characteristics",
     subtitleLabel: "Sales Style",
     subtitleValue: d.S_AUDIENCE_VISION,
@@ -102,7 +71,6 @@ function paintSales(api, allowFull = false) {
     areas,
   });
 
-  // Full details when allowed
   if (allowFull) {
     html += `
       <div class="card scrollTarget" id="block-sales-details">
@@ -122,4 +90,3 @@ function paintSales(api, allowFull = false) {
   contentDiv.innerHTML = html;
   hydrateABCMaps();
 }
-
