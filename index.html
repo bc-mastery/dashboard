@@ -336,6 +336,14 @@
       .scrollTarget { scroll-margin-top: calc(var(--headerH) + 18px); }
 
       /* --- FINAL, CORRECTED MOBILE STYLES FOR ABC MAP --- */
+      .bfGrid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      .bfMap {
+        display: flex;
+        justify-content: center;
+      }
       .abc-wrap {
         width: 86vw;
         max-width: 300px;
@@ -344,7 +352,7 @@
         --donut-nudge-y: 16px;
       }
       .abc-wrap .donut {
-        --outer-radius: 44% !important;
+        --outer-radius: 35.2% !important;
       }
       .abc-wrap .overlay{
         object-position: 50% 50% !important;
@@ -577,4 +585,3 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
-
