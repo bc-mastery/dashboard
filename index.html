@@ -5,10 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Strategy Dashboard</title>
 
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Rokkitt:wght@900&display=swap" rel="stylesheet">
 
-  <!-- (Optional) Google Charts loader; our code also lazy-loads if this isn't present) -->
   <script src="https://www.gstatic.com/charts/loader.js"></script>
 
   <style>
@@ -337,35 +335,16 @@
       .main > *:first-child{ margin-top: 18px !important; }
       .scrollTarget { scroll-margin-top: calc(var(--headerH) + 18px); }
 
-      /* ABC map controls — overlay fixed, move donut by shifting its CENTER */
-      :root{
-        --abc-mb-donut-shift-x: 0px;     /* +right / –left  */
-        --abc-mb-donut-shift-y: -16px;   /* +down  / –up    */
-        --abc-mb-donut-radius:  41.5%;   /* tune 44.0–45.0% to match frame */
-      }
-      .abc-wrap{
-        width:  min(86vw, 360px);
-        height: min(86vw, 360px) !important;
-        aspect-ratio: 1 / 1;
+      /* --- FINAL, CORRECTED MOBILE STYLES FOR ABC MAP --- */
+      .abc-wrap {
+        width: 86vw;
+        max-width: 300px;
         margin: 0 auto;
-        --donut-nudge-x: var(--abc-mb-donut-shift-x);
-        --donut-nudge-y: var(--abc-mb-donut-shift-y);
-        --overlay-scale: 1;
+        --donut-nudge-x: 0px;
+        --donut-nudge-y: 16px;
       }
-      .abc-wrap .donut{
-        --outer-radius: var(--abc-mb-donut-radius) !important;
-        -webkit-mask: radial-gradient(
-          circle at calc(50% + var(--donut-nudge-x, 0px))
-                    calc(50% + var(--donut-nudge-y, 0px)),
-          #000 0 var(--outer-radius),
-          transparent calc(var(--outer-radius) + 1px) 100%
-        ) !important;
-                mask: radial-gradient(
-          circle at calc(50% + var(--donut-nudge-x, 0px))
-                    calc(50% + var(--donut-nudge-y, 0px)),
-          #000 0 var(--outer-radius),
-          transparent calc(var(--outer-radius) + 1px) 100%
-        ) !important;
+      .abc-wrap .donut {
+        --outer-radius: 31.7% !important;
       }
       .abc-wrap .overlay{
         object-position: 50% 50% !important;
@@ -481,7 +460,6 @@
       <div class="wrap">
         <div class="bar">
           <div class="titleBlock">
-            <!-- Initial icon will be replaced by JS based on tab -->
             <img id="pageIcon" src="./assets/icons/Icon_gs_white.png" alt="Section icon">
             <div id="pageTitle" class="pageTitle">Growth Scan</div>
           </div>
@@ -492,7 +470,6 @@
         </div>
 
         <div class="tabsRow">
-          <!-- Primary tabs -->
           <div class="tabs" id="tabs">
             <button class="tabBtn" data-tab="growth">Growth Scan</button>
             <button class="tabBtn" data-tab="targeting">TARGETING</button>
@@ -502,10 +479,8 @@
             <button class="tabBtn" data-tab="mentoring">MENTORING</button>
           </div>
 
-          <!-- Secondary tabs row (chips + CTA on the right) -->
           <div class="tabs" id="blockTabsRow">
             <div id="blockTabs">
-              <!-- CTA sits in the same flex row as the chips -->
               <a id="downloadBtn" class="floatingCTA ctaDocked" target="_self" href="#">
                 <img src="./assets/icons/Icon_download.png" class="download-icon" alt="">
                 <span id="downloadText">Download PDF</span>
@@ -521,7 +496,6 @@
   <main class="main">
     <div id="content"></div>
 
-    <!-- Universal Upgrade Block template (inserted by JS when needed) -->
     <template id="universalUpgradeBlock">
       <section class="card upgradeBlock" role="region" aria-labelledby="upgradeBlockTitle">
         <h3 class="sectionTitle upgradeTitle" id="upgradeBlockTitle">Extend your strategy when you’re ready</h3>
@@ -538,10 +512,8 @@
       </section>
     </template>
 
-    <!-- Footer as a card block -->
     <footer class="card footerCard siteFooter" role="contentinfo">
       <div class="footer-inner">
-        <!-- Left: Logo above company info -->
         <div class="footer-left">
           <img src="./assets/logos/logo-full.png" alt="Business Canvas" class="footer-logo">
           <div class="footer-company">
@@ -551,7 +523,6 @@
           </div>
         </div>
 
-        <!-- Middle: Resources -->
         <div class="footer-middle">
           <h4 class="footer-heading">Services</h4>
           <a href="https://www.businesscanvas.io/4-pillar-business-strategy" target="_blank" rel="noopener">
@@ -562,7 +533,6 @@
           </a>
         </div>
 
-        <!-- Right: Credibility text + logos (order as requested) -->
         <div class="footer-right">
           <div class="badge-text">
             The Business Canvas method is used in EDIH business development projects.
@@ -583,7 +553,6 @@
 
   </main>
 
-  <!-- Floating Calendly button (hidden by default; toggled by JS) -->
   <a id="floatingCallBtn" class="floatingCallBtn" href="#" target="_blank" rel="noopener" aria-hidden="true" aria-label="Book a strategic call">
     <img src="./assets/icons/Icon_calendar.png" alt="">
     <span class="sr-only">Book a strategic call</span>
@@ -605,14 +574,6 @@
     })();
   </script>
 
-  <!-- ES modules entrypoint (replaces the old app.js) -->
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
-
-
-
-
-
-
-
