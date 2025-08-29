@@ -17,54 +17,11 @@ import {
 } from "../core/ui.js";
 import { fetchDashboardData } from "../services/api.js";
 
-/* ------------------------------ styles ------------------------------ */
-function injectTargetingStylesOnce() {
-  if (document.getElementById("targeting-styles")) return;
-  const style = document.createElement("style");
-  style.id = "targeting-styles";
-  // The rule forcing the grid layout has been removed.
-  style.textContent = `
-    /* Map wrapper (square, shared by overlay + donut host) */
-    #content .bfMap .abc-wrap {
-      position: relative;
-      width: 100%;
-      max-width: 360px;
-      aspect-ratio: 1 / 1;
-      margin-left: auto;
-    }
-
-    /* Overlay fills the wrapper */
-    #content .bfMap .abc-wrap .overlay {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      pointer-events: none;
-      user-select: none;
-      display: block;
-    }
-
-    /* Donut fills the wrapper (conic-gradient painted in JS) */
-    #content .bfMap .abc-wrap .donut {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      /* default: no nudge */
-      --donut-nudge-x: 0px;
-      --donut-nudge-y: 0px;
-    }
-  `;
-  document.head.appendChild(style);
-}
-
 /* ------------------------------ main render ------------------------------ */
 export async function renderTargetingTab() {
   setCurrentTab("targeting");
   document.body.setAttribute("data-current-tab", "targeting");
   clearUpgradeBlock();
-  injectTargetingStylesOnce();
 
   const contentDiv = document.getElementById("content");
   if (!contentDiv) return;
