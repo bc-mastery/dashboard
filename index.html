@@ -181,23 +181,23 @@
     #blockTabsRow .floatingCTA { position: static !important; z-index: 4; top:auto; right:auto; display:inline-flex !important; align-items:center; gap:6px; padding:4px 10px; font-size:10px; line-height:1; border-radius:10px; height:auto; margin-left:6px; }
 
     .blockBtn {
-      -webkit-appearance: none;
-      appearance: none;
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      font-size: 10px;
-      font-weight: 600;           /* keep the bold-ish look like primary tabs */
-      letter-spacing: 0.2px;      /* match tab feel */
-      padding: 4px 8px;
-      background: var(--bc-mint);
-      color: var(--bc-teal);
-      border: 2px solid transparent;
-      border-radius: 10px;
-      box-shadow: 0 2px 6px rgba(0,0,0,.06);
-      cursor: pointer;
-      transition: border-color 0.2s, background 0.2s, color 0.2s;
-    }
-    .blockBtn:hover { background: #b4fde5; }
-    .blockBtn.active { border: none; }  /* no visible border on active chips */
+  -webkit-appearance: none;
+  appearance: none;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-size: 10px;
+  font-weight: 600;           /* keep the bold-ish look like primary tabs */
+  letter-spacing: 0.2px;      /* match tab feel */
+  padding: 4px 8px;
+  background: var(--bc-mint);
+  color: var(--bc-teal);
+  border: 2px solid transparent;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.06);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+.blockBtn:hover { background: #b4fde5; }
+.blockBtn.active { border: none; }  /* no visible border on active chips */
 
     .floatingCTA {
       position: fixed; top: calc(var(--headerBarH) + 4px); right: 8px; z-index: 1100;
@@ -282,7 +282,7 @@
     }
     
     /* ====================== MOBILE-ONLY OVERRIDES ====================== */
-    @media (max-width: 768px){
+    @media (max-width: 992px){
       /* Mobile header behavior */
       .siteHeader{ position: sticky; top: 0; }
       .headerLogo{ display:none !important; }
@@ -344,7 +344,7 @@
         --donut-nudge-y: 16px;
       }
       .abc-wrap .donut {
-        --outer-radius: 35.2% !important;
+        --outer-radius: 44% !important;
       }
       .abc-wrap .overlay{
         object-position: 50% 50% !important;
@@ -566,7 +566,7 @@
       var btn = document.getElementById('floatingCallBtn');
       if (!btn) return;
       var url = (document.body.getAttribute('data-calendly-url') || '').trim();
-      var isMobile = window.matchMedia('(max-width: 768px)').matches;
+      var isMobile = window.matchMedia('(max-width: 992px)').matches;
       if (!isMobile) return;
       if (url && !/REPLACE_WITH/i.test(url)) btn.href = url;
       btn.setAttribute('aria-hidden', 'false');
