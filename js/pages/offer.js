@@ -1,6 +1,6 @@
 // /js/pages/offer.js
 
-import { APPS_SCRIPT_URL, token, nocacheFlag, ACCESS } from "../core/config.js";
+import { ACCESS } from "../core/config.js";
 import { state } from "../core/state.js";
 import { inferAccess, parseAreas, toDownloadLink, esc } from "../core/utils.js";
 import {
@@ -14,29 +14,17 @@ import {
   maybeInsertUniversalUpgradeBlock,
   updateFloatingCTA,
 } from "../core/ui.js";
-import { fetchPdfLinks } from "../services/pdf.js";
+import { fetchDashboardData } from "../services/api.js";
 
 /* ------------------------------ main render ------------------------------ */
 export async function renderOfferTab() {
   const contentDiv = document.getElementById("content");
   if (!contentDiv) return;
 
-  if (!token) {
-    contentDiv.innerHTML = `<div class="card"><p class="muted">No token provided in URL.</p></div>`;
-    return;
-  }
-
   contentDiv.innerHTML = `<div class="card"><p class="muted">Loading Offer Strategy…</p></div>`;
 
   try {
-    const url = `${APPS_SCRIPT_URL}?token=${encodeURIComponent(token)}${nocacheFlag ? "&nocache=1" : ""}`;
-    const r = await fetch(url);
-    const api = await r.json();
-
-    if (!api || !api.ok) {
-      contentDiv.innerHTML = `<div class="card"><p class="muted">${(api && api.message) || "No data found."}</p></div>`;
-      return;
-    }
+    const api = await fetchDashboardData();
 
     // Cache + access
     state.lastApiByTab.offer = { ...api, data: { ...api.data } };
@@ -52,31 +40,21 @@ export async function renderOfferTab() {
       brandEl.title = full;
     }
 
-    // Pre-fill direct PDF link (from O_STRATEGY_OUTPUT)
+    // Pre-fill direct PDF link
     const view = d.O_STRATEGY_OUTPUT || "";
     if (view) {
       state.dynamicPdfLinks.offer = toDownloadLink(view);
       updateFloatingCTA("offer");
     }
 
-    // Allow full content if OFFER_PAID or 4PBS_PAID is set
+    // Allow full content if paid
     const allowFull = !!d.OFFER_PAID || !!d["4PBS_PAID"];
-
-    // Paint page
     paintOffer(api, allowFull);
 
     // Secondary chips row
     const blockTabsRow = document.getElementById("blockTabsRow");
     if (blockTabsRow) blockTabsRow.style.display = "block";
     populateBlockTabsFromPage();
-
-    // Try to fetch dynamic PDF links from pdf mode, then refresh CTA
-    try {
-      await fetchPdfLinks("offer");
-      updateFloatingCTA("offer");
-    } catch (_) {
-      // ignore
-    }
 
     // Insert upgrade block for preview users
     maybeInsertUniversalUpgradeBlock({
@@ -100,10 +78,7 @@ function paintOffer(api, allowFull = false) {
   const d = (api && api.data) || {};
   const areas = parseAreas(d.D_AREA);
 
-  let html = "";
-
-  // First block — always shown (ABC map via buildFirstBlockHTML -> IMAGES.abcFrame)
-  html += buildFirstBlockHTML({
+  let html = buildFirstBlockHTML({
     title: "Offer Characteristics",
     subtitleLabel: "Offer Character",
     subtitleValue: d.O_CHARACTER,
@@ -111,7 +86,6 @@ function paintOffer(api, allowFull = false) {
     areas,
   });
 
-  // Full details when allowed
   if (allowFull) {
     html += `
       <div class="card scrollTarget" id="block-offer-details">
@@ -128,7 +102,5 @@ function paintOffer(api, allowFull = false) {
   }
 
   contentDiv.innerHTML = html;
-
-  // Activate any abc-wrap we just injected
   hydrateABCMaps();
 }
