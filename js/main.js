@@ -4,6 +4,7 @@ import {
   setTitleAndIcon,
   updateFloatingCTA,
   initDownloadButtonIsolation,
+  initBlockChipDelegation, // <-- IMPORT THE CLICK HANDLER
 } from "./core/ui.js";
 import { state } from "./core/state.js";
 import { token } from "./core/config.js";
@@ -89,6 +90,7 @@ document.addEventListener("DOMContentLoaded", () => {
   state.currentTab = getTabFromURL();
   setTitleAndIcon(state.currentTab);
   initDownloadButtonIsolation();
+  initBlockChipDelegation(); // <-- ACTIVATE THE CLICK HANDLER
   loadTab(state.currentTab);
   updateFloatingCTA(state.currentTab);
 });
