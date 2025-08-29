@@ -39,6 +39,32 @@ Unlock your full Sales Strategy — order the 4-Pillar Business Strategy or rese
   },
 };
 
+/* --------------------------- Reusable ABC Map Component --------------------------- */
+
+/**
+ * Builds the HTML for the reusable ABC Map component.
+ * This is the single source of truth for the map's structure.
+ * @param {object} params
+ * @param {string[]} params.areas - List of demand areas.
+ * @param {string} [params.overlay] - Optional custom overlay image path.
+ * @returns {string} The HTML string for the ABC map.
+ */
+function buildAbcMapHTML({ areas = [], overlay }) {
+  const overlayPath = overlay || IMAGES.abcFrame;
+  const mode = detectMode(areas);
+
+  return `
+    <div class="abc-wrap"
+         data-mode="${esc(mode)}"
+         data-areas="${areas.map(String).map(esc).join("|")}"
+         data-overlay="${esc(overlayPath)}">
+      <div class="donut"></div>
+      <img class="overlay" src="${overlayPath}" alt="ABC overlay">
+    </div>
+  `;
+}
+
+
 /* --------------------- First block builder (Targeting-style) ------------------- */
 export function buildFirstBlockHTML({
   title,
@@ -48,11 +74,6 @@ export function buildFirstBlockHTML({
   areas,
   overlay, // optional custom overlay path
 }) {
-  // Single source of truth (Cloudflare is case-sensitive)
-  const overlayPath = overlay || IMAGES.abcFrame;
-
-  const areaList = Array.isArray(areas) ? areas : [];
-  const mode = detectMode(areaList);
   const safeVal = (subtitleValue && String(subtitleValue).trim()) || "—";
   const subLine = `<p><span class="bfSub">${esc(subtitleLabel)}:</span> ${esc(safeVal)}</p>`;
   const descLine = descText ? `<p class="bfDesc preserve">${esc(descText)}</p>` : "";
@@ -66,13 +87,7 @@ export function buildFirstBlockHTML({
           ${descLine}
         </div>
         <div class="bfMap">
-          <div class="abc-wrap"
-               data-mode="${esc(mode)}"
-               data-areas="${areaList.map(String).map(esc).join("|")}"
-               data-overlay="${esc(overlayPath)}">
-            <div class="donut"></div>
-            <img class="overlay" src="${overlayPath}" alt="ABC overlay">
-          </div>
+          ${buildAbcMapHTML({ areas, overlay })}
         </div>
       </div>
     </div>
