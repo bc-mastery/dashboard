@@ -77,7 +77,7 @@ function injectTargetingStylesOnce() {
       }
       /* Mobile-only fine-tune: lift donut a few px (negative = up) */
       #content .bfMap .abc-wrap .donut {
-        --donut-nudge-y: 0px; /* try -6 / -10 to taste */
+        --donut-nudge-y: 0px;
       }
     }
   `;
@@ -241,4 +241,5 @@ function paintTargeting(api, allowFull = false) {
     }
   });
 }
+
 
