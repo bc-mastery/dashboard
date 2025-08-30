@@ -255,6 +255,55 @@
     }
     
     /* ====================== MOBILE-ONLY OVERRIDES ====================== */
+
+    @media (max-width: 768px){
+      /* ... (your existing mobile styles) ... */
+
+      /* Add this new rule for consistency */
+      #block-gs-overview .sectionHeader {
+        display: flex; /* Ensure it's a flex container */
+        align-items: center; /* Vertically align items */
+        justify-content: space-between; /* Space out title and help button */
+        gap: 12px;
+        position: relative; /* Keep relative for help bubble positioning */
+        margin-bottom: 0 !important; /* Reset margin from desktop style */
+      }
+
+      /* ... (rest of your existing mobile overrides) ... */
+    }
+
+
+    @media (max-width: 860px){
+      /* ... (your existing styles inside this block) ... */
+
+      /* MODIFY THESE RULES: */
+      #block-gs-overview .sectionHeader {
+        /* Ensure these are reset or set correctly for the mobile layout */
+        display: flex; /* Keep it as flex to align content */
+        align-items: center;
+        justify-content: space-between; /* Push title left, help button right */
+        gap: 12px;
+        margin-bottom: 0 !important; /* Ensure no extra margin */
+        order: 1; /* Make sure the header comes first */
+        padding-bottom: 8px; /* Add some space below the header */
+      }
+      #block-gs-overview .sectionHeader .bfTitle {
+        display: none !important; /* Hide the original desktop title */
+      }
+      #block-gs-overview .sectionHeader::before{
+        content: "Quick Scan"; /* Show custom mobile title */
+        display: block;
+        margin: 0; /* Reset margin for mobile title */
+        font-family: 'Rokkitt', serif;
+        font-weight: 900;
+        font-size: 22px;
+        color: #30BA80;
+        line-height: 1.2;
+        flex-grow: 1; /* Allow the title to take available space */
+      }
+      /* ... (rest of your existing styles inside this block) ... */
+    }
+    
     @media (max-width: 768px){
       .siteHeader{ position: sticky; top: 0; }
       .bar{ grid-template-columns: 1fr 1fr; }
@@ -446,6 +495,7 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
 
 
 
