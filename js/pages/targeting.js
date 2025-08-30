@@ -1,13 +1,9 @@
 // /js/pages/targeting.js
 
-import { ACCESS, IMAGES } from "../core/config.js";
+import { ACCESS, IMAGES, token } from "../core/config.js";
 import { state, setCurrentTab } from "../core/state.js";
 import { inferAccess, esc, parseAreas, toDownloadLink } from "../core/utils.js";
-import {
-  buildFirstBlockHTML,
-  hydrateABCMaps,
-  finalBlockContent,
-} from "../components/blocks.js";
+import { detectMode, setABCMap } from "../core/abcMap.js";
 import {
   populateBlockTabsFromPage,
   toggleFloatingCallBtn,
@@ -15,21 +11,104 @@ import {
   updateFloatingCTA,
   clearUpgradeBlock,
 } from "../core/ui.js";
-import { fetchDashboardData } from "../services/api.js";
+import { finalBlockContent } from "../components/blocks.js";
+import { centerLockChart } from "../core/charts.js";
+import { fetchDashboardData } from "../services/api.js"; // <-- Import new service
+
+/* ------------------------------ styles ------------------------------ */
+function injectTargetingStylesOnce() {
+  if (document.getElementById("targeting-styles")) return;
+  const style = document.createElement("style");
+  style.id = "targeting-styles";
+  style.textContent = `
+    /* Desktop: 2:1 text:map */
+    #content .card .bfGrid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      align-items: start;
+      gap: 22px;
+    }
+
+    /* Map wrapper (square, shared by overlay + donut host) */
+    #content .bfMap .abc-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 360px;
+      aspect-ratio: 1 / 1;
+      margin-left: auto;
+    }
+
+    /* Overlay fills the wrapper */
+    #content .bfMap .abc-wrap .overlay {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      user-select: none;
+      display: block;
+    }
+
+    /* Donut fills the wrapper (conic-gradient painted in JS) */
+    #content .bfMap .abc-wrap .donut {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      /* default: no nudge */
+      --donut-nudge-x: 0px;
+      --donut-nudge-y: 0px;
+    }
+
+    /* Mobile: stack and center */
+    @media (max-width: 860px) {
+      #content .card .bfGrid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      #content .bfMap {
+        display: flex;
+        justify-content: center;
+      }
+      #content .bfMap .abc-wrap {
+        max-width: 300px;
+        margin-left: 0;
+      }
+      /* Mobile-only fine-tune: lift donut a few px (negative = up) */
+      #content .bfMap .abc-wrap .donut {
+        --donut-nudge-y: -18px; /* try -6 / -10 to taste */
+      }
+    }
+  `;
+  document.head.appendChild(style);
+}
 
 /* ------------------------------ main render ------------------------------ */
-export async function renderTargetingTab() {
+export async function renderTargetingTab(forceRefresh = false) {
   setCurrentTab("targeting");
   document.body.setAttribute("data-current-tab", "targeting");
   clearUpgradeBlock();
 
+  injectTargetingStylesOnce();
+
   const contentDiv = document.getElementById("content");
   if (!contentDiv) return;
+
+  if (!token) {
+    contentDiv.innerHTML = `<div class="card"><p class="muted">No token provided in URL.</p></div>`;
+    return;
+  }
 
   contentDiv.innerHTML = `<div class="card"><p class="muted">Loading Targeting Strategy…</p></div>`;
 
   try {
-    const api = await fetchDashboardData();
+    const api = await fetchDashboardData(forceRefresh);
+
+    if (!api || !api.ok) {
+      contentDiv.innerHTML = `<div class="card"><p class="muted">${(api && api.message) || "No data found."}</p></div>`;
+      return;
+    }
 
     state.lastApiByTab.targeting = { ...api, data: { ...api.data } };
     const d = api.data || {};
@@ -77,14 +156,29 @@ function paintTargeting(api, allowFull = false) {
 
   const d = (api && api.data) || {};
   const areas = parseAreas(d.D_AREA);
+  const mode = detectMode(areas);
 
-  let html = buildFirstBlockHTML({
-    title: "Behavioral Factors",
-    subtitleLabel: "Demand Area(s)",
-    subtitleValue: d.D_AREA,
-    descText: d.D_DRIVER_DESC,
-    areas,
-  });
+  let html = `
+    <div class="card scrollTarget" id="block-behavioral">
+      <div class="bfGrid">
+        <div class="bfText">
+          <div class="bfTitle">Behavioral Factors</div>
+          ${d.D_AREA ? `<p><span class="bfSub">Demand Area(s):</span> ${esc(d.D_AREA)}</p>` : ""}
+          ${d.D_DRIVER ? `<p><span class="bfSub">Driver(s):</span> ${esc(d.D_DRIVER)}</p>` : ""}
+          ${d.D_DRIVER_DESC ? `<p class="bfDesc preserve">${esc(d.D_DRIVER_DESC)}</p>` : ""}
+        </div>
+        <div class="bfMap">
+          <div class="abc-wrap"
+               data-mode="${esc(mode)}"
+               data-areas="${areas.map(String).map(esc).join("|")}"
+               data-overlay="${esc(IMAGES.abcFrame)}">
+            <div class="donut"></div>
+            <img class="overlay" src="${IMAGES.abcFrame}" alt="ABC overlay">
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
 
   if (allowFull) {
     html += `
@@ -122,5 +216,28 @@ function paintTargeting(api, allowFull = false) {
   }
 
   contentDiv.innerHTML = html;
-  hydrateABCMaps();
+
+  // Render + center-lock the donut vs overlay
+  document.querySelectorAll(".abc-wrap").forEach((wrapper) => {
+    const m = (wrapper.dataset.mode || "B2B").toUpperCase();
+    const a = (wrapper.dataset.areas || "")
+      .split("|")
+      .map((s) => s.trim())
+      .filter(Boolean);
+    const overlayPath = wrapper.dataset.overlay || IMAGES.abcFrame;
+
+    setABCMap({ container: wrapper, mode: m, areas: a, overlayPath });
+
+    const host = wrapper.querySelector(".donut");
+
+    // Center-lock first
+    centerLockChart({ wrapper, host, mobileYOffset: -20 });
+
+    // Add or remove the CSS nudge class on mobile
+    if (window.matchMedia("(max-width: 860px)").matches) {
+      host.classList.add("gc-nudge-up");
+    } else {
+      host.classList.remove("gc-nudge-up");
+    }
+  });
 }
