@@ -280,41 +280,35 @@
 
       .main{ padding-top: calc(var(--headerH) - 40px); }
       .scrollTarget { scroll-margin-top: calc(var(--headerH) + 18px); }
-    }
 
-    #block-gs-overview .bfGrid{ grid-template-columns: 1fr 2fr !important; }
-
-    @media (max-width: 860px){
-      #block-gs-overview .sectionHeader, #block-gs-overview .bfGrid {
-        grid-template-columns: 1fr !important;
-      }
-      #block-gs-overview .sectionHeader {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        order: 1;
-      }
-      #block-gs-overview .bfGrid {
-        display: grid;
-        align-items: start;
-        gap: 12px;
-      }
-      #block-gs-overview .bfMap{ order: 2; display: flex; justify-content: center; }
-      #block-gs-overview .bfText{ order: 3; }
-      #block-gs-overview .bfTitle { display: block; } /* Ensure title is visible */
-      
-      #block-gs-overview #gsDonut{
-        width: 100% !important; max-width: none !important;
-        height: auto !important; aspect-ratio: 1 / 1; margin: 0 auto;
-      }
-
+      .bfGrid { grid-template-columns: 1fr; gap: 16px; }
+      .bfMap { display: flex; justify-content: center; }
       .abc-wrap {
         width: min(86vw, 300px); height: auto; aspect-ratio: 1 / 1;
         margin: 0 auto; --donut-nudge-x: 0px; --donut-nudge-y: -18px;
       }
       .abc-wrap .donut { --outer-radius: 43.8% !important; }
-      .abc-wrap .overlay { object-position: 50% 50% !important; transform: none !important; }
+      .abc-wrap .overlay{ object-position: 50% 50% !important; transform: none !important; }
+    }
+
+    #block-gs-overview .bfGrid{ grid-template-columns: 1fr 2fr !important; }
+
+    @media (max-width: 860px){
+      #block-gs-overview .bfGrid{
+        grid-template-columns: 1fr !important; align-items: start; gap: 12px;
+      }
+      #block-gs-overview .bfGrid::before {
+        content: "Quick Scan"; display: block; margin: 6px 0 8px; font-family: 'Rokkitt', serif;
+        font-weight: 900; font-size: 22px; color: #30BA80; line-height: 1.2; order: 1;
+      }
+      #block-gs-overview .bfMap{ order: 2; }
+      #block-gs-overview .bfText{ order: 3; }
+      #block-gs-overview .bfTitle{ display: none !important; }
+      #block-gs-overview #gsDonut{
+        width: 100% !important; max-width: 300px !important; /* Re-added max-width for smaller screens */
+        height: 300px !important; /* Re-added fixed height */
+        margin: 0 auto;
+      }
     }
 
     @media (max-width: 900px){ .footer-inner{ grid-template-columns: 1fr; } .footer-right{ grid-column: auto; } }
