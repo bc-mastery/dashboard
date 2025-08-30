@@ -289,31 +289,19 @@
       }
       .abc-wrap .donut { --outer-radius: 43.8% !important; }
       .abc-wrap .overlay{ object-position: 50% 50% !important; transform: none !important; }
-
-      /* Fix for the Quick Scan help icon alignment on mobile */
-      #block-gs-overview .sectionHeader {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        position: relative;
-        margin-bottom: 0 !important;
-      }
     }
 
     #block-gs-overview .bfGrid{ grid-template-columns: 1fr 2fr !important; }
-    
+
     @media (max-width: 860px){
       #block-gs-overview .bfGrid{
         grid-template-columns: 1fr !important; align-items: start; gap: 12px;
       }
-      #block-gs-overview .bfGrid::before{
-        content: "Quick Scan"; display: block; margin: 6px 0 8px; font-family: 'Rokkitt', serif;
-        font-weight: 900; font-size: 22px; color: #30BA80; line-height: 1.2; order: 1;
-      }
+      /* This rule was duplicating the title and has been removed. */
+      /* #block-gs-overview .bfGrid::before { ... } */
+
       #block-gs-overview .bfMap{ order: 2; }
       #block-gs-overview .bfText{ order: 3; }
-      #block-gs-overview .bfTitle{ display: none !important; }
       #block-gs-overview #gsDonut{
         width: 100% !important; max-width: none !important;
         height: auto !important; aspect-ratio: 1 / 1; margin: 0 auto;
@@ -321,14 +309,20 @@
 
       /* Corrected styles for mobile help icon alignment */
       #block-gs-overview .sectionHeader {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        position: relative;
+        margin-bottom: 0 !important;
         order: 1;
         padding-bottom: 8px;
       }
       #block-gs-overview .sectionHeader .bfTitle {
-        display: none !important;
+        display: none !important; /* Hide the original HTML title */
       }
       #block-gs-overview .sectionHeader::before{
-        content: "Quick Scan";
+        content: "Quick Scan"; /* Show the title via CSS */
         display: block;
         margin: 0;
         font-family: 'Rokkitt', serif;
@@ -336,8 +330,9 @@
         font-size: 22px;
         color: #30BA80;
         line-height: 1.2;
-        flex-grow: 1;
+        flex-grow: 1; /* Allow title to take space */
       }
+      #block-gs-overview .bfTitle{ display: none !important; } /* Hide original title */
     }
 
     @media (max-width: 900px){ .footer-inner{ grid-template-columns: 1fr; } .footer-right{ grid-column: auto; } }
