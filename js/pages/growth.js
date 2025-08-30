@@ -230,7 +230,32 @@ export async function renderGrowthTab(forceRefresh = false) {
                 >?</button>
 
                 <div class="gsHelpBubble" id="gsOverviewHelpBubble" role="tooltip">
-                <p><strong>This is the placeholder text for the Quick Scan help bubble.</strong> You can add your final explanation for this section here later.</p>
+                    <p>The Growth Scan is designed to evaluate the four fundamental pillars that determine your business’s success: Targeting, Offer, Marketing, and Sales. These elements are deeply interconnected, and if even one is weak, your entire strategy falters.</p>
+                    <p>To properly evaluate these areas, we need to compare your current strategic directions with those that your target customers' behavior dictates. Hence, we compare subjective and objective factors to see how well you can utilize your business potential.</p>
+                    <p>Every business owner sees their business, activity, product, or service, and their audience in a certain way. Here are the factors that show how you position yourself currently:</p>
+                    <ul style="padding-left: 18px; margin: 0 0 8px 0; color: #FFFFFF; font-size: 14px; line-height: 1.5;">
+                        <li>How do you frame your product/service?</li>
+                        <li>How do you approach customers?</li>
+                        <li>What trust-building elements do you use?</li>
+                    </ul>
+                    <p>These factors tell a lot about how you see your business and how you — consciously or unconsciously — set your strategic directions. But are they aligned with how your customers really think?...</p>
+                    <p>Most business owners use their product or service as the foundation for their business strategy and try to align everything else to that. But the product or service must be a consequence of where in their customers’ lives or business their activity has the most impact. So the order is like this: Activity → Target Audience → Offer… Marketing and Sales.</p>
+                    <p>You saw the questions that show how you position yourself. The answers to all other questions determine your Business Profile. Based on these insights, we can define who your actual target market is and how they “work”.</p>
+                    <ul style="padding-left: 18px; margin: 0 0 8px 0; color: #FFFFFF; font-size: 14px; line-height: 1.5;">
+                        <li>How they decide;</li>
+                        <li>How they act;</li>
+                        <li>How they think;</li>
+                        <li>What they seek…</li>
+                    </ul>
+                    <p>From there, we can define any and every strategic factor needed to turn your Target Audience into actual Customers.</p>
+                    <p>This is the process, step by step:</p>
+                    <ol style="padding-left: 18px; margin: 0 0 8px 0; color: #FFFFFF; font-size: 14px; line-height: 1.5;">
+                        <li>Your Audience is classified into one or two of the 8 life (B2C) or business (B2B) areas in our award-winning Audience Behavior Canvas</li>
+                        <li>Your Business Profile with your Target Audience runs through our ABC Matrix, enriched with 60+ factors</li>
+                        <li>These factors are completed by our AI engine trained on behavioral economics</li>
+                        <li>You get a Strategic Analysis on how your customers actually work.</li>
+                    </ol>
+                    <p style="margin-top: 16px; color:#B4FDE5; font-weight:700;"><strong>Let’s see…</strong></p>
                 </div>
             </div>
         </div>
@@ -499,6 +524,4 @@ export async function renderGrowthTab(forceRefresh = false) {
     toggleFloatingCallBtn(state.lastAccess === ACCESS.GS_ONLY);
   } catch (err) {
     console.error(err);
-    contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
-  }
-}
+    contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String
