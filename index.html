@@ -288,18 +288,16 @@
         margin: 0 auto; --donut-nudge-x: 0px; --donut-nudge-y: -18px;
       }
       .abc-wrap .donut { --outer-radius: 43.8% !important; }
+      /* This rule was restored to fix the map overlay */
       .abc-wrap .overlay{ object-position: 50% 50% !important; transform: none !important; }
     }
 
     #block-gs-overview .bfGrid{ grid-template-columns: 1fr 2fr !important; }
-
+    
     @media (max-width: 860px){
       #block-gs-overview .bfGrid{
         grid-template-columns: 1fr !important; align-items: start; gap: 12px;
       }
-      /* This rule was duplicating the title and has been removed. */
-      /* #block-gs-overview .bfGrid::before { ... } */
-
       #block-gs-overview .bfMap{ order: 2; }
       #block-gs-overview .bfText{ order: 3; }
       #block-gs-overview #gsDonut{
