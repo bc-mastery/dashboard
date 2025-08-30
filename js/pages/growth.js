@@ -1,6 +1,6 @@
 // /js/pages/growth.js
 
-import { ACCESS, APPS_SCRIPT_URL, token } from "../core/config.js";
+import { ACCESS, token } from "../core/config.js";
 import { state, setCurrentTab } from "../core/state.js";
 import { esc, toDownloadLink } from "../core/utils.js";
 import { ensureCharts, drawDonut, drawSegmentedBars, injectGsStylesOnce } from "../core/charts.js";
@@ -11,7 +11,7 @@ import {
   updateFloatingCTA,
   clearUpgradeBlock,
 } from "../core/ui.js";
-import { fetchDashboardData } from "../services/api.js"; // <-- THE ONLY CHANGE IS HERE
+import { fetchDashboardData } from "../services/api.js";
 
 /* ------------------------------ helpers ------------------------------ */
 function toPercent(val) {
@@ -27,13 +27,6 @@ function toPercent(val) {
   return Math.round(n * 100) / 100;
 }
 const pctLabel = (n) => `${toPercent(n)}%`;
-
-/** Build URL safely (adds token & extra query params). */
-function buildUrlWithToken(baseUrl, token, extraParams = {}) {
-  const sep = baseUrl.includes("?") ? "&" : "?";
-  const qs = new URLSearchParams({ token, ...extraParams });
-  return `${baseUrl}${sep}${qs.toString()}`;
-}
 
 /* ------------------------------ local styles (Block #1 layout + help bubble/overlay) ------------------------------ */
 function injectGrowthOverviewStylesOnce() {
@@ -161,7 +154,7 @@ function injectPillarHelpStylesOnce() {
 }
 
 /* ------------------------------ main render ------------------------------ */
-export async function renderGrowthTab() {
+export async function renderGrowthTab(forceRefresh = false) {
   setCurrentTab("growth");
   document.body.setAttribute("data-current-tab", "growth");
   clearUpgradeBlock();
@@ -178,12 +171,7 @@ export async function renderGrowthTab() {
   contentDiv.innerHTML = `<div class="card"><p class="muted">Loading Growth Scan…</p></div>`;
 
   try {
-    const api = await fetchDashboardData();
-
-    if (!api || !api.ok) {
-      contentDiv.innerHTML = `<div class="card"><p class="muted">${(api && api.message) || "No data found."}</p></div>`;
-      return;
-    }
+    const api = await fetchDashboardData(forceRefresh);
 
     // Cache + data
     state.lastApiByTab.growth = { ...api, data: { ...api.data } };
@@ -228,7 +216,8 @@ export async function renderGrowthTab() {
     // HTML
     contentDiv.innerHTML = `
       <section class="card scrollTarget" id="block-gs-overview">
-        <div class="bfTitle">Quick Scan</div>   <div class="bfGrid">
+        <div class="bfTitle">Quick Scan</div>
+        <div class="bfGrid">
           <div class="bfMap">
             <div id="gsDonut" class="gsDonutChart"></div>
           </div>
