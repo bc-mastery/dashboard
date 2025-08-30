@@ -76,7 +76,7 @@ function injectPillarHelpStylesOnce() {
   const style = document.createElement("style");
   style.id = "gs-pillar-help-styles";
   style.textContent = `
-    #block-gs-pillars .sectionHeader {
+    #block-gs-pillars .sectionHeader, #block-gs-overview .sectionHeader {
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -216,7 +216,24 @@ export async function renderGrowthTab(forceRefresh = false) {
     // HTML
     contentDiv.innerHTML = `
       <section class="card scrollTarget" id="block-gs-overview">
-        <div class="bfTitle">Quick Scan</div>
+        <div class="sectionHeader" style="margin-bottom: -8px;">
+            <div class="bfTitle" style="margin-bottom: 0;">Quick Scan</div>
+            <div class="gsHelpWrap" id="gsOverviewHelpWrap">
+                <button
+                type="button"
+                class="gsHelpBtn"
+                id="gsOverviewHelpBtn"
+                aria-label="What does this section mean?"
+                aria-expanded="false"
+                aria-controls="gsOverviewHelpBubble"
+                title="What does this section mean?"
+                >?</button>
+
+                <div class="gsHelpBubble" id="gsOverviewHelpBubble" role="tooltip">
+                <p><strong>This is the placeholder text for the Quick Scan help bubble.</strong> You can add your final explanation for this section here later.</p>
+                </div>
+            </div>
+        </div>
         <div class="bfGrid">
           <div class="bfMap">
             <div id="gsDonut" class="gsDonutChart"></div>
@@ -416,67 +433,68 @@ export async function renderGrowthTab(forceRefresh = false) {
       overlay.id = "gsOverlay";
       document.body.appendChild(overlay);
     }
-
-    // --- Help icon behavior (hover via CSS; click for touch/tablet + overlay) ---
-    const wrap = document.getElementById("gsPillarHelpWrap");
-    const btn  = document.getElementById("gsPillarHelpBtn");
-
-    if (wrap && btn) {
-      const close = () => {
-        wrap.classList.remove("open");
-        wrap.classList.remove("openHover");
-        btn.setAttribute("aria-expanded", "false");
-        if (overlay) {
-          overlay.classList.remove("show");
-          overlay.classList.remove("hover");
-        }
-        document.body.style.removeProperty("overflow");
-      };
     
-      const open = () => {
-        wrap.classList.remove("openHover");
-        wrap.classList.add("open");
-        btn.setAttribute("aria-expanded", "true");
-        if (overlay) {
-          overlay.classList.add("show");
-          overlay.classList.remove("hover");
-        }
-        document.body.style.overflow = "hidden";
-      };
+    // --- Reusable Help Bubble Initializer ---
+    const initHelpBubble = (wrapId, btnId) => {
+        const wrap = document.getElementById(wrapId);
+        const btn  = document.getElementById(btnId);
+        if (!wrap || !btn || !overlay) return;
     
-      const toggle = (e) => {
-        e.preventDefault();
-        wrap.classList.contains("open") ? close() : open();
-      };
-    
-      btn.addEventListener("click", toggle, { passive: false });
-    
-      wrap.addEventListener("mouseenter", () => {
-        if (!wrap.classList.contains("open")) {
-          wrap.classList.add("openHover");
-          if (overlay) {
-            overlay.classList.add("show");
-            overlay.classList.add("hover");
-          }
-        }
-      });
-    
-      wrap.addEventListener("mouseleave", () => {
-        if (!wrap.classList.contains("open")) {
-          wrap.classList.remove("openHover");
-          if (overlay) {
+        const close = () => {
+            wrap.classList.remove("open");
+            wrap.classList.remove("openHover");
+            btn.setAttribute("aria-expanded", "false");
             overlay.classList.remove("show");
             overlay.classList.remove("hover");
-          }
-        }
-      });
-    
-      btn.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
-      document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
-      document.addEventListener("click", (e) => { if (!wrap.contains(e.target)) close(); });
-      wrap.addEventListener("click", (e) => e.stopPropagation());
-      if (overlay) overlay.addEventListener("click", close);
-    }
+            document.body.style.removeProperty("overflow");
+        };
+      
+        const open = () => {
+            wrap.classList.remove("openHover");
+            wrap.classList.add("open");
+            btn.setAttribute("aria-expanded", "true");
+            overlay.classList.add("show");
+            overlay.classList.remove("hover");
+            document.body.style.overflow = "hidden";
+        };
+      
+        const toggle = (e) => {
+            e.preventDefault();
+            wrap.classList.contains("open") ? close() : open();
+        };
+      
+        btn.addEventListener("click", toggle, { passive: false });
+      
+        wrap.addEventListener("mouseenter", () => {
+            if (!wrap.classList.contains("open")) {
+                wrap.classList.add("openHover");
+                overlay.classList.add("show");
+                overlay.classList.add("hover");
+            }
+        });
+      
+        wrap.addEventListener("mouseleave", () => {
+            if (!wrap.classList.contains("open")) {
+                wrap.classList.remove("openHover");
+                overlay.classList.remove("show");
+                overlay.classList.remove("hover");
+            }
+        });
+      
+        const docClickHandler = (e) => { if (!wrap.contains(e.target)) close(); };
+        const docKeyHandler = (e) => { if (e.key === "Escape") close(); };
+
+        btn.addEventListener("keydown", docKeyHandler);
+        document.addEventListener("keydown", docKeyHandler);
+        document.addEventListener("click", docClickHandler);
+        wrap.addEventListener("click", (e) => e.stopPropagation());
+        overlay.addEventListener("click", close);
+    };
+
+    // Initialize both help bubbles
+    initHelpBubble("gsPillarHelpWrap", "gsPillarHelpBtn");
+    initHelpBubble("gsOverviewHelpWrap", "gsOverviewHelpBtn");
+
 
     toggleFloatingCallBtn(state.lastAccess === ACCESS.GS_ONLY);
   } catch (err) {
