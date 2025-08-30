@@ -148,11 +148,9 @@
       gap: 12px;
       flex-wrap: wrap;
     }
-
     .upgradeBlock {
       padding-bottom: 22px;
     }
-    
     .btn {
       display: inline-block;
       padding: 10px 18px;
@@ -186,7 +184,6 @@
       transform: translateY(-1px);
     }
 
-    
     .floatingCTA {
       position: fixed; top: calc(var(--headerBarH) + 4px); right: 8px; z-index: 1100;
       display:flex; align-items:center; justify-content:center; height:20px; padding:0 10px;
@@ -255,55 +252,6 @@
     }
     
     /* ====================== MOBILE-ONLY OVERRIDES ====================== */
-
-    @media (max-width: 768px){
-      /* ... (your existing mobile styles) ... */
-
-      /* Add this new rule for consistency */
-      #block-gs-overview .sectionHeader {
-        display: flex; /* Ensure it's a flex container */
-        align-items: center; /* Vertically align items */
-        justify-content: space-between; /* Space out title and help button */
-        gap: 12px;
-        position: relative; /* Keep relative for help bubble positioning */
-        margin-bottom: 0 !important; /* Reset margin from desktop style */
-      }
-
-      /* ... (rest of your existing mobile overrides) ... */
-    }
-
-
-    @media (max-width: 860px){
-      /* ... (your existing styles inside this block) ... */
-
-      /* MODIFY THESE RULES: */
-      #block-gs-overview .sectionHeader {
-        /* Ensure these are reset or set correctly for the mobile layout */
-        display: flex; /* Keep it as flex to align content */
-        align-items: center;
-        justify-content: space-between; /* Push title left, help button right */
-        gap: 12px;
-        margin-bottom: 0 !important; /* Ensure no extra margin */
-        order: 1; /* Make sure the header comes first */
-        padding-bottom: 8px; /* Add some space below the header */
-      }
-      #block-gs-overview .sectionHeader .bfTitle {
-        display: none !important; /* Hide the original desktop title */
-      }
-      #block-gs-overview .sectionHeader::before{
-        content: "Quick Scan"; /* Show custom mobile title */
-        display: block;
-        margin: 0; /* Reset margin for mobile title */
-        font-family: 'Rokkitt', serif;
-        font-weight: 900;
-        font-size: 22px;
-        color: #30BA80;
-        line-height: 1.2;
-        flex-grow: 1; /* Allow the title to take available space */
-      }
-      /* ... (rest of your existing styles inside this block) ... */
-    }
-    
     @media (max-width: 768px){
       .siteHeader{ position: sticky; top: 0; }
       .bar{ grid-template-columns: 1fr 1fr; }
@@ -337,13 +285,24 @@
       .bfMap { display: flex; justify-content: center; }
       .abc-wrap {
         width: min(86vw, 300px); height: auto; aspect-ratio: 1 / 1;
-        margin: 0 auto; --donut-nudge-x: 0px; --donut-nudge-y: 0px;
+        margin: 0 auto; --donut-nudge-x: 0px; --donut-nudge-y: -18px;
       }
       .abc-wrap .donut { --outer-radius: 43.8% !important; }
       .abc-wrap .overlay{ object-position: 50% 50% !important; transform: none !important; }
+
+      /* Fix for the Quick Scan help icon alignment on mobile */
+      #block-gs-overview .sectionHeader {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        position: relative;
+        margin-bottom: 0 !important;
+      }
     }
 
     #block-gs-overview .bfGrid{ grid-template-columns: 1fr 2fr !important; }
+    
     @media (max-width: 860px){
       #block-gs-overview .bfGrid{
         grid-template-columns: 1fr !important; align-items: start; gap: 12px;
@@ -358,6 +317,26 @@
       #block-gs-overview #gsDonut{
         width: 100% !important; max-width: none !important;
         height: auto !important; aspect-ratio: 1 / 1; margin: 0 auto;
+      }
+
+      /* Corrected styles for mobile help icon alignment */
+      #block-gs-overview .sectionHeader {
+        order: 1;
+        padding-bottom: 8px;
+      }
+      #block-gs-overview .sectionHeader .bfTitle {
+        display: none !important;
+      }
+      #block-gs-overview .sectionHeader::before{
+        content: "Quick Scan";
+        display: block;
+        margin: 0;
+        font-family: 'Rokkitt', serif;
+        font-weight: 900;
+        font-size: 22px;
+        color: #30BA80;
+        line-height: 1.2;
+        flex-grow: 1;
       }
     }
 
@@ -495,7 +474,3 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
-
-
-
-
