@@ -32,6 +32,7 @@ function setURLTab(tabName) {
 
 /* ------------------------------ router ----------------------------- */
 async function loadTab(tabName) {
+  window.scrollTo(0, 0);
   const contentDiv = document.getElementById("content");
   if (contentDiv) contentDiv.innerHTML = "";
 
