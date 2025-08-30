@@ -4,10 +4,10 @@ import {
   setTitleAndIcon,
   updateFloatingCTA,
   initDownloadButtonIsolation,
-  initBlockChipDelegation, // <-- IMPORT THE CLICK HANDLER
+  initBlockChipDelegation,
 } from "./core/ui.js";
 import { state } from "./core/state.js";
-import { token } from "./core/config.js";
+import { token, getParam } from "./core/config.js"; // <-- Import getParam
 
 // Page renderers
 import { renderGrowthTab } from "./pages/growth.js";
@@ -20,66 +20,67 @@ import { renderKnowledgeTab } from "./pages/knowledge.js";
 
 /* ----------------------------- helpers ----------------------------- */
 function getTabFromURL() {
-  const p = new URLSearchParams(window.location.search);
-  return (p.get("tab") || "growth").toLowerCase();
+  return getParam("tab") || "growth";
 }
 
 function setURLTab(tabName) {
   const next = new URL(window.location.href);
   next.searchParams.set("tab", tabName);
+  next.searchParams.delete("refresh"); // Clean up refresh param after use
   history.replaceState(null, "", next.toString());
 }
 
 /* ------------------------------ router ----------------------------- */
-function loadTab(tabName) {
+async function loadTab(tabName) {
   const contentDiv = document.getElementById("content");
   if (contentDiv) contentDiv.innerHTML = "";
 
+  const forceRefresh = getParam("refresh") === "true";
+
   switch (tabName) {
     case "growth":
-      renderGrowthTab();
-      setTimeout(() => updateFloatingCTA("growth"), 100);
+      await renderGrowthTab(forceRefresh);
       break;
     case "targeting":
-      renderTargetingTab();
+      await renderTargetingTab(forceRefresh);
       break;
     case "offer":
-      renderOfferTab();
+      await renderOfferTab(forceRefresh);
       break;
     case "marketing":
-      renderMarketingTab();
+      await renderMarketingTab(forceRefresh);
       break;
     case "sales":
-      renderSalesTab();
+      await renderSalesTab(forceRefresh);
       break;
     case "mentoring":
-      renderMentoringTab();
+      await renderMentoringTab(forceRefresh);
       break;
     case "knowledge":
-      if (typeof renderKnowledgeTab === "function") renderKnowledgeTab();
+      if (typeof renderKnowledgeTab === "function") {
+        await renderKnowledgeTab(forceRefresh);
+      }
       break;
     default:
-      renderGrowthTab();
-      setTimeout(() => updateFloatingCTA("growth"), 100);
+      await renderGrowthTab(forceRefresh);
   }
+  // Update URL after loading to remove the refresh parameter
+  setURLTab(tabName);
 }
 
 /* ----------------------------- bootstrap --------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
   if (!token) {
-    alert("Token missing in URL");
+    const contentDiv = document.getElementById("content");
+    if(contentDiv) contentDiv.innerHTML = `<div class="card"><p class="muted">Token missing in URL. Please check your link.</p></div>`;
     return;
   }
 
-  // Wire ONLY the PRIMARY navigation tabs (top strip)
   document.querySelectorAll("#tabs .tabBtn").forEach((tabBtn) => {
     tabBtn.addEventListener("click", (e) => {
       e.preventDefault();
-
       const tabName = (tabBtn.dataset.tab || "growth").toLowerCase();
       state.currentTab = tabName;
-
-      setURLTab(tabName);
       setTitleAndIcon(tabName);
       loadTab(tabName);
       updateFloatingCTA(tabName);
@@ -90,7 +91,8 @@ document.addEventListener("DOMContentLoaded", () => {
   state.currentTab = getTabFromURL();
   setTitleAndIcon(state.currentTab);
   initDownloadButtonIsolation();
-  initBlockChipDelegation(); // <-- ACTIVATE THE CLICK HANDLER
-  loadTab(state.currentTab);
-  updateFloatingCTA(state.currentTab);
+  initBlockChipDelegation();
+  loadTab(state.currentTab).then(() => {
+    updateFloatingCTA(state.currentTab);
+  });
 });
