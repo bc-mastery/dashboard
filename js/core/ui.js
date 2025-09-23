@@ -245,7 +245,7 @@ export function initDownloadButtonIsolation() {
       a.download = "";
       a.style.display = "none";
       document.body.appendChild(a);
-a.click();
+      a.click();
       document.body.removeChild(a);
     } else {
       console.warn("No valid PDF data returned for tab:", tab);
