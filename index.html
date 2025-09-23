@@ -125,7 +125,6 @@
       pointer-events: none;
     }
     
-    /* --- START: SPECIAL STYLING FOR MENTORING BUTTON --- */
     .tabBtn-cta {
       background-color: var(--bc-green);
       color: var(--bc-white);
@@ -146,16 +145,14 @@
       box-shadow: inset 0 1px 3px rgba(0,0,0,0.2), 0 1px 1px rgba(0,0,0,0.08);
     }
     .tabBtn-cta.tab-active, #tabs .tabBtn-cta.active {
-      background-color: var(--bc-teal); /* Use TEAL for the active background */
+      background-color: var(--bc-teal);
       color: var(--bc-white);
-      border-color: transparent; /* Border is now handled by the ::before element */
+      border-color: transparent;
       box-shadow: none;
     }
     .tabBtn-cta.tab-active img {
         filter: brightness(0) invert(1);
     }
-    /* --- END: SPECIAL STYLING FOR MENTORING BUTTON --- */
-    
     /* --- END: FINAL BUTTON STYLING --- */
 
     .main{
@@ -251,7 +248,10 @@
     .floatingCTA {
       position: fixed; top: calc(var(--headerBarH) + 4px); right: 8px; z-index: 1100;
       display:flex; align-items:center; justify-content:center; height:20px; padding:0 10px;
-      border:2px solid #30BA80; border-radius:12px; background:#333333; color:var(--bc-white);
+      border:2px solid transparent;
+      border-radius:12px;
+      background: #5f9f9e; /* UPDATED COLOR */
+      color:var(--bc-white);
       font-size:12px; font-weight:600; letter-spacing:0.2px; cursor:pointer; text-decoration:none;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), 0 4px 8px rgba(0,0,0,0.15), 0 1px 0 rgba(0,0,0,0.04);
       transition: transform 0.05s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s;
