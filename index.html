@@ -31,7 +31,7 @@
     *, *::before, *::after { box-sizing: border-box; }
     img, svg, canvas, video { max-width: 100%; height: auto; display:block; }
     .panel { overflow: visible; }
-    .wrap, .tabsRow, #blockTabsRow, .main { max-width: 100%; overflow-x: visible; }
+    .wrap, #blockTabsRow, .main { max-width: 100%; } /* Removed tabsRow from overflow rule */
     .footerCard { overflow: hidden; }
     #tabs, .footer-inner, .footer-left, .footer-middle, .footer-right, .main, #content { min-width: 0; }
     .wrap{ max-width:1100px; margin:0 auto; padding:0 20px; }
@@ -71,89 +71,78 @@
 
     .tabsRow { display:flex; flex-direction:column; gap:6px; padding-top:2px; padding-bottom:0; }
 
-    /* --- START: NEW BUTTON STYLING (REPLACE THE OLD BLOCK WITH THIS) --- */
+    /* --- START: NEW BUTTON STYLING --- */
+    .tabBtn {
+      appearance: none;
+      border: 2px solid #ddd;
+      cursor: pointer;
+      background: var(--bc-white);
+      color: var(--bc-teal);
+      padding: 6px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 4px 8px rgba(0, 0, 0, 0.15), 0 1px 0 rgba(0, 0, 0, 0.04);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+    }
 
-.tabBtn {
-  appearance: none;
-  border: 2px solid #ddd;
-  cursor: pointer;
-  background: var(--bc-white);
-  color: var(--bc-teal);
-  padding: 6px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.2px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 4px 8px rgba(0, 0, 0, 0.15), 0 1px 0 rgba(0, 0, 0, 0.04);
-  
-  /* Smoother transition for all properties, including transform */
-  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
-}
+    .tabBtn:hover {
+      background: #f0f0f0;
+      transform: translateY(-2px) scale(1.03);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 6px 12px rgba(0, 0, 0, 0.2), 0 1px 0 rgba(0, 0, 0, 0.04);
+    }
 
-.tabBtn:hover {
-  background: #f0f0f0; /* Lighter hover color for a more subtle feel */
-  
-  /* The "lift and grow" animation */
-  transform: translateY(-2px) scale(1.03);
-  
-  /* Enhanced shadow to complete the "lifted" effect */
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 6px 12px rgba(0, 0, 0, 0.2), 0 1px 0 rgba(0, 0, 0, 0.04);
-}
+    .tabBtn:active {
+      transform: translateY(1px);
+      background: #d5d5d5;
+      box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 1px rgba(0, 0, 0, 0.08);
+    }
 
-.tabBtn:active {
-  /* Keeps the satisfying "press down" effect */
-  transform: translateY(1px); 
-  background: #d5d5d5;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 1px rgba(0, 0, 0, 0.08);
-}
+    .tabBtn.tab-active, #tabs .tabBtn.active {
+      position: relative;
+      border: 2px solid transparent;
+      background-color: var(--bc-dark);
+      color: var(--bc-white);
+      background-clip: padding-box;
+    }
 
-/* This section for the active tab remains unchanged */
-.tabBtn.tab-active, #tabs .tabBtn.active {
-  position: relative;
-  border: 2px solid transparent;
-  background-color: var(--bc-dark);
-  color: var(--bc-white);
-  background-clip: padding-box;
-}
-
-.tabBtn.tab-active::before, #tabs .tabBtn.active::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 2px;
-  background: linear-gradient(135deg, var(--bc-mint), var(--bc-teal));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
-}
+    .tabBtn.tab-active::before, #tabs .tabBtn.active::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      padding: 2px;
+      background: linear-gradient(135deg, var(--bc-mint), var(--bc-teal));
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor;
+      mask-composite: exclude;
+      pointer-events: none;
+    }
+    /* --- END: NEW BUTTON STYLING --- */
 
     .main{
       padding-top: calc(var(--headerH) + 10px); padding-bottom: 18px;
     }
 
-/* This is the new base style for your cards */
-.card {
-  position: relative; 
-  background: var(--bc-white); 
-  border-radius: 16px; /* A bit softer than the original 14px */
-  padding: 22px 22px 8px;
-  margin-bottom: 18px;
-  border: 1px solid rgba(2, 77, 79, 0.15); /* A slightly more defined border */
-  
-  /* The key for depth: a soft, realistic shadow */
-  box-shadow: 0 6px 20px 5px rgba(0, 0, 0, 0.2);
+    /* --- START: NEW MODERN CARD STYLING --- */
+    .card {
+      position: relative;
+      background: var(--bc-white);
+      border-radius: 16px;
+      padding: 22px 22px 8px;
+      margin-bottom: 18px;
+      border: 1px solid rgba(2, 77, 79, 0.15);
+      box-shadow: 0 6px 20px 5px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    }
 
-  /* Smooth animation for the hover effect */
-  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-}
+    .card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+    /* --- END: NEW MODERN CARD STYLING --- */
 
-/* This creates the "lift" effect when a user hovers over a card */
-.card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-}
     .sectionTitle{ font-family:'Rokkitt', serif; font-weight:900; color:var(--bc-green); font-size:22px; margin:6px 0 14px; }
     .subtitle{ font-weight:700; color:#024D4F; }
     .muted{ color:#4b4b4b; }
@@ -177,7 +166,7 @@
       background: conic-gradient(from -90deg, transparent 0 360deg);
       --outer-radius: 44%;
       -webkit-mask: radial-gradient(circle at calc(50% + var(--donut-nudge-x, 0px)) calc(50% + var(--donut-nudge-y, 0px)), #000 0 var(--outer-radius), transparent calc(var(--outer-radius) + 1px) 100%);
-              mask: radial-gradient(circle at calc(50% + var(--donut-nudge-x, 0px)) calc(50% + var(--donut-nudge-y, 0px)), #000 0 var(--outer-radius), transparent calc(var(--outer-radius) + 1px) 100%);
+      mask: radial-gradient(circle at calc(50% + var(--donut-nudge-x, 0px)) calc(50% + var(--donut-nudge-y, 0px)), #000 0 var(--outer-radius), transparent calc(var(--outer-radius) + 1px) 100%);
       z-index: 1; transition: background 200ms ease;
     }
     
@@ -197,51 +186,19 @@
     .blockBtn:hover { background: #b4fde5; }
     .blockBtn.active { border: none; }
 
-    .upgrade-ctaRow {
-      margin-top: 20px;
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .upgradeBlock {
-      padding-bottom: 22px;
-    }
+    .upgrade-ctaRow { margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap; }
+    .upgradeBlock { padding-bottom: 22px; }
     
     .btn {
-      display: inline-block;
-      padding: 10px 18px;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 14px;
-      text-decoration: none;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: all 0.2s ease-in-out;
-      text-align: center;
+      display: inline-block; padding: 10px 18px; border-radius: 10px; font-weight: 600; font-size: 14px;
+      text-decoration: none; cursor: pointer; border: 2px solid transparent;
+      transition: all 0.2s ease-in-out; text-align: center;
     }
-    .btn-primary {
-      background-color: var(--bc-green);
-      color: var(--bc-white);
-      border-color: var(--bc-green);
-    }
-    .btn-primary:hover {
-      background-color: #29a26f;
-      border-color: #29a26f;
-      transform: translateY(-1px);
-    }
-    .btn-outline {
-      background-color: transparent;
-      color: var(--bc-teal);
-      border-color: var(--bc-teal);
-    }
-    .btn-outline:hover {
-      background-color: var(--bc-teal);
-      color: var(--bc-white);
-      transform: translateY(-1px);
-    }
+    .btn-primary { background-color: var(--bc-green); color: var(--bc-white); border-color: var(--bc-green); }
+    .btn-primary:hover { background-color: #29a26f; border-color: #29a26f; transform: translateY(-1px); }
+    .btn-outline { background-color: transparent; color: var(--bc-teal); border-color: var(--bc-teal); }
+    .btn-outline:hover { background-color: var(--bc-teal); color: var(--bc-white); transform: translateY(-1px); }
 
-    
     .floatingCTA {
       position: fixed; top: calc(var(--headerBarH) + 4px); right: 8px; z-index: 1100;
       display:flex; align-items:center; justify-content:center; height:20px; padding:0 10px;
@@ -279,19 +236,12 @@
     .badge-text{ font-size: 14px; line-height: 1.5; color: var(--bc-dark); margin: 8px 0; }
     .badge-logos{ display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 4px 0 10px; }
     .badge-logos img{ height: auto; max-width: 180px; object-fit: contain; }
-    
-    /* --- NEW STYLE FOR AWARD LOGO --- */
-    .badge-logos .stevie-logo {
-      max-width: 90px;
-    }
+    .badge-logos .stevie-logo { max-width: 90px; }
 
     .floatingCallBtn {
-      display: flex; align-items: center; justify-content: center;
-      position: fixed; bottom: 20px; right: 20px;
-      width: 44px; height: 44px; border-radius: 50%;
-      background-color: var(--bc-green);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      z-index: 5000; transition: transform 0.2s ease;
+      display: flex; align-items: center; justify-content: center; position: fixed; bottom: 20px; right: 20px;
+      width: 44px; height: 44px; border-radius: 50%; background-color: var(--bc-green);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 5000; transition: transform 0.2s ease;
     }
     .floatingCallBtn:hover { transform: scale(1.1); }
     .floatingCallBtn img { width: 24px; height: 24px; filter: brightness(0) invert(1); }
@@ -309,7 +259,6 @@
       }
     }
     
-    /* ====================== MOBILE-ONLY OVERRIDES ====================== */
     @media (max-width: 768px){
       .siteHeader{ position: sticky; top: 0; }
       .bar{ grid-template-columns: 1fr 1fr; }
@@ -321,14 +270,14 @@
       .pageTitle{ font-size: clamp(18px, 4.6vw, 22px); max-width:50vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
       :root{ --headerBarH: 44px; --headerTabsH: 0px; --headerH: calc(var(--headerBarH) + 16px); }
 
-      #tabs{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width:100%; overflow-x: clip; }
+      #tabs{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width:100%; }
       #tabs .tabBtn{
         width: 100%; height: 40px; padding: 10px 6px; font-size: 12px; border-radius: 10px;
         -webkit-appearance: none; appearance: none; overflow: hidden; white-space: normal; text-overflow: clip;
       }
 
       #blockTabs .blockBtn{ display:none !important; }
-      #blockTabsRow{ display:block; padding-top:0; overflow-x:clip; }
+      #blockTabsRow{ display:block; padding-top:0; }
       #blockTabs{ display:block; }
       #blockTabsRow .floatingCTA{
         display:block !important; width:auto; max-width:480px; box-sizing:border-box;
@@ -351,9 +300,7 @@
 
     #block-gs-overview .bfGrid{ grid-template-columns: 1fr 2fr !important; }
     @media (max-width: 860px){
-      #block-gs-overview .bfGrid{
-        grid-template-columns: 1fr !important; align-items: start; gap: 12px;
-      }
+      #block-gs-overview .bfGrid{ grid-template-columns: 1fr !important; align-items: start; gap: 12px; }
       #block-gs-overview .bfMap{ order: 2; }
       #block-gs-overview .bfText{ order: 3; }
       #block-gs-overview #gsDonut{
@@ -376,6 +323,20 @@
     #tabs, #tabs .tabBtn, #blockTabsRow, #blockTabs, #blockTabs .blockBtn, #blockTabsRow .floatingCTA { pointer-events: auto; }
     #blockTabsRow, #blockTabs { position: relative; z-index: 4001; }
     #blockTabs .blockBtn { z-index: 4002; }
+
+    /* --- START: DEFINITIVE FIX FOR BUTTON CLIPPING --- */
+    .siteHeader .panel,
+    .wrap,
+    .tabsRow,
+    #tabs {
+      overflow: visible;
+    }
+
+    .tabBtn:hover {
+      position: relative;
+      z-index: 2;
+    }
+    /* --- END: DEFINITIVE FIX FOR BUTTON CLIPPING --- */
   </style>
 </head>
 
@@ -496,8 +457,3 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
-
-
-
-
-
