@@ -180,15 +180,36 @@
     #blockTabs .blockBtn { position: relative; z-index: 6; pointer-events: auto; }
     #blockTabsRow .floatingCTA { position: static !important; z-index: 4; top:auto; right:auto; display:inline-flex !important; align-items:center; gap:6px; padding:4px 10px; font-size:10px; line-height:1; border-radius:10px; height:auto; margin-left:6px; }
 
-    .blockBtn {
-      -webkit-appearance: none; appearance: none; font-family: Inter, system-ui, sans-serif;
-      font-size: 10px; font-weight: 600; letter-spacing: 0.2px; padding: 4px 8px;
-      background: var(--bc-mint); color: var(--bc-teal); border: 2px solid transparent;
-      border-radius: 10px; box-shadow: 0 2px 6px rgba(0,0,0,.06); cursor: pointer;
-      transition: border-color 0.2s, background 0.2s, color 0.2s;
-    }
-    .blockBtn:hover { background: #b4fde5; }
-    .blockBtn.active { border: none; }
+/* Base style for the new text links */
+.blockBtn {
+  -webkit-appearance: none;
+  appearance: none;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 13px; /* Slightly larger for better readability */
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  padding: 4px 8px;
+  background: transparent; /* Remove the button background */
+  color: var(--bc-dark);   /* Change text color to a dark grey */
+  border: none;           /* Remove the button border */
+  border-radius: 8px;     /* Keep a radius for the hover effect */
+  box-shadow: none;       /* Remove the button shadow */
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Hover effect: a subtle background color */
+.blockBtn:hover {
+  background-color: #f0f0f0; /* A light grey for the hover state */
+  color: var(--bc-teal);
+}
+
+/* Active state: shows which section is currently active/viewed */
+.blockBtn.active {
+  background-color: var(--bc-mint); /* Your brand's mint color */
+  color: var(--bc-teal);
+  font-weight: 700; /* Make it bold */
+}
 
     .upgrade-ctaRow { margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap; }
     .upgradeBlock { padding-bottom: 22px; }
@@ -495,3 +516,4 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
