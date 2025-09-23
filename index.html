@@ -74,7 +74,7 @@
     /* --- START: FINAL BUTTON STYLING --- */
     .tabBtn {
       appearance: none;
-      border: 2px solid #ddd; /* The standard border */
+      border: 2px solid #ddd;
       cursor: pointer;
       background: var(--bc-white);
       color: var(--bc-teal);
@@ -125,7 +125,6 @@
       pointer-events: none;
     }
     
-    /* --- START: SPECIAL STYLING FOR MENTORING BUTTON --- */
     .tabBtn-cta {
       background-color: var(--bc-green);
       color: var(--bc-white);
@@ -151,15 +150,12 @@
     .tabBtn-cta.tab-active img {
         filter: brightness(0) invert(1);
     }
-    /* --- END: SPECIAL STYLING FOR MENTORING BUTTON --- */
-    
     /* --- END: FINAL BUTTON STYLING --- */
 
     .main{
       padding-top: calc(var(--headerH) + 10px); padding-bottom: 18px;
     }
 
-    /* --- START: NEW MODERN CARD STYLING --- */
     .card {
       position: relative;
       background: var(--bc-white);
@@ -175,7 +171,6 @@
       transform: translateY(-6px);
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
     }
-    /* --- END: NEW MODERN CARD STYLING --- */
 
     .sectionTitle{ font-family:'Rokkitt', serif; font-weight:900; color:var(--bc-green); font-size:22px; margin:6px 0 14px; }
     .subtitle{ font-weight:700; color:#024D4F; }
@@ -210,7 +205,6 @@
     #blockTabs .blockBtn { position: relative; z-index: 6; pointer-events: auto; }
     #blockTabsRow .floatingCTA { position: static !important; z-index: 4; top:auto; right:auto; display:inline-flex !important; align-items:center; gap:6px; padding:4px 10px; font-size:10px; line-height:1; border-radius:10px; height:auto; margin-left:6px; }
 
-    /* --- START: NEW SUBSECTION TEXT LINK STYLING --- */
     .blockBtn {
       -webkit-appearance: none; appearance: none; font-family: Inter, system-ui, sans-serif;
       font-size: 11px;
@@ -234,7 +228,6 @@
       color: var(--bc-teal);
       font-weight: 700;
     }
-    /* --- END: NEW SUBSECTION TEXT LINK STYLING --- */
 
     .upgrade-ctaRow { margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap; }
     .upgradeBlock { padding-bottom: 22px; }
@@ -288,7 +281,6 @@
     .badge-logos img{ height: auto; max-width: 180px; object-fit: contain; }
     .badge-logos .stevie-logo { max-width: 90px; }
 
-    /* --- START: UPDATED FLOATING BUTTON STYLE --- */
     .floatingCallBtn {
       display: flex; align-items: center; justify-content: center; position: fixed; bottom: 20px; right: 20px;
       width: 56px; height: 56px; border-radius: 50%; background-color: var(--bc-green);
@@ -300,7 +292,6 @@
     .floatingCallBtn img {
       width: 28px; height: 28px; filter: brightness(0) invert(1);
     }
-    /* --- END: UPDATED FLOATING BUTTON STYLE --- */
     
     .sr-only {
       position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
@@ -485,7 +476,7 @@
               <span>Sales</span>
             </button>
             <button class="tabBtn tabBtn-cta" data-tab="mentoring">
-              <img src="./assets/icons/Icon_mentoring_white.png" alt="">
+              <img src="./assets/icons/Icon_mentoring_white_2.png" alt="">
               <span>Mentoring</span>
             </button>
           </div>
@@ -564,10 +555,11 @@
 
   <a id="floatingCallBtn" class="floatingCallBtn" href="#" target="_blank" rel="noopener" aria-hidden="true">
     <div class="fab-content">
-      <img src="./assets/icons/Icon_mentoring_white.png" alt="Ask a Mentor">
+      <img src="./assets/icons/Icon_mentoring_white_2.png" alt="Ask a Mentor">
       <span class="fab-label">Ask a Mentor</span>
     </div>
   </a>
+
   <script>
     (function () {
       var btn = document.getElementById('floatingCallBtn');
