@@ -71,26 +71,63 @@
 
     .tabsRow { display:flex; flex-direction:column; gap:6px; padding-top:2px; padding-bottom:0; }
 
-    .tabBtn {
-      appearance: none; border: 2px solid #ddd; cursor: pointer; background: var(--bc-white);
-      color: var(--bc-teal); padding: 6px 10px; border-radius: 12px; font-size: 12px;
-      font-weight: 600; letter-spacing: 0.2px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), 0 4px 8px rgba(0,0,0,0.15), 0 1px 0 rgba(0,0,0,0.04);
-      transition: transform 0.05s ease, box-shadow 0.2s ease, background 0.2s ease, border-color 0.2s;
-    }
-    .tabBtn:hover { background:#e0e0e0; }
-    .tabBtn:active { transform:translateY(1px); background:#d5d5d5; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2), 0 1px 1px rgba(0,0,0,0.08); }
+    /* --- START: NEW BUTTON STYLING (REPLACE THE OLD BLOCK WITH THIS) --- */
 
-    .tabBtn.tab-active, #tabs .tabBtn.active {
-      position: relative; border: 2px solid transparent; background-color: var(--bc-dark);
-      color: var(--bc-white); background-clip: padding-box;
-    }
-    .tabBtn.tab-active::before, #tabs .tabBtn.active::before {
-      content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 2px;
-      background: linear-gradient(135deg, var(--bc-mint), var(--bc-teal));
-      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-      -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
-    }
+.tabBtn {
+  appearance: none;
+  border: 2px solid #ddd;
+  cursor: pointer;
+  background: var(--bc-white);
+  color: var(--bc-teal);
+  padding: 6px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 4px 8px rgba(0, 0, 0, 0.15), 0 1px 0 rgba(0, 0, 0, 0.04);
+  
+  /* Smoother transition for all properties, including transform */
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.tabBtn:hover {
+  background: #f0f0f0; /* Lighter hover color for a more subtle feel */
+  
+  /* The "lift and grow" animation */
+  transform: translateY(-2px) scale(1.03);
+  
+  /* Enhanced shadow to complete the "lifted" effect */
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 6px 12px rgba(0, 0, 0, 0.2), 0 1px 0 rgba(0, 0, 0, 0.04);
+}
+
+.tabBtn:active {
+  /* Keeps the satisfying "press down" effect */
+  transform: translateY(1px); 
+  background: #d5d5d5;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 1px rgba(0, 0, 0, 0.08);
+}
+
+/* This section for the active tab remains unchanged */
+.tabBtn.tab-active, #tabs .tabBtn.active {
+  position: relative;
+  border: 2px solid transparent;
+  background-color: var(--bc-dark);
+  color: var(--bc-white);
+  background-clip: padding-box;
+}
+
+.tabBtn.tab-active::before, #tabs .tabBtn.active::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 2px;
+  background: linear-gradient(135deg, var(--bc-mint), var(--bc-teal));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
 
     .main{
       padding-top: calc(var(--headerH) + 10px); padding-bottom: 18px;
@@ -459,6 +496,7 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
 
 
 
