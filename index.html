@@ -31,7 +31,7 @@
     *, *::before, *::after { box-sizing: border-box; }
     img, svg, canvas, video { max-width: 100%; height: auto; display:block; }
     .panel { overflow: visible; }
-    .wrap, #blockTabsRow, .main { max-width: 100%; } /* Removed tabsRow from overflow rule */
+    .wrap, #blockTabsRow, .main { max-width: 100%; }
     .footerCard { overflow: hidden; }
     #tabs, .footer-inner, .footer-left, .footer-middle, .footer-right, .main, #content { min-width: 0; }
     .wrap{ max-width:1100px; margin:0 auto; padding:0 20px; }
@@ -78,7 +78,7 @@
       cursor: pointer;
       background: var(--bc-white);
       color: var(--bc-teal);
-      padding: 6px 10px;
+      padding: 6px 12px; /* Increased padding for icon */
       border-radius: 12px;
       font-size: 12px;
       font-weight: 600;
@@ -105,6 +105,10 @@
       background-color: var(--bc-dark);
       color: var(--bc-white);
       background-clip: padding-box;
+    }
+    
+    .tabBtn.tab-active img {
+        filter: brightness(0) invert(1);
     }
 
     .tabBtn.tab-active::before, #tabs .tabBtn.active::before {
@@ -253,9 +257,9 @@
     @media (min-width: 769px){
       #tabs{ display: flex; gap: 6px; flex-wrap: wrap; }
       #tabs .tabBtn{
-        display: inline-flex; align-items: center; justify-content: center;
+        display: inline-flex; align-items: center;
         flex: 0 0 var(--primaryTabW); width: var(--primaryTabW); height: var(--primaryTabH);
-        padding: 0 12px; line-height: 1; text-align: center;
+        padding: 0 12px; line-height: 1;
       }
     }
     
@@ -272,7 +276,7 @@
 
       #tabs{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width:100%; }
       #tabs .tabBtn{
-        width: 100%; height: 40px; padding: 10px 6px; font-size: 12px; border-radius: 10px;
+        width: 100%; height: 40px; padding: 10px; font-size: 12px; border-radius: 10px;
         -webkit-appearance: none; appearance: none; overflow: hidden; white-space: normal; text-overflow: clip;
       }
 
@@ -337,6 +341,21 @@
       z-index: 2;
     }
     /* --- END: DEFINITIVE FIX FOR BUTTON CLIPPING --- */
+
+    /* --- START: NEW STYLING FOR BUTTON ICONS --- */
+    .tabBtn {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start; /* Aligns content to the left */
+      gap: 8px; /* Space between icon and text */
+    }
+
+    .tabBtn img {
+      width: 16px;
+      height: 16px;
+      object-fit: contain;
+    }
+    /* --- END: NEW STYLING FOR BUTTON ICONS --- */
   </style>
 </head>
 
@@ -356,12 +375,30 @@
         </div>
         <div class="tabsRow">
           <div class="tabs" id="tabs">
-            <button class="tabBtn" data-tab="growth">Growth Scan</button>
-            <button class="tabBtn" data-tab="targeting">TARGETING</button>
-            <button class="tabBtn" data-tab="offer">OFFER</button>
-            <button class="tabBtn" data-tab="marketing">MARKETING</button>
-            <button class="tabBtn" data-tab="sales">SALES</button>
-            <button class="tabBtn" data-tab="mentoring">MENTORING</button>
+            <button class="tabBtn" data-tab="growth">
+              <img src="./assets/icons/Icon_gs_green.png" alt="">
+              <span>Growth Scan</span>
+            </button>
+            <button class="tabBtn" data-tab="targeting">
+              <img src="./assets/icons/Icon_targeting_green.png" alt="">
+              <span>Targeting</span>
+            </button>
+            <button class="tabBtn" data-tab="offer">
+              <img src="./assets/icons/Icon_offer_green.png" alt="">
+              <span>Offer</span>
+            </button>
+            <button class="tabBtn" data-tab="marketing">
+              <img src="./assets/icons/Icon_marketing_green.png" alt="">
+              <span>Marketing</span>
+            </button>
+            <button class="tabBtn" data-tab="sales">
+              <img src="./assets/icons/Icon_sales_green.png" alt="">
+              <span>Sales</span>
+            </button>
+            <button class="tabBtn" data-tab="mentoring">
+              <img src="./assets/icons/Icon_mentoring_green.png" alt="">
+              <span>Mentoring</span>
+            </button>
           </div>
           <div class="tabs" id="blockTabsRow">
             <div id="blockTabs">
