@@ -124,6 +124,25 @@
       mask-composite: exclude;
       pointer-events: none;
     }
+    
+    /* --- START: SPECIAL STYLING FOR MENTORING BUTTON --- */
+    .tabBtn-cta {
+      background-color: var(--bc-green);
+      color: var(--bc-white);
+      border-color: var(--bc-green);
+    }
+    .tabBtn-cta img {
+      filter: brightness(0) invert(1);
+    }
+    .tabBtn-cta:hover {
+      background-color: #29a26f; /* A darker shade of green */
+      border-color: #29a26f;
+    }
+    .tabBtn-cta.tab-active img {
+        filter: brightness(0) invert(1);
+    }
+    /* --- END: SPECIAL STYLING FOR MENTORING BUTTON --- */
+    
     /* --- END: FINAL BUTTON STYLING --- */
 
     .main{
