@@ -74,7 +74,7 @@
     /* --- START: FINAL BUTTON STYLING --- */
     .tabBtn {
       appearance: none;
-      border: 2px solid transparent; /* Set border to transparent */
+      border: 2px solid #ddd; /* The standard border */
       cursor: pointer;
       background: var(--bc-white);
       color: var(--bc-teal);
@@ -83,16 +83,14 @@
       font-size: 12px;
       font-weight: 600;
       letter-spacing: 0.2px;
-      /* Use inset shadow to create border effect without affecting size */
-      box-shadow: inset 0 0 0 2px #ddd, inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 4px 8px rgba(0, 0, 0, 0.15);
-      transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 4px 8px rgba(0, 0, 0, 0.15), 0 1px 0 rgba(0, 0, 0, 0.04);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
     }
 
     .tabBtn:hover {
       background: #f0f0f0;
       transform: translateY(-2px) scale(1.03);
-      /* Remove the inset border on hover and enhance the drop shadow */
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 6px 12px rgba(0, 0, 0, 0.2);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 6px 12px rgba(0, 0, 0, 0.2), 0 1px 0 rgba(0, 0, 0, 0.04);
     }
 
     .tabBtn:active {
@@ -106,7 +104,8 @@
       background-color: var(--bc-dark);
       color: var(--bc-white);
       background-clip: padding-box;
-      box-shadow: none; /* Remove shadows for the active state */
+      border-color: var(--bc-dark); /* Force border to match background, ensuring identical size */
+      box-shadow: none;
     }
     
     .tabBtn.tab-active img {
@@ -116,7 +115,7 @@
     .tabBtn.tab-active::before, #tabs .tabBtn.active::before {
       content: "";
       position: absolute;
-      inset: 0;
+      inset: -2px; /* Set to -2px to cover the parent's border */
       border-radius: inherit;
       padding: 2px;
       background: linear-gradient(135deg, var(--bc-mint), var(--bc-teal));
