@@ -71,26 +71,28 @@
 
     .tabsRow { display:flex; flex-direction:column; gap:6px; padding-top:2px; padding-bottom:0; }
 
-    /* --- START: NEW BUTTON STYLING --- */
+    /* --- START: FINAL BUTTON STYLING --- */
     .tabBtn {
       appearance: none;
-      border: 2px solid #ddd;
+      border: 2px solid transparent; /* Set border to transparent */
       cursor: pointer;
       background: var(--bc-white);
       color: var(--bc-teal);
-      padding: 6px 10px; /* Reduced horizontal padding */
+      padding: 6px 10px;
       border-radius: 12px;
       font-size: 12px;
       font-weight: 600;
       letter-spacing: 0.2px;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 4px 8px rgba(0, 0, 0, 0.15), 0 1px 0 rgba(0, 0, 0, 0.04);
-      transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+      /* Use inset shadow to create border effect without affecting size */
+      box-shadow: inset 0 0 0 2px #ddd, inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 4px 8px rgba(0, 0, 0, 0.15);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
     }
 
     .tabBtn:hover {
       background: #f0f0f0;
       transform: translateY(-2px) scale(1.03);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 6px 12px rgba(0, 0, 0, 0.2), 0 1px 0 rgba(0, 0, 0, 0.04);
+      /* Remove the inset border on hover and enhance the drop shadow */
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8), 0 6px 12px rgba(0, 0, 0, 0.2);
     }
 
     .tabBtn:active {
@@ -101,10 +103,10 @@
 
     .tabBtn.tab-active, #tabs .tabBtn.active {
       position: relative;
-      border: 2px solid transparent;
       background-color: var(--bc-dark);
       color: var(--bc-white);
       background-clip: padding-box;
+      box-shadow: none; /* Remove shadows for the active state */
     }
     
     .tabBtn.tab-active img {
@@ -123,7 +125,7 @@
       mask-composite: exclude;
       pointer-events: none;
     }
-    /* --- END: NEW BUTTON STYLING --- */
+    /* --- END: FINAL BUTTON STYLING --- */
 
     .main{
       padding-top: calc(var(--headerH) + 10px); padding-bottom: 18px;
