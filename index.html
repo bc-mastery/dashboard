@@ -180,36 +180,31 @@
     #blockTabs .blockBtn { position: relative; z-index: 6; pointer-events: auto; }
     #blockTabsRow .floatingCTA { position: static !important; z-index: 4; top:auto; right:auto; display:inline-flex !important; align-items:center; gap:6px; padding:4px 10px; font-size:10px; line-height:1; border-radius:10px; height:auto; margin-left:6px; }
 
-/* Base style for the new text links */
-.blockBtn {
-  -webkit-appearance: none;
-  appearance: none;
-  font-family: Inter, system-ui, sans-serif;
-  font-size: 11px; /* Slightly larger for better readability */
-  font-weight: 600;
-  letter-spacing: 0.2px;
-  padding: 4px 8px;
-  background: transparent; /* Remove the button background */
-  color: var(--bc-dark);   /* Change text color to a dark grey */
-  border: none;           /* Remove the button border */
-  border-radius: 8px;     /* Keep a radius for the hover effect */
-  box-shadow: none;       /* Remove the button shadow */
-  cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
+    /* --- START: NEW SUBSECTION TEXT LINK STYLING --- */
+    .blockBtn {
+      -webkit-appearance: none; appearance: none; font-family: Inter, system-ui, sans-serif;
+      font-size: 11px;
+      font-weight: 600; letter-spacing: 0.2px; padding: 4px 8px;
+      background: transparent;
+      color: var(--bc-dark);
+      border: none;
+      border-radius: 8px;
+      box-shadow: none;
+      cursor: pointer;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
 
-/* Hover effect: a subtle background color */
-.blockBtn:hover {
-  background-color: #f0f0f0; /* A light grey for the hover state */
-  color: var(--bc-teal);
-}
+    .blockBtn:hover {
+      background-color: #f0f0f0;
+      color: var(--bc-teal);
+    }
 
-/* Active state: shows which section is currently active/viewed */
-.blockBtn.active {
-  background-color: var(--bc-mint); /* Your brand's mint color */
-  color: var(--bc-teal);
-  font-weight: 700; /* Make it bold */
-}
+    .blockBtn.active {
+      background-color: var(--bc-mint);
+      color: var(--bc-teal);
+      font-weight: 700;
+    }
+    /* --- END: NEW SUBSECTION TEXT LINK STYLING --- */
 
     .upgrade-ctaRow { margin-top: 20px; display: flex; gap: 12px; flex-wrap: wrap; }
     .upgradeBlock { padding-bottom: 22px; }
@@ -285,6 +280,7 @@
       }
     }
     
+    /* ====================== MOBILE-ONLY OVERRIDES ====================== */
     @media (max-width: 768px){
       .siteHeader{ position: sticky; top: 0; }
       .bar{ grid-template-columns: 1fr 1fr; }
@@ -301,6 +297,13 @@
         width: 100%; height: 40px; padding: 10px; font-size: 12px; border-radius: 10px;
         -webkit-appearance: none; appearance: none; overflow: hidden; white-space: normal; text-overflow: clip;
       }
+      
+      /* --- START: LARGER MOBILE ICONS --- */
+      #tabs .tabBtn img {
+        width: 19px;
+        height: 19px;
+      }
+      /* --- END: LARGER MOBILE ICONS --- */
 
       #blockTabs .blockBtn{ display:none !important; }
       #blockTabsRow{ display:block; padding-top:0; }
@@ -516,5 +519,3 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
-
-
