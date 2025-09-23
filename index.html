@@ -259,13 +259,20 @@
     .badge-logos img{ height: auto; max-width: 180px; object-fit: contain; }
     .badge-logos .stevie-logo { max-width: 90px; }
 
+    /* --- START: UPDATED FLOATING BUTTON STYLE --- */
     .floatingCallBtn {
       display: flex; align-items: center; justify-content: center; position: fixed; bottom: 20px; right: 20px;
-      width: 56px; height: 56px; border-radius: 10%; background-color: var(--bc-green);
+      width: 56px; height: 56px; border-radius: 50%; background-color: var(--bc-green);
       box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 5000; transition: transform 0.2s ease;
     }
+
     .floatingCallBtn:hover { transform: scale(1.1); }
-    .floatingCallBtn img { width: 40px; height: 40px; filter: brightness(0) invert(1); }
+
+    .floatingCallBtn img {
+      width: 28px; height: 28px; filter: brightness(0) invert(1);
+    }
+    /* --- END: UPDATED FLOATING BUTTON STYLE --- */
+    
     .sr-only {
       position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
       overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0;
@@ -276,7 +283,7 @@
       #tabs .tabBtn{
         display: inline-flex; align-items: center;
         flex: 0 0 var(--primaryTabW); width: var(--primaryTabW); height: var(--primaryTabH);
-        padding: 0 10px; /* Reduced padding */
+        padding: 0 10px;
         line-height: 1;
       }
     }
@@ -299,12 +306,9 @@
         -webkit-appearance: none; appearance: none; overflow: hidden; white-space: normal; text-overflow: clip;
       }
       
-      /* --- START: LARGER MOBILE ICONS --- */
       #tabs .tabBtn img {
-        width: 19px;
-        height: 19px;
+        width: 19px; height: 19px;
       }
-      /* --- END: LARGER MOBILE ICONS --- */
 
       #blockTabs .blockBtn{ display:none !important; }
       #blockTabsRow{ display:block; padding-top:0; }
@@ -372,8 +376,8 @@
     .tabBtn {
       display: flex;
       align-items: center;
-      justify-content: flex-start; /* Aligns content to the left */
-      gap: 6px; /* Reduced space between icon and text */
+      justify-content: flex-start;
+      gap: 6px;
     }
 
     .tabBtn img {
@@ -382,6 +386,36 @@
       object-fit: contain;
     }
     /* --- END: NEW STYLING FOR BUTTON ICONS --- */
+
+    /* --- START: FLOATING BUTTON HOVER TEXT --- */
+    .floatingCallBtn .fab-content {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .fab-label {
+      position: absolute;
+      right: 68px; /* Position it to the left of the button */
+      background-color: var(--bc-dark);
+      color: var(--bc-white);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      white-space: nowrap;
+      pointer-events: none;
+      
+      opacity: 0;
+      transform: scale(0.95);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .floatingCallBtn:hover .fab-label {
+      opacity: 1;
+      transform: scale(1);
+    }
+    /* --- END: FLOATING BUTTON HOVER TEXT --- */
   </style>
 </head>
 
@@ -499,11 +533,12 @@
     </footer>
   </div>
 
-  <a id="floatingCallBtn" class="floatingCallBtn" href="#" target="_blank" rel="noopener" aria-hidden="true" aria-label="Ask a Mentor">
-    <img src="./assets/icons/Icon_mentoring_green.png" alt="">
-    <span class="sr-only">Ask your Mentor</span>
+  <a id="floatingCallBtn" class="floatingCallBtn" href="#" target="_blank" rel="noopener" aria-hidden="true">
+    <div class="fab-content">
+      <img src="./assets/icons/Icon_mentoring_green.png" alt="Ask a Mentor">
+      <span class="fab-label">Ask a Mentor</span>
+    </div>
   </a>
-
   <script>
     (function () {
       var btn = document.getElementById('floatingCallBtn');
@@ -520,5 +555,3 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
-
-
