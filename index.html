@@ -104,7 +104,7 @@
       background-color: var(--bc-dark);
       color: var(--bc-white);
       background-clip: padding-box;
-      border-color: var(--bc-dark); /* Force border to match background, ensuring identical size */
+      border-color: var(--bc-dark);
       box-shadow: none;
     }
     
@@ -115,7 +115,7 @@
     .tabBtn.tab-active::before, #tabs .tabBtn.active::before {
       content: "";
       position: absolute;
-      inset: -2px; /* Set to -2px to cover the parent's border */
+      inset: -2px;
       border-radius: inherit;
       padding: 2px;
       background: linear-gradient(135deg, var(--bc-mint), var(--bc-teal));
@@ -130,13 +130,23 @@
       background-color: var(--bc-green);
       color: var(--bc-white);
       border-color: var(--bc-green);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 4px 8px rgba(0,0,0,0.2);
     }
     .tabBtn-cta img {
       filter: brightness(0) invert(1);
     }
     .tabBtn-cta:hover {
-      background-color: #29a26f; /* A darker shade of green */
+      background-color: #29a26f;
       border-color: #29a26f;
+    }
+    .tabBtn-cta.tab-active, #tabs .tabBtn-cta.active {
+      background-color: #258e60;
+      border-color: #258e60;
+      color: var(--bc-white);
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .tabBtn-cta.tab-active::before {
+      display: none;
     }
     .tabBtn-cta.tab-active img {
         filter: brightness(0) invert(1);
@@ -474,8 +484,8 @@
               <img src="./assets/icons/Icon_sales_green_2.png" alt="">
               <span>Sales</span>
             </button>
-            <button class="tabBtn" data-tab="mentoring">
-              <img src="./assets/icons/Icon_mentoring_green.png" alt="">
+            <button class="tabBtn tabBtn-cta" data-tab="mentoring">
+              <img src="./assets/icons/Icon_mentoring_white.png" alt="">
               <span>Mentoring</span>
             </button>
           </div>
@@ -554,7 +564,7 @@
 
   <a id="floatingCallBtn" class="floatingCallBtn" href="#" target="_blank" rel="noopener" aria-hidden="true">
     <div class="fab-content">
-      <img src="./assets/icons/Icon_mentoring_green.png" alt="Ask a Mentor">
+      <img src="./assets/icons/Icon_mentoring_white.png" alt="Ask a Mentor">
       <span class="fab-label">Ask a Mentor</span>
     </div>
   </a>
