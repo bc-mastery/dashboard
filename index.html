@@ -95,10 +95,28 @@
     .main{
       padding-top: calc(var(--headerH) + 10px); padding-bottom: 18px;
     }
-    .card{
-      position: relative; background:var(--bc-white); border-radius:14px; padding:22px 22px 8px;
-      box-shadow: 0 6px 16px rgba(0,0,0,0.12); border:1px solid rgba(2,77,79,.1); margin-bottom:18px;
-    }
+
+/* This is the new base style for your cards */
+.card {
+  position: relative; 
+  background: var(--bc-white); 
+  border-radius: 16px; /* A bit softer than the original 14px */
+  padding: 22px 22px 8px;
+  margin-bottom: 18px;
+  border: 1px solid rgba(2, 77, 79, 0.15); /* A slightly more defined border */
+  
+  /* The key for depth: a soft, realistic shadow */
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+
+  /* Smooth animation for the hover effect */
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+/* This creates the "lift" effect when a user hovers over a card */
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
     .sectionTitle{ font-family:'Rokkitt', serif; font-weight:900; color:var(--bc-green); font-size:22px; margin:6px 0 14px; }
     .subtitle{ font-weight:700; color:#024D4F; }
     .muted{ color:#4b4b4b; }
@@ -441,3 +459,4 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
+
