@@ -20,23 +20,48 @@ function activateScrollSpy() {
 
   const headerHeight = document.querySelector(".siteHeader")?.offsetHeight || 150;
 
-  // The observer will fire when a section crosses the activation line.
+  // The observer will fire frequently as sections move through the viewport.
   const observerOptions = {
-    rootMargin: `-${headerHeight + 100}px 0px 0px 0px`,
+    rootMargin: `-${headerHeight}px 0px -50px 0px`,
     threshold: 0,
   };
 
   const observerCallback = () => {
-    // Define the activation point: 100px below the header.
-    const triggerLine = headerHeight + 100;
+    let bestSection = null;
+    let maxScore = -Infinity;
 
-    // Find the last section whose top has passed above this trigger line.
-    const newActiveSection = sections.findLast(section => {
+    // The ideal position for a section's top is just below the sticky header.
+    const idealPosition = headerHeight;
+
+    sections.forEach(section => {
         const rect = section.getBoundingClientRect();
-        return rect.top <= triggerLine;
+        const top = rect.top;
+
+        // Ignore sections completely off-screen.
+        if (rect.bottom < idealPosition || top > window.innerHeight) {
+            return;
+        }
+
+        const distance = top - idealPosition;
+        let score;
+
+        if (distance <= 0) {
+            // Section is at or above the ideal line (already scrolled past).
+            // Penalize it more heavily the further up it goes.
+            score = 1000 + distance; // `distance` is negative, so this decreases the score.
+        } else {
+            // Section is below the ideal line (approaching).
+            // Penalize it less to give it priority.
+            score = 1000 - (distance * 1.5);
+        }
+
+        if (score > maxScore) {
+            maxScore = score;
+            bestSection = section;
+        }
     });
 
-    const newActiveId = newActiveSection ? newActiveSection.id : null;
+    const newActiveId = bestSection ? bestSection.id : null;
 
     // Only update the UI if the active section has changed.
     if (newActiveId !== currentActiveSectionId) {
@@ -53,7 +78,6 @@ function activateScrollSpy() {
   sections.forEach((section) => scrollSpyObserver.observe(section));
   
   // Also attach to the main scroll event for maximum responsiveness.
-  // This helps catch edge cases where the observer might not fire.
   let scrollTimeout;
   window.addEventListener('scroll', () => {
     clearTimeout(scrollTimeout);
