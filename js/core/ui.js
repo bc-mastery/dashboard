@@ -20,17 +20,20 @@ function activateScrollSpy() {
 
   const headerHeight = document.querySelector(".siteHeader")?.offsetHeight || 150;
 
-  // This margin creates a horizontal "trigger" line just below the header.
-  // The observer will fire whenever a section crosses this line.
+  // The observer will now fire whenever a section enters or leaves the visible part of the viewport (below the header)
   const observerOptions = {
-    rootMargin: `-${headerHeight}px 0px -${window.innerHeight - headerHeight - 1}px 0px`,
+    rootMargin: `-${headerHeight}px 0px 0px 0px`,
+    threshold: 0,
   };
 
   const observerCallback = () => {
-    // Find the last section whose top is at or above the trigger line.
+    // The activation "trigger line" is the vertical middle of the viewport.
+    const triggerLine = window.innerHeight / 2;
+
+    // Find the last section whose top has passed above the trigger line.
     const newActiveSection = sections.findLast(section => {
         const rect = section.getBoundingClientRect();
-        return rect.top <= headerHeight + 2; // +2px buffer
+        return rect.top <= triggerLine;
     });
 
     const newActiveId = newActiveSection ? newActiveSection.id : null;
