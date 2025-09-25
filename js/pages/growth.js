@@ -77,78 +77,59 @@ function injectPillarHelpStylesOnce() {
   style.id = "gs-pillar-help-styles";
   style.textContent = `
     #block-gs-pillars .sectionHeader, #block-gs-overview .sectionHeader {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      position: relative;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; position: relative;
     }
     .gsHelpWrap {
-      position: static;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 1;
+      position: static; display: inline-flex; align-items: center;
+      justify-content: center; line-height: 1;
     }
     .gsHelpBtn {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      background: #30BA80;
-      color: #FFFFFF;
-      border: none;
-      cursor: pointer;
-      font-weight: 800;
-      font-size: 16px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
+      width: 28px; height: 28px; border-radius: 50%; background: #30BA80;
+      color: #FFFFFF; border: none; cursor: pointer; font-weight: 800; font-size: 16px;
+      display: inline-flex; align-items: center; justify-content: center;
       box-shadow: 0 1px 2px rgba(0,0,0,.06);
     }
     .gsHelpBtn:focus-visible {
-      outline: 2px solid #024D4F;
-      outline-offset: 2px;
+      outline: 2px solid #024D4F; outline-offset: 2px;
     }
     .gsHelpBubble {
-      position: absolute;
-      left: 24px;
-      right: 0;
-      top: calc(100% + 8px);
+      position: absolute; /* Default position, will be changed by JS */
       width: auto;
-      max-width: none;
-      background: #333333;
-      border: 1px solid #E5E7EB;
-      border-radius: 12px;
+      max-width: 520px; /* Max-width on desktop */
+      background: #333333; border: 1px solid #E5E7EB; border-radius: 12px;
       padding: 12px 14px;
       box-shadow: 0 10px 20px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.06);
-      z-index: 4002; /* CORRECTED: Increased z-index */
+      z-index: 4002;
       display: none;
     }
     .gsHelpBubble p, .gsHelpBubble ul, .gsHelpBubble ol {
-      margin: 0 0 8px 0;
-      color: #FFFFFF;
-      font-size: 14px;
-      line-height: 1.5;
-      font-family: 'Inter', sans-serif;
+      margin: 0 0 8px 0; color: #FFFFFF; font-size: 14px;
+      line-height: 1.5; font-family: 'Inter', sans-serif;
     }
     .gsHelpBubble p:last-child, .gsHelpBubble ul:last-child, .gsHelpBubble ol:last-child { margin-bottom: 0; }
-    /* REMOVED hover rules from here */
     .gsHelpWrap.open .gsHelpBubble { display: block; }
     #gsOverlay {
-      position: fixed;
-      inset: 0;
+      position: fixed; inset: 0;
       background: rgba(2, 77, 79, 0.25);
-      backdrop-filter: blur(2px);
-      -webkit-backdrop-filter: blur(2px);
-      z-index: 4001; /* CORRECTED: Increased z-index */
+      backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
+      z-index: 4001;
       display: none;
     }
     #gsOverlay.show { display: block; }
-    .gsHelpWrap.openHover .gsHelpBubble { display: block; }
-    #gsOverlay.hover { pointer-events: none; }
+
+    /* NEW: Mobile styles for scrolling and positioning */
+    @media (max-width: 768px) {
+      .gsHelpBubble {
+        width: calc(100% - 40px); /* Use most of the screen width */
+        max-height: 75vh;          /* Limit height to 75% of the viewport */
+        overflow-y: auto;          /* Enable vertical scrolling */
+      }
+    }
   `;
   document.head.appendChild(style);
 }
+
 
 /* ------------------------------ main render ------------------------------ */
 export async function renderGrowthTab(forceRefresh = false) {
@@ -444,49 +425,75 @@ export async function renderGrowthTab(forceRefresh = false) {
     const initHelpBubble = (wrapId, btnId) => {
         const wrap = document.getElementById(wrapId);
         const btn  = document.getElementById(btnId);
-        if (!wrap || !btn || !overlay) return;
-    
+        const bubble = wrap.querySelector('.gsHelpBubble');
+        const overlay = document.getElementById('gsOverlay');
+        if (!wrap || !btn || !bubble || !overlay) return;
+
+        const originalParent = bubble.parentElement;
+        let isAppendedToBody = false;
+
         const close = () => {
             wrap.classList.remove("open");
-            wrap.classList.remove("openHover");
             btn.setAttribute("aria-expanded", "false");
             overlay.classList.remove("show");
-            overlay.classList.remove("hover");
             document.body.style.removeProperty("overflow");
+
+            // Move the bubble back to its original place in the DOM
+            if (isAppendedToBody) {
+                originalParent.appendChild(bubble);
+                bubble.style.cssText = ''; // Clear inline styles
+                isAppendedToBody = false;
+            }
         };
       
         const open = () => {
-            wrap.classList.remove("openHover");
             wrap.classList.add("open");
             btn.setAttribute("aria-expanded", "true");
             overlay.classList.add("show");
-            overlay.classList.remove("hover");
             document.body.style.overflow = "hidden";
+
+            // Move bubble to body to escape parent's stacking context
+            if (!isAppendedToBody) {
+                document.body.appendChild(bubble);
+                isAppendedToBody = true;
+            }
+
+            // Dynamically position the bubble
+            const isMobile = window.matchMedia("(max-width: 768px)").matches;
+            if (isMobile) {
+                // Center on mobile
+                bubble.style.position = 'fixed';
+                bubble.style.top = '50%';
+                bubble.style.left = '50%';
+                bubble.style.transform = 'translate(-50%, -50%)';
+            } else {
+                // Position near the button on desktop
+                const btnRect = btn.getBoundingClientRect();
+                bubble.style.position = 'fixed';
+                bubble.style.top = `${btnRect.bottom + 8}px`;
+                bubble.style.left = `${btnRect.left}px`;
+                bubble.style.transform = '';
+            }
         };
       
         const toggle = (e) => {
             e.preventDefault();
+            e.stopPropagation();
             wrap.classList.contains("open") ? close() : open();
         };
       
+        // --- Event Listeners ---
         btn.addEventListener("click", toggle, { passive: false });
-      
-        wrap.addEventListener("mouseenter", () => {
-          // Logic removed to disable hover effect
-      });
-    
-      wrap.addEventListener("mouseleave", () => {
-          // Logic removed to disable hover effect
-      });
-      
-        const docClickHandler = (e) => { if (!btn.contains(e.target)) close(); };
-        const docKeyHandler = (e) => { if (e.key === "Escape") close(); };
+        
+        // This listener handles clicking anywhere (overlay, bubble, document) EXCEPT the button
+        const clickAwayHandler = (e) => {
+          if (!btn.contains(e.target) && wrap.classList.contains('open')) {
+            close();
+          }
+        };
 
-        btn.addEventListener("keydown", docKeyHandler);
-        document.addEventListener("keydown", docKeyHandler);
-        document.addEventListener("click", docClickHandler);
-        wrap.addEventListener("click", (e) => e.stopPropagation());
-        overlay.addEventListener("click", close);
+        document.addEventListener("click", clickAwayHandler);
+        document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
     };
 
     // Initialize both help bubbles
@@ -500,5 +507,3 @@ export async function renderGrowthTab(forceRefresh = false) {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
-
-
