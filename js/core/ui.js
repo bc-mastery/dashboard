@@ -5,43 +5,52 @@ import { state } from "./state.js";
 
 // ✅ --- START: SCROLL SPY LOGIC ---
 let scrollSpyObserver = null;
+let currentActiveSectionId = null; // Keep track of the active section
 
 function activateScrollSpy() {
   if (scrollSpyObserver) {
     scrollSpyObserver.disconnect();
   }
+  currentActiveSectionId = null; // Reset for the new page
 
-  const sections = document.querySelectorAll(".scrollTarget");
+  const sections = Array.from(document.querySelectorAll(".scrollTarget"));
   const chips = document.querySelectorAll("#blockTabs .blockBtn");
 
   if (!sections.length || !chips.length) return;
 
   const headerHeight = document.querySelector(".siteHeader")?.offsetHeight || 150;
 
+  // This margin creates a horizontal "trigger" line just below the header.
+  // The observer will fire whenever a section crosses this line.
   const observerOptions = {
-    rootMargin: `-${headerHeight}px 0px -40% 0px`,
-    threshold: 0,
+    rootMargin: `-${headerHeight}px 0px -${window.innerHeight - headerHeight - 1}px 0px`,
   };
 
-  const observerCallback = (entries) => {
-    let mostVisibleSectionId = null;
-    let maxVisibility = 0;
+  const observerCallback = () => {
+    // Find the last section whose top is at or above the trigger line.
+    const newActiveSection = sections.findLast(section => {
+        const rect = section.getBoundingClientRect();
+        return rect.top <= headerHeight + 2; // +2px buffer
+    });
 
-    entries.forEach((entry) => {
-      if (entry.intersectionRatio > maxVisibility) {
-        maxVisibility = entry.intersectionRatio;
-        mostVisibleSectionId = entry.target.id;
-      }
-    });
-    
-    chips.forEach((chip) => {
-        const isActive = chip.dataset.target === `#${mostVisibleSectionId}`;
-        chip.classList.toggle("active", isActive);
-    });
+    const newActiveId = newActiveSection ? newActiveSection.id : null;
+
+    // Only update the UI if the active section has changed.
+    if (newActiveId !== currentActiveSectionId) {
+        currentActiveSectionId = newActiveId;
+        
+        chips.forEach((chip) => {
+            const isActive = chip.dataset.target === `#${currentActiveSectionId}`;
+            chip.classList.toggle("active", isActive);
+        });
+    }
   };
 
   scrollSpyObserver = new IntersectionObserver(observerCallback, observerOptions);
   sections.forEach((section) => scrollSpyObserver.observe(section));
+  
+  // Run it once on load to set the initial state correctly.
+  observerCallback();
 }
 // ✅ --- END: SCROLL SPY LOGIC ---
 
