@@ -20,33 +20,23 @@ function activateScrollSpy() {
 
   const headerHeight = document.querySelector(".siteHeader")?.offsetHeight || 150;
 
-  // This observer will fire frequently as sections move through the viewport.
+  // The observer will fire when a section crosses the activation line.
   const observerOptions = {
-    rootMargin: `-${headerHeight}px 0px -50px 0px`,
+    rootMargin: `-${headerHeight + 100}px 0px 0px 0px`,
     threshold: 0,
   };
 
   const observerCallback = () => {
-    let closestSection = null;
-    let minDistance = Infinity;
+    // Define the activation point: 100px below the header.
+    const triggerLine = headerHeight + 100;
 
-    // The ideal position for a section's top is just below the sticky header.
-    const idealPosition = headerHeight;
-
-    sections.forEach(section => {
+    // Find the last section whose top has passed above this trigger line.
+    const newActiveSection = sections.findLast(section => {
         const rect = section.getBoundingClientRect();
-        
-        // Consider any section that is not completely below the viewport
-        if (rect.top < window.innerHeight) {
-            const distance = Math.abs(rect.top - idealPosition);
-            if (distance < minDistance) {
-                minDistance = distance;
-                closestSection = section;
-            }
-        }
+        return rect.top <= triggerLine;
     });
 
-    const newActiveId = closestSection ? closestSection.id : null;
+    const newActiveId = newActiveSection ? newActiveSection.id : null;
 
     // Only update the UI if the active section has changed.
     if (newActiveId !== currentActiveSectionId) {
@@ -61,6 +51,14 @@ function activateScrollSpy() {
 
   scrollSpyObserver = new IntersectionObserver(observerCallback, observerOptions);
   sections.forEach((section) => scrollSpyObserver.observe(section));
+  
+  // Also attach to the main scroll event for maximum responsiveness.
+  // This helps catch edge cases where the observer might not fire.
+  let scrollTimeout;
+  window.addEventListener('scroll', () => {
+    clearTimeout(scrollTimeout);
+    scrollTimeout = setTimeout(observerCallback, 50);
+  }, { passive: true });
   
   // Run it once on load to set the initial state correctly.
   observerCallback();
