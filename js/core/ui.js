@@ -20,23 +20,33 @@ function activateScrollSpy() {
 
   const headerHeight = document.querySelector(".siteHeader")?.offsetHeight || 150;
 
-  // The observer will now fire whenever a section enters or leaves the visible part of the viewport (below the header)
+  // This observer will fire frequently as sections move through the viewport.
   const observerOptions = {
-    rootMargin: `-${headerHeight}px 0px 0px 0px`,
+    rootMargin: `-${headerHeight}px 0px -50px 0px`,
     threshold: 0,
   };
 
   const observerCallback = () => {
-    // The activation "trigger line" is the vertical middle of the viewport.
-    const triggerLine = window.innerHeight / 2;
+    let closestSection = null;
+    let minDistance = Infinity;
 
-    // Find the last section whose top has passed above the trigger line.
-    const newActiveSection = sections.findLast(section => {
+    // The ideal position for a section's top is just below the sticky header.
+    const idealPosition = headerHeight;
+
+    sections.forEach(section => {
         const rect = section.getBoundingClientRect();
-        return rect.top <= triggerLine;
+        
+        // Consider any section that is not completely below the viewport
+        if (rect.top < window.innerHeight) {
+            const distance = Math.abs(rect.top - idealPosition);
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestSection = section;
+            }
+        }
     });
 
-    const newActiveId = newActiveSection ? newActiveSection.id : null;
+    const newActiveId = closestSection ? closestSection.id : null;
 
     // Only update the UI if the active section has changed.
     if (newActiveId !== currentActiveSectionId) {
