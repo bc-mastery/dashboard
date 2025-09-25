@@ -70,7 +70,7 @@ function injectGrowthOverviewStylesOnce() {
   document.head.appendChild(style);
 }
 
-/* Keep your existing help bubble + overlay styles */
+/* CORRECTED STYLES FOR HELP BUBBLE */
 function injectPillarHelpStylesOnce() {
   if (document.getElementById("gs-pillar-help-styles")) return;
   const style = document.createElement("style");
@@ -129,7 +129,6 @@ function injectPillarHelpStylesOnce() {
   `;
   document.head.appendChild(style);
 }
-
 
 /* ------------------------------ main render ------------------------------ */
 export async function renderGrowthTab(forceRefresh = false) {
@@ -413,7 +412,7 @@ export async function renderGrowthTab(forceRefresh = false) {
       { key: "sales",     label: "Sales",     value: sRate },
     ]);
 
-    // --- Create the screen overlay once (for blur/grey dim when opened via click/tap) ---
+    // --- Create the screen overlay once ---
     let overlay = document.getElementById("gsOverlay");
     if (!overlay) {
       overlay = document.createElement("div");
@@ -421,7 +420,7 @@ export async function renderGrowthTab(forceRefresh = false) {
       document.body.appendChild(overlay);
     }
     
-    // --- Reusable Help Bubble Initializer ---
+    // --- CORRECTED Reusable Help Bubble Initializer ---
     const initHelpBubble = (wrapId, btnId) => {
         const wrap = document.getElementById(wrapId);
         const btn  = document.getElementById(btnId);
@@ -485,7 +484,6 @@ export async function renderGrowthTab(forceRefresh = false) {
         // --- Event Listeners ---
         btn.addEventListener("click", toggle, { passive: false });
         
-        // This listener handles clicking anywhere (overlay, bubble, document) EXCEPT the button
         const clickAwayHandler = (e) => {
           if (!btn.contains(e.target) && wrap.classList.contains('open')) {
             close();
@@ -499,7 +497,6 @@ export async function renderGrowthTab(forceRefresh = false) {
     // Initialize both help bubbles
     initHelpBubble("gsPillarHelpWrap", "gsPillarHelpBtn");
     initHelpBubble("gsOverviewHelpWrap", "gsOverviewHelpBtn");
-
 
     toggleFloatingCallBtn(state.lastAccess === ACCESS.GS_ONLY);
   } catch (err) {
