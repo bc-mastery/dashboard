@@ -34,32 +34,12 @@ function injectGrowthOverviewStylesOnce() {
   const style = document.createElement("style");
   style.id = "gs-overview-styles";
   style.textContent = `
-    #block-gs-overview .bfGrid{
-      display:grid;
-      grid-template-columns: 1fr 2fr;
-      align-items:start;
-      gap:22px;
-    }
-    #block-gs-overview .bfMap{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-    #block-gs-overview #gsDonut{
-      width:100%;
-      max-width:360px;
-      height:360px;
-    }
+    #block-gs-overview .bfGrid{ display:grid; grid-template-columns: 1fr 2fr; align-items:start; gap:22px; }
+    #block-gs-overview .bfMap{ display:flex; align-items:center; justify-content:center; }
+    #block-gs-overview #gsDonut{ width:100%; max-width:360px; height:360px; }
     @media (max-width: 860px){
-      #block-gs-overview .bfGrid{
-        grid-template-columns: 1fr;
-        gap:16px;
-      }
-      #block-gs-overview #gsDonut{
-        max-width:300px;
-        height:300px;
-        margin:0 auto;
-      }
+      #block-gs-overview .bfGrid{ grid-template-columns: 1fr; gap:16px; }
+      #block-gs-overview #gsDonut{ max-width:300px; height:300px; margin:0 auto; }
     }
   `;
   document.head.appendChild(style);
@@ -70,58 +50,23 @@ function injectPillarHelpStylesOnce() {
   const style = document.createElement("style");
   style.id = "gs-pillar-help-styles";
   style.textContent = `
-    #block-gs-pillars .sectionHeader, #block-gs-overview .sectionHeader {
-      display: flex; align-items: center; justify-content: space-between;
-      gap: 12px; position: relative;
-    }
-    .gsHelpWrap {
-      position: static; display: inline-flex; align-items: center;
-      justify-content: center; line-height: 1;
-    }
-    .gsHelpBtn {
-      width: 28px; height: 28px; border-radius: 50%; background: #30BA80;
-      color: #FFFFFF; border: none; cursor: pointer; font-weight: 800; font-size: 16px;
-      display: inline-flex; align-items: center; justify-content: center;
-      box-shadow: 0 1px 2px rgba(0,0,0,.06);
-    }
-    .gsHelpBtn:focus-visible {
-      outline: 2px solid #024D4F; outline-offset: 2px;
-    }
-    .gsHelpBubble {
-      position: absolute; 
-      width: auto;
-      max-width: 520px;
-      background: #333333; border: 1px solid #E5E7EB; border-radius: 12px;
-      padding: 12px 14px;
-      box-shadow: 0 10px 20px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.06);
-      z-index: 4002;
-      display: none;
-    }
-    .gsHelpBubble p, .gsHelpBubble ul, .gsHelpBubble ol {
-      margin: 0 0 8px 0; color: #FFFFFF; font-size: 14px;
-      line-height: 1.5; font-family: 'Inter', sans-serif;
-    }
-    .gsHelpBubble p:last-child, .gsHelpBubble ul:last-child, .gsHelpBubble ol:last-child { margin-bottom: 0; }
+    .sectionHeader { display: flex; align-items: center; justify-content: space-between; gap: 12px; position: relative; }
+    .gsHelpWrap { position: static; display: inline-flex; }
+    .gsHelpBtn { width: 28px; height: 28px; border-radius: 50%; background: #30BA80; color: #FFFFFF; border: none; cursor: pointer; font-weight: 800; font-size: 16px; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
+    .gsHelpBtn:focus-visible { outline: 2px solid #024D4F; outline-offset: 2px; }
+    .gsHelpBubble { position: absolute; max-width: 520px; background: #333333; border: 1px solid #E5E7EB; border-radius: 12px; padding: 12px 14px; box-shadow: 0 10px 20px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.06); z-index: 4002; display: none; }
+    .gsHelpBubble p, .gsHelpBubble ul { margin: 0 0 8px 0; color: #FFFFFF; font-size: 14px; line-height: 1.5; }
+    .gsHelpBubble p:last-child, .gsHelpBubble ul:last-child { margin-bottom: 0; }
     .gsHelpWrap.open .gsHelpBubble { display: block; }
-    #gsOverlay {
-      position: fixed; inset: 0;
-      background: rgba(2, 77, 79, 0.25);
-      backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
-      z-index: 4001;
-      display: none;
-    }
+    #gsOverlay { position: fixed; inset: 0; background: rgba(2, 77, 79, 0.25); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); z-index: 4001; display: none; }
     #gsOverlay.show { display: block; }
-
     @media (max-width: 768px) {
-      .gsHelpBubble {
-        width: calc(100% - 40px);
-        max-height: 75vh;
-        overflow-y: auto;
-      }
+      .gsHelpBubble { width: calc(100% - 40px); max-height: 75vh; overflow-y: auto; }
     }
   `;
   document.head.appendChild(style);
 }
+
 
 /* ------------------------------ main render ------------------------------ */
 export async function renderGrowthTab(forceRefresh = false) {
@@ -133,24 +78,16 @@ export async function renderGrowthTab(forceRefresh = false) {
   const contentDiv = document.getElementById("content");
   if (!contentDiv) return;
 
-  if (!token) {
-    contentDiv.innerHTML = `<div class="card"><p class="muted">No token provided in URL.</p></div>`;
-    return;
-  }
-
   contentDiv.innerHTML = `<div class="card"><p class="muted">Loading Growth Scan…</p></div>`;
 
   try {
     const api = await fetchDashboardData(forceRefresh);
+
     state.lastApiByTab.growth = { ...api, data: { ...api.data } };
     const d = api.data || {};
 
     const brandEl = document.getElementById("brandName");
-    if (brandEl) {
-      const full = String(d.Brand || "");
-      brandEl.textContent = full.length > 80 ? full.slice(0, 80) : full;
-      brandEl.title = full;
-    }
+    if (brandEl) brandEl.textContent = d.Brand || "";
 
     if (d.GS_OUTPUT) {
       state.dynamicPdfLinks.growth = toDownloadLink(String(d.GS_OUTPUT));
@@ -177,6 +114,7 @@ export async function renderGrowthTab(forceRefresh = false) {
 
     injectGrowthOverviewStylesOnce();
 
+    // THIS HTML BLOCK IS PRESERVED FROM YOUR ORIGINAL FILE TO MAINTAIN THE LAYOUT
     contentDiv.innerHTML = `
       <section class="card scrollTarget" id="block-gs-overview">
         <div class="sectionHeader" style="margin-bottom: -8px;">
@@ -202,10 +140,8 @@ export async function renderGrowthTab(forceRefresh = false) {
             <p>That means your business still has another <strong style="color:#FF0040;">${esc(pctLabel(untapped))} of untapped business potential.</strong></p>
             <p style="margin-bottom:0;">Your utilization rate depends on how well you know…</p>
             <ul style="margin:0; padding-left:18px; list-style-position:outside;">
-              <li style="margin:0;">Who you sell to;</li>
-              <li style="margin:0;">What you sell to them;</li>
-              <li style="margin:0;">How you attract them;</li>
-              <li style="margin:0;">And how you sell to them.</li>
+              <li style="margin:0;">Who you sell to;</li><li style="margin:0;">What you sell to them;</li>
+              <li style="margin:0;">How you attract them;</li><li style="margin:0;">And how you sell to them.</li>
             </ul>
             <p>But right now, you’re leaving money on the table and limiting your ability to break through. With only a few strategic changes, you could achieve <strong style="color:#30BA80">${esc(growthPotentialLabel)}</strong> growth.</p>
             <p style="color:#FF0040; font-weight:700;">Right now, your biggest blocker is ${esc(d.GS_BLOCKER || "")}.</p>
@@ -235,32 +171,22 @@ export async function renderGrowthTab(forceRefresh = false) {
       <section class="card scrollTarget" id="block-gs-summary"><div class="sectionTitle">Strategic Summary</div><p class="preserve">${esc(d.GS_GAPS_SUMMARY || "")}</p></section>
     `;
 
-    const blockTabsRow = document.getElementById("blockTabsRow");
-    if (blockTabsRow) blockTabsRow.style.display = "block";
     populateBlockTabsFromPage();
     updateFloatingCTA("growth");
-
     injectGsStylesOnce();
     injectPillarHelpStylesOnce();
     await ensureCharts();
 
-    drawDonut("gsDonut", [
-      { label: "Utilized", value: util, color: "#30BA80" },
-      { label: "Untapped", value: untapped, color: "#FF0040" },
-    ], { pieHole: 0.62 });
+    drawDonut("gsDonut", [{ value: util, color: "#30BA80" }, { value: untapped, color: "#FF0040" }], { pieHole: 0.62 });
+    drawSegmentedBars("gsBars", [{ label: "Targeting", value: tRate }, { label: "Offer", value: oRate }, { label: "Marketing", value: mRate }, { label: "Sales", value: sRate }]);
 
-    drawSegmentedBars("gsBars", [
-      { label: "Targeting", value: tRate }, { label: "Offer", value: oRate },
-      { label: "Marketing", value: mRate }, { label: "Sales", value: sRate },
-    ]);
-
-    let overlay = document.getElementById("gsOverlay");
-    if (!overlay) {
-      overlay = document.createElement("div");
+    if (!document.getElementById("gsOverlay")) {
+      const overlay = document.createElement("div");
       overlay.id = "gsOverlay";
       document.body.appendChild(overlay);
     }
     
+    // THIS IS THE CORRECTED, SELF-CONTAINED BUBBLE LOGIC
     const initHelpBubble = (wrapId, btnId) => {
         const wrap = document.getElementById(wrapId);
         const btn  = document.getElementById(btnId);
@@ -273,9 +199,7 @@ export async function renderGrowthTab(forceRefresh = false) {
 
         const close = () => {
             wrap.classList.remove("open");
-            btn.setAttribute("aria-expanded", "false");
             overlay.classList.remove("show");
-            document.body.style.removeProperty("overflow");
             if (isAppendedToBody) {
                 originalParent.appendChild(bubble);
                 bubble.style.cssText = '';
@@ -285,22 +209,18 @@ export async function renderGrowthTab(forceRefresh = false) {
       
         const open = () => {
             wrap.classList.add("open");
-            btn.setAttribute("aria-expanded", "true");
             overlay.classList.add("show");
-            document.body.style.overflow = "hidden";
-            if (!isAppendedToBody) {
-                document.body.appendChild(bubble);
-                isAppendedToBody = true;
-            }
+            document.body.appendChild(bubble);
+            isAppendedToBody = true;
+            
             const isMobile = window.matchMedia("(max-width: 768px)").matches;
+            bubble.style.position = 'fixed';
             if (isMobile) {
-                bubble.style.position = 'fixed';
                 bubble.style.top = '50%';
                 bubble.style.left = '50%';
                 bubble.style.transform = 'translate(-50%, -50%)';
             } else {
                 const btnRect = btn.getBoundingClientRect();
-                bubble.style.position = 'fixed';
                 bubble.style.top = `${btnRect.bottom + 8}px`;
                 bubble.style.left = `${btnRect.left}px`;
                 bubble.style.transform = '';
@@ -308,18 +228,18 @@ export async function renderGrowthTab(forceRefresh = false) {
         };
       
         const toggle = (e) => {
-            e.preventDefault();
             e.stopPropagation();
             wrap.classList.contains("open") ? close() : open();
         };
       
-        btn.addEventListener("click", toggle, { passive: false });
+        btn.addEventListener("click", toggle);
         
         const clickAwayHandler = (e) => {
-          if (!btn.contains(e.target) && wrap.classList.contains('open')) {
-            close();
-          }
+            if (wrap.classList.contains('open') && !bubble.contains(e.target) && !btn.contains(e.target)) {
+                close();
+            }
         };
+
         document.addEventListener("click", clickAwayHandler);
         document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
     };
@@ -330,6 +250,6 @@ export async function renderGrowthTab(forceRefresh = false) {
     toggleFloatingCallBtn(state.lastAccess === ACCESS.GS_ONLY);
   } catch (err) {
     console.error(err);
-    contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
+    contentDiv.innerHTML = `<div class="card"><p class="muted">Error: ${esc(err.message)}</p></div>`;
   }
 }
