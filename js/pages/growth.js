@@ -54,19 +54,18 @@ function injectPillarHelpStylesOnce() {
     .gsHelpWrap { position: static; display: inline-flex; }
     .gsHelpBtn { width: 28px; height: 28px; border-radius: 50%; background: #30BA80; color: #FFFFFF; border: none; cursor: pointer; font-weight: 800; font-size: 16px; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
     .gsHelpBtn:focus-visible { outline: 2px solid #024D4F; outline-offset: 2px; }
-    .gsHelpBubble { position: absolute; max-width: 520px; background: #333333; border: 1px solid #E5E7EB; border-radius: 12px; padding: 12px 14px; box-shadow: 0 10px 20px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.06); z-index: 4002; display: none; }
+    .gsHelpBubble { position: absolute; max-width: 520px; background: #333333; border: 1px solid #E5E7EB; border-radius: 12px; padding: 12px 14px; box-shadow: 0 10px 20px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.06); z-index: 5002; display: none; }
     .gsHelpBubble p, .gsHelpBubble ul { margin: 0 0 8px 0; color: #FFFFFF; font-size: 14px; line-height: 1.5; }
     .gsHelpBubble p:last-child, .gsHelpBubble ul:last-child { margin-bottom: 0; }
-    .gsHelpWrap.open .gsHelpBubble { display: block; }
-    #gsOverlay { position: fixed; inset: 0; background: rgba(2, 77, 79, 0.25); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); z-index: 4001; display: none; }
+    #gsOverlay { position: fixed; inset: 0; background: rgba(2, 77, 79, 0.25); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); z-index: 5001; display: none; }
     #gsOverlay.show { display: block; }
+    .gsHelpWrap.open .gsHelpBubble { display: block; }
     @media (max-width: 768px) {
       .gsHelpBubble { width: calc(100% - 40px); max-height: 75vh; overflow-y: auto; }
     }
   `;
   document.head.appendChild(style);
 }
-
 
 /* ------------------------------ main render ------------------------------ */
 export async function renderGrowthTab(forceRefresh = false) {
@@ -82,35 +81,16 @@ export async function renderGrowthTab(forceRefresh = false) {
 
   try {
     const api = await fetchDashboardData(forceRefresh);
-
     state.lastApiByTab.growth = { ...api, data: { ...api.data } };
     const d = api.data || {};
 
     const brandEl = document.getElementById("brandName");
     if (brandEl) brandEl.textContent = d.Brand || "";
+    if (d.GS_OUTPUT) state.dynamicPdfLinks.growth = toDownloadLink(String(d.GS_OUTPUT));
 
-    if (d.GS_OUTPUT) {
-      state.dynamicPdfLinks.growth = toDownloadLink(String(d.GS_OUTPUT));
-    }
-
-    const avg = toPercent(d.GS_AVERAGE);
-    const counter = toPercent(d.GS_COUNTER_AVERAGE);
-    let util = avg, untapped = counter;
-    const sum = util + untapped;
-    if (sum > 100 && sum > 0) {
-      util = Math.round((util / sum) * 10000) / 100;
-      untapped = Math.round((untapped / sum) * 10000) / 100;
-    }
-
-    const tRate = toPercent(d.GS_T_RATE);
-    const oRate = toPercent(d.GS_O_RATE);
-    const mRate = toPercent(d.GS_M_RATE);
-    const sRate = toPercent(d.GS_S_RATE);
-
-    const rawGP = String(d.GS_GROWTH_POTENTIAL ?? "");
-    const isRange = /~?\s*\d+(\.\d+)?\s*[–-]\s*\d+(\.\d+)?\s*%?/.test(rawGP);
-    const growthPotential = toPercent(d.GS_GROWTH_POTENTIAL);
-    const growthPotentialLabel = isRange ? rawGP : pctLabel(growthPotential);
+    const util = toPercent(d.GS_AVERAGE);
+    const untapped = 100 - util;
+    const growthPotentialLabel = `${toPercent(d.GS_GROWTH_POTENTIAL)}%`;
 
     injectGrowthOverviewStylesOnce();
 
@@ -178,7 +158,7 @@ export async function renderGrowthTab(forceRefresh = false) {
     await ensureCharts();
 
     drawDonut("gsDonut", [{ value: util, color: "#30BA80" }, { value: untapped, color: "#FF0040" }], { pieHole: 0.62 });
-    drawSegmentedBars("gsBars", [{ label: "Targeting", value: tRate }, { label: "Offer", value: oRate }, { label: "Marketing", value: mRate }, { label: "Sales", value: sRate }]);
+    drawSegmentedBars("gsBars", [{ label: "Targeting", value: toPercent(d.GS_T_RATE) }, { label: "Offer", value: toPercent(d.GS_O_RATE) }, { label: "Marketing", value: toPercent(d.GS_M_RATE) }, { label: "Sales", value: toPercent(d.GS_S_RATE) }]);
 
     if (!document.getElementById("gsOverlay")) {
       const overlay = document.createElement("div");
@@ -186,7 +166,7 @@ export async function renderGrowthTab(forceRefresh = false) {
       document.body.appendChild(overlay);
     }
     
-    // THIS IS THE CORRECTED, SELF-CONTAINED BUBBLE LOGIC
+    // THIS IS THE DEFINITIVE, CORRECTED BUBBLE LOGIC
     const initHelpBubble = (wrapId, btnId) => {
         const wrap = document.getElementById(wrapId);
         const btn  = document.getElementById(btnId);
@@ -195,23 +175,31 @@ export async function renderGrowthTab(forceRefresh = false) {
         if (!wrap || !btn || !bubble || !overlay) return;
 
         const originalParent = bubble.parentElement;
-        let isAppendedToBody = false;
-
+        
         const close = () => {
             wrap.classList.remove("open");
             overlay.classList.remove("show");
-            if (isAppendedToBody) {
+            if (bubble.parentElement === document.body) {
                 originalParent.appendChild(bubble);
-                bubble.style.cssText = '';
-                isAppendedToBody = false;
+            }
+            document.removeEventListener("click", closeHandler, true);
+            document.removeEventListener("keydown", keydownHandler);
+        };
+
+        const closeHandler = (e) => {
+            if (!bubble.contains(e.target) && !btn.contains(e.target)) {
+                close();
             }
         };
-      
+
+        const keydownHandler = (e) => {
+            if (e.key === "Escape") close();
+        };
+
         const open = () => {
             wrap.classList.add("open");
             overlay.classList.add("show");
             document.body.appendChild(bubble);
-            isAppendedToBody = true;
             
             const isMobile = window.matchMedia("(max-width: 768px)").matches;
             bubble.style.position = 'fixed';
@@ -225,23 +213,22 @@ export async function renderGrowthTab(forceRefresh = false) {
                 bubble.style.left = `${btnRect.left}px`;
                 bubble.style.transform = '';
             }
+            
+            // Add listeners on the next event cycle to prevent immediate closing
+            setTimeout(() => {
+                document.addEventListener("click", closeHandler, true);
+                document.addEventListener("keydown", keydownHandler);
+            }, 0);
         };
       
-        const toggle = (e) => {
+        btn.addEventListener("click", (e) => {
             e.stopPropagation();
-            wrap.classList.contains("open") ? close() : open();
-        };
-      
-        btn.addEventListener("click", toggle);
-        
-        const clickAwayHandler = (e) => {
-            if (wrap.classList.contains('open') && !bubble.contains(e.target) && !btn.contains(e.target)) {
+            if (wrap.classList.contains("open")) {
                 close();
+            } else {
+                open();
             }
-        };
-
-        document.addEventListener("click", clickAwayHandler);
-        document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
+        });
     };
 
     initHelpBubble("gsPillarHelpWrap", "gsPillarHelpBtn");
