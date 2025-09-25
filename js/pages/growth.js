@@ -34,12 +34,32 @@ function injectGrowthOverviewStylesOnce() {
   const style = document.createElement("style");
   style.id = "gs-overview-styles";
   style.textContent = `
-    #block-gs-overview .bfGrid{ display:grid; grid-template-columns: 1fr 2fr; align-items:start; gap:22px; }
-    #block-gs-overview .bfMap{ display:flex; align-items:center; justify-content:center; }
-    #block-gs-overview #gsDonut{ width:100%; max-width:360px; height:360px; }
+    #block-gs-overview .bfGrid{
+      display:grid;
+      grid-template-columns: 1fr 2fr;
+      align-items:start;
+      gap:22px;
+    }
+    #block-gs-overview .bfMap{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    #block-gs-overview #gsDonut{
+      width:100%;
+      max-width:360px;
+      height:360px;
+    }
     @media (max-width: 860px){
-      #block-gs-overview .bfGrid{ grid-template-columns: 1fr; gap:16px; }
-      #block-gs-overview #gsDonut{ max-width:300px; height:300px; margin:0 auto; }
+      #block-gs-overview .bfGrid{
+        grid-template-columns: 1fr;
+        gap:16px;
+      }
+      #block-gs-overview #gsDonut{
+        max-width:300px;
+        height:300px;
+        margin:0 auto;
+      }
     }
   `;
   document.head.appendChild(style);
@@ -50,18 +70,54 @@ function injectPillarHelpStylesOnce() {
   const style = document.createElement("style");
   style.id = "gs-pillar-help-styles";
   style.textContent = `
-    .sectionHeader { display: flex; align-items: center; justify-content: space-between; gap: 12px; position: relative; }
-    .gsHelpWrap { position: static; display: inline-flex; }
-    .gsHelpBtn { width: 28px; height: 28px; border-radius: 50%; background: #30BA80; color: #FFFFFF; border: none; cursor: pointer; font-weight: 800; font-size: 16px; display: inline-flex; align-items: center; justify-content: center; box-shadow: 0 1px 2px rgba(0,0,0,.06); }
-    .gsHelpBtn:focus-visible { outline: 2px solid #024D4F; outline-offset: 2px; }
-    .gsHelpBubble { position: absolute; max-width: 520px; background: #333333; border: 1px solid #E5E7EB; border-radius: 12px; padding: 12px 14px; box-shadow: 0 10px 20px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.06); z-index: 4002; display: none; }
-    .gsHelpBubble p, .gsHelpBubble ul { margin: 0 0 8px 0; color: #FFFFFF; font-size: 14px; line-height: 1.5; }
-    .gsHelpBubble p:last-child, .gsHelpBubble ul:last-child { margin-bottom: 0; }
+    #block-gs-pillars .sectionHeader, #block-gs-overview .sectionHeader {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; position: relative;
+    }
+    .gsHelpWrap {
+      position: static; display: inline-flex; align-items: center;
+      justify-content: center; line-height: 1;
+    }
+    .gsHelpBtn {
+      width: 28px; height: 28px; border-radius: 50%; background: #30BA80;
+      color: #FFFFFF; border: none; cursor: pointer; font-weight: 800; font-size: 16px;
+      display: inline-flex; align-items: center; justify-content: center;
+      box-shadow: 0 1px 2px rgba(0,0,0,.06);
+    }
+    .gsHelpBtn:focus-visible {
+      outline: 2px solid #024D4F; outline-offset: 2px;
+    }
+    .gsHelpBubble {
+      position: absolute; 
+      width: auto;
+      max-width: 520px;
+      background: #333333; border: 1px solid #E5E7EB; border-radius: 12px;
+      padding: 12px 14px;
+      box-shadow: 0 10px 20px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.06);
+      z-index: 4002;
+      display: none;
+    }
+    .gsHelpBubble p, .gsHelpBubble ul, .gsHelpBubble ol {
+      margin: 0 0 8px 0; color: #FFFFFF; font-size: 14px;
+      line-height: 1.5; font-family: 'Inter', sans-serif;
+    }
+    .gsHelpBubble p:last-child, .gsHelpBubble ul:last-child, .gsHelpBubble ol:last-child { margin-bottom: 0; }
     .gsHelpWrap.open .gsHelpBubble { display: block; }
-    #gsOverlay { position: fixed; inset: 0; background: rgba(2, 77, 79, 0.25); backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px); z-index: 4001; display: none; }
+    #gsOverlay {
+      position: fixed; inset: 0;
+      background: rgba(2, 77, 79, 0.25);
+      backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
+      z-index: 4001;
+      display: none;
+    }
     #gsOverlay.show { display: block; }
+
     @media (max-width: 768px) {
-      .gsHelpBubble { width: calc(100% - 40px); max-height: 75vh; overflow-y: auto; }
+      .gsHelpBubble {
+        width: calc(100% - 40px);
+        max-height: 75vh;
+        overflow-y: auto;
+      }
     }
   `;
   document.head.appendChild(style);
@@ -76,36 +132,101 @@ export async function renderGrowthTab(forceRefresh = false) {
 
   const contentDiv = document.getElementById("content");
   if (!contentDiv) return;
+
+  if (!token) {
+    contentDiv.innerHTML = `<div class="card"><p class="muted">No token provided in URL.</p></div>`;
+    return;
+  }
+
   contentDiv.innerHTML = `<div class="card"><p class="muted">Loading Growth Scan…</p></div>`;
 
   try {
     const api = await fetchDashboardData(forceRefresh);
     state.lastApiByTab.growth = { ...api, data: { ...api.data } };
     const d = api.data || {};
-    if (d.Brand) document.getElementById("brandName").textContent = d.Brand;
-    if (d.GS_OUTPUT) state.dynamicPdfLinks.growth = toDownloadLink(String(d.GS_OUTPUT));
 
-    const util = toPercent(d.GS_AVERAGE);
-    const untapped = 100 - util;
-    const growthPotentialLabel = `${toPercent(d.GS_GROWTH_POTENTIAL)}%`;
+    const brandEl = document.getElementById("brandName");
+    if (brandEl) {
+      const full = String(d.Brand || "");
+      brandEl.textContent = full.length > 80 ? full.slice(0, 80) : full;
+      brandEl.title = full;
+    }
+
+    if (d.GS_OUTPUT) {
+      state.dynamicPdfLinks.growth = toDownloadLink(String(d.GS_OUTPUT));
+    }
+
+    const avg = toPercent(d.GS_AVERAGE);
+    const counter = toPercent(d.GS_COUNTER_AVERAGE);
+    let util = avg, untapped = counter;
+    const sum = util + untapped;
+    if (sum > 100 && sum > 0) {
+      util = Math.round((util / sum) * 10000) / 100;
+      untapped = Math.round((untapped / sum) * 10000) / 100;
+    }
+
+    const tRate = toPercent(d.GS_T_RATE);
+    const oRate = toPercent(d.GS_O_RATE);
+    const mRate = toPercent(d.GS_M_RATE);
+    const sRate = toPercent(d.GS_S_RATE);
+
+    const rawGP = String(d.GS_GROWTH_POTENTIAL ?? "");
+    const isRange = /~?\s*\d+(\.\d+)?\s*[–-]\s*\d+(\.\d+)?\s*%?/.test(rawGP);
+    const growthPotential = toPercent(d.GS_GROWTH_POTENTIAL);
+    const growthPotentialLabel = isRange ? rawGP : pctLabel(growthPotential);
 
     injectGrowthOverviewStylesOnce();
+
     contentDiv.innerHTML = `
       <section class="card scrollTarget" id="block-gs-overview">
-        <div class="sectionHeader"><div class="bfTitle">Quick Scan</div><div class="gsHelpWrap" id="gsOverviewHelpWrap"><button type="button" class="gsHelpBtn" id="gsOverviewHelpBtn" title="What does this section mean?">?</button><div class="gsHelpBubble" id="gsOverviewHelpBubble"><p>The Growth Scan compares your view of your business with your audience’s reality. The results reveal where your strategy aligns with your customers and where gaps are holding you back.</p></div></div></div>
+        <div class="sectionHeader" style="margin-bottom: -8px;">
+            <div class="bfTitle" style="margin-bottom: 0;">Quick Scan</div>
+            <div class="gsHelpWrap" id="gsOverviewHelpWrap">
+                <button type="button" class="gsHelpBtn" id="gsOverviewHelpBtn" aria-label="What does this section mean?" aria-expanded="false" aria-controls="gsOverviewHelpBubble" title="What does this section mean?">?</button>
+                <div class="gsHelpBubble" id="gsOverviewHelpBubble" role="tooltip">
+                    <p>Every business owner sees their product, service, and customers in a certain way — but customers don’t always see things the same.</p>
+                    <p>The Growth Scan compares two sides:</p>
+                    <ul style="padding-left: 18px; margin-top: -4px; margin-bottom: 8px;">
+                        <li>Your view: how you frame your offer, approach customers, and build trust.</li>
+                        <li>Your audience’s reality: how they actually think, decide, and act.</li>
+                    </ul>
+                    <p>By running both through our <strong>Audience Behavior Canvas (ABC) Matrix</strong>, we reveal where your strategy and your audience are aligned — and where gaps are holding you back.</p>
+                    <p style="margin-top: 16px; color:#B4FDE5; font-weight:700;"><strong>The results you see are based on this comparison: your perception vs. your actual Target Audience. Those differences show exactly what needs fixing to unlock growth.</strong></p>
+                </div>
+            </div>
+        </div>
         <div class="bfGrid">
-          <div class="bfMap"><div id="gsDonut"></div></div>
+          <div class="bfMap"><div id="gsDonut" class="gsDonutChart"></div></div>
           <div class="bfText">
-            <p>Currently utilized business potential: <strong>${pctLabel(util)}</strong></p>
-            <p>That means another <strong>${pctLabel(untapped)} of untapped potential.</strong></p>
-            <p>With a few changes, you could achieve <strong>${growthPotentialLabel}</strong> growth.</p>
-            <p>Your biggest blocker is ${d.GS_BLOCKER || "not identified"}.</p>
+            <p style="margin:0; color:#333333;">Currently utilized business potential: <strong style="color:#30BA80;">${esc(pctLabel(util))}</strong></p>
+            <p>That means your business still has another <strong style="color:#FF0040;">${esc(pctLabel(untapped))} of untapped business potential.</strong></p>
+            <p style="margin-bottom:0;">Your utilization rate depends on how well you know…</p>
+            <ul style="margin:0; padding-left:18px; list-style-position:outside;">
+              <li style="margin:0;">Who you sell to;</li>
+              <li style="margin:0;">What you sell to them;</li>
+              <li style="margin:0;">How you attract them;</li>
+              <li style="margin:0;">And how you sell to them.</li>
+            </ul>
+            <p>But right now, you’re leaving money on the table and limiting your ability to break through. With only a few strategic changes, you could achieve <strong style="color:#30BA80">${esc(growthPotentialLabel)}</strong> growth.</p>
+            <p style="color:#FF0040; font-weight:700;">Right now, your biggest blocker is ${esc(d.GS_BLOCKER || "")}.</p>
+            <p class="muted">Besides that, below you can see how your business performs in the most critical strategic areas — a.k.a. pillars.</p>
           </div>
         </div>
       </section>
       <section class="card scrollTarget" id="block-gs-pillars" style="padding-bottom: 28px;">
-        <div class="sectionHeader"><div class="sectionTitle">4-Pillar Snapshot</div><div class="gsHelpWrap" id="gsPillarHelpWrap"><button type="button" class="gsHelpBtn" id="gsPillarHelpBtn" title="What do these percentages mean?">?</button><div class="gsHelpBubble" id="gsPillarHelpBubble"><p><strong>0–60%:</strong> You plan based on intuition. You need a stable strategy.</p><p><strong>61–80%:</strong> You have an established strategy but room to improve outcomes.</p><p><strong>81–100%:</strong> You’ve mastered the area. A strategic shift may be needed to break plateaus.</p></div></div></div>
-        <div id="gsBars"></div>
+        <div class="sectionHeader">
+          <div class="sectionTitle">4-Pillar Snapshot</div>
+          <div class="gsHelpWrap" id="gsPillarHelpWrap">
+            <button type="button" class="gsHelpBtn" id="gsPillarHelpBtn" aria-label="What do the percentage ranges mean?" aria-expanded="false" aria-controls="gsPillarHelpBubble" title="What do these percentages mean?">?</button>
+            <div class="gsHelpBubble" id="gsPillarHelpBubble" role="tooltip">
+              <p><strong>0–60%:</strong> You don’t have an established strategy in the given area. You plan and execute based on intuition and experience — which may have gotten you this far, but to break through, you need a stable strategy and the right tactics.</p>
+              <p><strong>61–80%:</strong> You have an established strategy in the given area. You know how to catch the right customers and build a prosperous business. However, you have plenty of room to improve — and with the right resources, you can multiply your outcomes.</p>
+              <p><strong>81–100%:</strong> You’ve mastered the given area with a well-built strategy. If you’ve plateaued and want to level up, you need a strategic shift in this or other areas so you can break out of your current limitations.</p>
+              <p style="margin-top: 16px; color:#B4FDE5; font-weight:700;"><strong>Scroll down to see how to improve your Targeting, Offer, Marketing, and Sales!</strong></p>
+            </div>
+          </div>
+        </div>
+        <div id="gsBars" class="gsBars" role="list" aria-label="Pillar progress"></div>
       </section>
       <section class="card scrollTarget" id="block-gs-targeting"><div class="sectionTitle">Targeting Scan</div><p class="preserve">${esc(d.GS_T_DESC || "")}</p></section>
       <section class="card scrollTarget" id="block-gs-offer"><div class="sectionTitle">Offer Scan</div><p class="preserve">${esc(d.GS_O_DESC || "")}</p></section>
@@ -114,17 +235,28 @@ export async function renderGrowthTab(forceRefresh = false) {
       <section class="card scrollTarget" id="block-gs-summary"><div class="sectionTitle">Strategic Summary</div><p class="preserve">${esc(d.GS_GAPS_SUMMARY || "")}</p></section>
     `;
 
+    const blockTabsRow = document.getElementById("blockTabsRow");
+    if (blockTabsRow) blockTabsRow.style.display = "block";
     populateBlockTabsFromPage();
     updateFloatingCTA("growth");
+
     injectGsStylesOnce();
     injectPillarHelpStylesOnce();
     await ensureCharts();
 
-    drawDonut("gsDonut", [{ value: util, color: "#30BA80" }, { value: untapped, color: "#FF0040" }], { pieHole: 0.62 });
-    drawSegmentedBars("gsBars", [{ label: "Targeting", value: toPercent(d.GS_T_RATE) }, { label: "Offer", value: toPercent(d.GS_O_RATE) }, { label: "Marketing", value: toPercent(d.GS_M_RATE) }, { label: "Sales", value: toPercent(d.GS_S_RATE) }]);
+    drawDonut("gsDonut", [
+      { label: "Utilized", value: util, color: "#30BA80" },
+      { label: "Untapped", value: untapped, color: "#FF0040" },
+    ], { pieHole: 0.62 });
 
-    if (!document.getElementById("gsOverlay")) {
-      const overlay = document.createElement("div");
+    drawSegmentedBars("gsBars", [
+      { label: "Targeting", value: tRate }, { label: "Offer", value: oRate },
+      { label: "Marketing", value: mRate }, { label: "Sales", value: sRate },
+    ]);
+
+    let overlay = document.getElementById("gsOverlay");
+    if (!overlay) {
+      overlay = document.createElement("div");
       overlay.id = "gsOverlay";
       document.body.appendChild(overlay);
     }
@@ -135,40 +267,60 @@ export async function renderGrowthTab(forceRefresh = false) {
         const bubble = wrap.querySelector('.gsHelpBubble');
         const overlay = document.getElementById('gsOverlay');
         if (!wrap || !btn || !bubble || !overlay) return;
+
         const originalParent = bubble.parentElement;
         let isAppendedToBody = false;
+
         const close = () => {
             wrap.classList.remove("open");
+            btn.setAttribute("aria-expanded", "false");
             overlay.classList.remove("show");
-            if (isAppendedToBody) originalParent.appendChild(bubble);
-            isAppendedToBody = false;
+            document.body.style.removeProperty("overflow");
+            if (isAppendedToBody) {
+                originalParent.appendChild(bubble);
+                bubble.style.cssText = '';
+                isAppendedToBody = false;
+            }
         };
+      
         const open = () => {
             wrap.classList.add("open");
+            btn.setAttribute("aria-expanded", "true");
             overlay.classList.add("show");
-            document.body.appendChild(bubble);
-            isAppendedToBody = true;
+            document.body.style.overflow = "hidden";
+            if (!isAppendedToBody) {
+                document.body.appendChild(bubble);
+                isAppendedToBody = true;
+            }
             const isMobile = window.matchMedia("(max-width: 768px)").matches;
-            bubble.style.position = 'fixed';
             if (isMobile) {
+                bubble.style.position = 'fixed';
                 bubble.style.top = '50%';
                 bubble.style.left = '50%';
                 bubble.style.transform = 'translate(-50%, -50%)';
             } else {
                 const btnRect = btn.getBoundingClientRect();
+                bubble.style.position = 'fixed';
                 bubble.style.top = `${btnRect.bottom + 8}px`;
                 bubble.style.left = `${btnRect.left}px`;
                 bubble.style.transform = '';
             }
         };
+      
         const toggle = (e) => {
+            e.preventDefault();
             e.stopPropagation();
             wrap.classList.contains("open") ? close() : open();
         };
-        btn.addEventListener("click", toggle);
-        document.addEventListener("click", (e) => {
-          if (!bubble.contains(e.target) && !btn.contains(e.target)) close();
-        });
+      
+        btn.addEventListener("click", toggle, { passive: false });
+        
+        const clickAwayHandler = (e) => {
+          if (!btn.contains(e.target) && wrap.classList.contains('open')) {
+            close();
+          }
+        };
+        document.addEventListener("click", clickAwayHandler);
         document.addEventListener("keydown", (e) => { if (e.key === "Escape") close(); });
     };
 
@@ -178,6 +330,6 @@ export async function renderGrowthTab(forceRefresh = false) {
     toggleFloatingCallBtn(state.lastAccess === ACCESS.GS_ONLY);
   } catch (err) {
     console.error(err);
-    contentDiv.innerHTML = `<div class="card"><p class="muted">Error: ${esc(err.message)}</p></div>`;
+    contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
