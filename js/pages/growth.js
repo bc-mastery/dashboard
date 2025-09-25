@@ -121,7 +121,7 @@ function injectPillarHelpStylesOnce() {
       border-radius: 12px;
       padding: 12px 14px;
       box-shadow: 0 10px 20px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.06);
-      z-index: 1001;
+      z-index: 4002; /* CORRECTED: Increased z-index */
       display: none;
     }
     .gsHelpBubble p, .gsHelpBubble ul, .gsHelpBubble ol {
@@ -132,10 +132,7 @@ function injectPillarHelpStylesOnce() {
       font-family: 'Inter', sans-serif;
     }
     .gsHelpBubble p:last-child, .gsHelpBubble ul:last-child, .gsHelpBubble ol:last-child { margin-bottom: 0; }
-    .gsHelpWrap:hover .gsHelpBubble,
-    .gsHelpWrap:has(.gsHelpBtn:focus) .gsHelpBubble {
-      display: block;
-    }
+    /* REMOVED hover rules from here */
     .gsHelpWrap.open .gsHelpBubble { display: block; }
     #gsOverlay {
       position: fixed;
@@ -143,7 +140,7 @@ function injectPillarHelpStylesOnce() {
       background: rgba(2, 77, 79, 0.25);
       backdrop-filter: blur(2px);
       -webkit-backdrop-filter: blur(2px);
-      z-index: 900;
+      z-index: 4001; /* CORRECTED: Increased z-index */
       display: none;
     }
     #gsOverlay.show { display: block; }
@@ -475,22 +472,14 @@ export async function renderGrowthTab(forceRefresh = false) {
         btn.addEventListener("click", toggle, { passive: false });
       
         wrap.addEventListener("mouseenter", () => {
-            if (!wrap.classList.contains("open")) {
-                wrap.classList.add("openHover");
-                overlay.classList.add("show");
-                overlay.classList.add("hover");
-            }
-        });
+          // Logic removed to disable hover effect
+      });
+    
+      wrap.addEventListener("mouseleave", () => {
+          // Logic removed to disable hover effect
+      });
       
-        wrap.addEventListener("mouseleave", () => {
-            if (!wrap.classList.contains("open")) {
-                wrap.classList.remove("openHover");
-                overlay.classList.remove("show");
-                overlay.classList.remove("hover");
-            }
-        });
-      
-        const docClickHandler = (e) => { if (!wrap.contains(e.target)) close(); };
+        const docClickHandler = (e) => { if (!btn.contains(e.target)) close(); };
         const docKeyHandler = (e) => { if (e.key === "Escape") close(); };
 
         btn.addEventListener("keydown", docKeyHandler);
@@ -511,4 +500,5 @@ export async function renderGrowthTab(forceRefresh = false) {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
+
 
