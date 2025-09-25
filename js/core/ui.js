@@ -3,6 +3,49 @@ import { TAB_TITLES, TAB_ICONS, UI_ICONS } from "./config.js";
 import { getMinTabsRequiredForDownload, toDownloadLink } from "./utils.js";
 import { state } from "./state.js";
 
+// ✅ --- START: SCROLL SPY LOGIC ---
+let scrollSpyObserver = null;
+
+function activateScrollSpy() {
+  if (scrollSpyObserver) {
+    scrollSpyObserver.disconnect();
+  }
+
+  const sections = document.querySelectorAll(".scrollTarget");
+  const chips = document.querySelectorAll("#blockTabs .blockBtn");
+
+  if (!sections.length || !chips.length) return;
+
+  const headerHeight = document.querySelector(".siteHeader")?.offsetHeight || 150;
+
+  const observerOptions = {
+    rootMargin: `-${headerHeight}px 0px -40% 0px`,
+    threshold: 0,
+  };
+
+  const observerCallback = (entries) => {
+    let mostVisibleSectionId = null;
+    let maxVisibility = 0;
+
+    entries.forEach((entry) => {
+      if (entry.intersectionRatio > maxVisibility) {
+        maxVisibility = entry.intersectionRatio;
+        mostVisibleSectionId = entry.target.id;
+      }
+    });
+    
+    chips.forEach((chip) => {
+        const isActive = chip.dataset.target === `#${mostVisibleSectionId}`;
+        chip.classList.toggle("active", isActive);
+    });
+  };
+
+  scrollSpyObserver = new IntersectionObserver(observerCallback, observerOptions);
+  sections.forEach((section) => scrollSpyObserver.observe(section));
+}
+// ✅ --- END: SCROLL SPY LOGIC ---
+
+
 /* --------------------------- Header title + icon --------------------------- */
 export function setTitleAndIcon(tab) {
   // This function is now much simpler. It ONLY toggles the active class.
@@ -182,6 +225,9 @@ export function populateBlockTabsFromPage() {
   blockTabsRow.style.visibility = hasChips ? "visible" : "hidden";
 
   enforceDownloadProtection();
+
+  // ✅ ACTIVATE SCROLL SPY
+  activateScrollSpy();
 }
 
 /* ------------------- Make the download button self-sufficient --------------- */
