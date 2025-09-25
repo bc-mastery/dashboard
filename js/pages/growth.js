@@ -67,6 +67,7 @@ function injectPillarHelpStylesOnce() {
   document.head.appendChild(style);
 }
 
+
 /* ------------------------------ main render ------------------------------ */
 export async function renderGrowthTab(forceRefresh = false) {
   setCurrentTab("growth");
@@ -81,6 +82,7 @@ export async function renderGrowthTab(forceRefresh = false) {
 
   try {
     const api = await fetchDashboardData(forceRefresh);
+
     state.lastApiByTab.growth = { ...api, data: { ...api.data } };
     const d = api.data || {};
 
