@@ -445,7 +445,8 @@ export async function renderGrowthTab(forceRefresh = false) {
         const wrap = document.getElementById(wrapId);
         const btn  = document.getElementById(btnId);
         if (!wrap || !btn || !overlay) return;
-    
+        const card = wrap.closest('.card'); // ✅ Find the parent .card element
+
         const close = () => {
             wrap.classList.remove("open");
             wrap.classList.remove("openHover");
@@ -453,6 +454,7 @@ export async function renderGrowthTab(forceRefresh = false) {
             overlay.classList.remove("show");
             overlay.classList.remove("hover");
             document.body.style.removeProperty("overflow");
+            if (card) card.style.zIndex = ''; // ✅ Reset z-index when closing
         };
       
         const open = () => {
@@ -462,6 +464,7 @@ export async function renderGrowthTab(forceRefresh = false) {
             overlay.classList.add("show");
             overlay.classList.remove("hover");
             document.body.style.overflow = "hidden";
+            if (card) card.style.zIndex = '4003'; // ✅ Elevate z-index to be on top of the overlay
         };
       
         const toggle = (e) => {
@@ -500,4 +503,3 @@ export async function renderGrowthTab(forceRefresh = false) {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
-
