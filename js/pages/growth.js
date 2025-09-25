@@ -121,7 +121,7 @@ function injectPillarHelpStylesOnce() {
       border-radius: 12px;
       padding: 12px 14px;
       box-shadow: 0 10px 20px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.06);
-      z-index: 4002; /* CORRECTED: Increased z-index */
+      z-index: 4002;
       display: none;
     }
     .gsHelpBubble p, .gsHelpBubble ul, .gsHelpBubble ol {
@@ -132,7 +132,6 @@ function injectPillarHelpStylesOnce() {
       font-family: 'Inter', sans-serif;
     }
     .gsHelpBubble p:last-child, .gsHelpBubble ul:last-child, .gsHelpBubble ol:last-child { margin-bottom: 0; }
-    /* REMOVED hover rules from here */
     .gsHelpWrap.open .gsHelpBubble { display: block; }
     #gsOverlay {
       position: fixed;
@@ -140,12 +139,45 @@ function injectPillarHelpStylesOnce() {
       background: rgba(2, 77, 79, 0.25);
       backdrop-filter: blur(2px);
       -webkit-backdrop-filter: blur(2px);
-      z-index: 4001; /* CORRECTED: Increased z-index */
+      z-index: 4001;
       display: none;
     }
     #gsOverlay.show { display: block; }
-    .gsHelpWrap.openHover .gsHelpBubble { display: block; }
-    #gsOverlay.hover { pointer-events: none; }
+
+    /* ✅ --- START: MOBILE BUBBLE STYLES --- */
+    .gsHelpCloseBtn {
+        display: none; /* Hidden by default */
+        position: absolute;
+        top: 8px;
+        right: 8px;
+        width: 32px;
+        height: 32px;
+        background: transparent;
+        border: none;
+        color: white;
+        font-size: 24px;
+        line-height: 1;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+        .gsHelpBubble {
+            position: fixed; /* Changed to fixed for viewport centering */
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: calc(100% - 40px);
+            max-width: 400px;
+            max-height: 80vh; /* Limit height to 80% of the viewport height */
+            overflow-y: auto; /* Allow scrolling if content overflows */
+            padding: 24px;
+        }
+        .gsHelpCloseBtn {
+            display: block; /* Show on mobile */
+        }
+    }
+    /* --- END: MOBILE BUBBLE STYLES --- */
   `;
   document.head.appendChild(style);
 }
@@ -227,6 +259,7 @@ export async function renderGrowthTab(forceRefresh = false) {
                 >?</button>
 
                 <div class="gsHelpBubble" id="gsOverviewHelpBubble" role="tooltip">
+                    <button type="button" class="gsHelpCloseBtn" aria-label="Close">&times;</button>
                     <p>Every business owner sees their product, service, and customers in a certain way — but customers don’t always see things the same.</p>
                     <p>The Growth Scan compares two sides:</p>
                     <ul style="padding-left: 18px; margin-top: -4px; margin-bottom: 8px;">
@@ -300,6 +333,7 @@ export async function renderGrowthTab(forceRefresh = false) {
             >?</button>
 
             <div class="gsHelpBubble" id="gsPillarHelpBubble" role="tooltip">
+                <button type="button" class="gsHelpCloseBtn" aria-label="Close">&times;</button>
               <p><strong>0–60%:</strong> You don’t have an established strategy in the given area. You plan and execute based on intuition and experience — which may have gotten you this far, but to break through, you need a stable strategy and the right tactics.</p>
               <p><strong>61–80%:</strong> You have an established strategy in the given area. You know how to catch the right customers and build a prosperous business. However, you have plenty of room to improve — and with the right resources, you can multiply your outcomes.</p>
               <p><strong>81–100%:</strong> You’ve mastered the given area with a well-built strategy. If you’ve plateaued and want to level up, you need a strategic shift in this or other areas so you can break out of your current limitations.</p>
@@ -445,26 +479,25 @@ export async function renderGrowthTab(forceRefresh = false) {
         const wrap = document.getElementById(wrapId);
         const btn  = document.getElementById(btnId);
         if (!wrap || !btn || !overlay) return;
-        const card = wrap.closest('.card'); // ✅ Find the parent .card element
+        const card = wrap.closest('.card');
+        const bubble = wrap.querySelector('.gsHelpBubble');
+        const closeBtn = bubble.querySelector('.gsHelpCloseBtn');
+
 
         const close = () => {
             wrap.classList.remove("open");
-            wrap.classList.remove("openHover");
             btn.setAttribute("aria-expanded", "false");
             overlay.classList.remove("show");
-            overlay.classList.remove("hover");
             document.body.style.removeProperty("overflow");
-            if (card) card.style.zIndex = ''; // ✅ Reset z-index when closing
+            if (card) card.style.zIndex = '';
         };
       
         const open = () => {
-            wrap.classList.remove("openHover");
             wrap.classList.add("open");
             btn.setAttribute("aria-expanded", "true");
             overlay.classList.add("show");
-            overlay.classList.remove("hover");
             document.body.style.overflow = "hidden";
-            if (card) card.style.zIndex = '4003'; // ✅ Elevate z-index to be on top of the overlay
+            if (card) card.style.zIndex = '4003';
         };
       
         const toggle = (e) => {
@@ -473,22 +506,13 @@ export async function renderGrowthTab(forceRefresh = false) {
         };
       
         btn.addEventListener("click", toggle, { passive: false });
+        if(closeBtn) closeBtn.addEventListener("click", close);
       
-        wrap.addEventListener("mouseenter", () => {
-          // Logic removed to disable hover effect
-      });
-    
-      wrap.addEventListener("mouseleave", () => {
-          // Logic removed to disable hover effect
-      });
-      
-        const docClickHandler = (e) => { if (!btn.contains(e.target)) close(); };
+        const docClickHandler = (e) => { if (!bubble.contains(e.target) && !btn.contains(e.target)) close(); };
         const docKeyHandler = (e) => { if (e.key === "Escape") close(); };
 
-        btn.addEventListener("keydown", docKeyHandler);
         document.addEventListener("keydown", docKeyHandler);
         document.addEventListener("click", docClickHandler);
-        wrap.addEventListener("click", (e) => e.stopPropagation());
         overlay.addEventListener("click", close);
     };
 
