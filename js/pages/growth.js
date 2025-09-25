@@ -68,6 +68,7 @@ function injectPillarHelpStylesOnce() {
   document.head.appendChild(style);
 }
 
+
 /* ------------------------------ main render ------------------------------ */
 export async function renderGrowthTab(forceRefresh = false) {
   setCurrentTab("growth");
@@ -82,6 +83,7 @@ export async function renderGrowthTab(forceRefresh = false) {
 
   try {
     const api = await fetchDashboardData(forceRefresh);
+
     state.lastApiByTab.growth = { ...api, data: { ...api.data } };
     const d = api.data || {};
 
@@ -166,70 +168,71 @@ export async function renderGrowthTab(forceRefresh = false) {
       overlay.id = "gsOverlay";
       document.body.appendChild(overlay);
     }
-    
+
     // DEFINITIVE BUBBLE LOGIC THAT SOLVES ALL ISSUES
     const initHelpBubble = (wrapId, btnId) => {
-      const wrap = document.getElementById(wrapId);
-      const btn = document.getElementById(btnId);
-      const bubble = wrap.querySelector('.gsHelpBubble');
-      const overlay = document.getElementById('gsOverlay');
-      if (!wrap || !btn || !bubble || !overlay) return;
+        const wrap = document.getElementById(wrapId);
+        const btn  = document.getElementById(btnId);
+        const bubble = wrap.querySelector('.gsHelpBubble');
+        const overlay = document.getElementById('gsOverlay');
+        if (!wrap || !btn || !bubble || !overlay) return;
 
-      const originalParent = bubble.parentElement;
+        const originalParent = bubble.parentElement;
 
-      const close = () => {
-        wrap.classList.remove("open");
-        overlay.classList.remove("show");
-        if (bubble.parentElement !== originalParent) {
-            originalParent.appendChild(bubble);
-            bubble.style.cssText = '';
-        }
-        document.removeEventListener("click", docClickHandler, true);
-        document.removeEventListener("keydown", keydownHandler);
-      };
+        const close = () => {
+            wrap.classList.remove("open");
+            overlay.classList.remove("show");
+            if (bubble.parentElement !== originalParent) {
+                originalParent.appendChild(bubble);
+                bubble.style.cssText = '';
+            }
+            document.removeEventListener("click", docClickHandler, true);
+        };
 
-      const docClickHandler = (e) => {
-        if (!bubble.contains(e.target) && !btn.contains(e.target)) {
-          close();
-        }
-      };
-      
-      const keydownHandler = (e) => {
-        if (e.key === "Escape") close();
-      };
+        const docClickHandler = (e) => {
+            if (!bubble.contains(e.target) && !btn.contains(e.target)) {
+              close();
+            }
+        };
 
-      const open = () => {
-        wrap.classList.add("open");
-        overlay.classList.add("show");
-        document.body.appendChild(bubble);
+        const open = () => {
+            wrap.classList.add("open");
+            overlay.classList.add("show");
+            document.body.appendChild(bubble); // Move to body to escape stacking context
 
-        const isMobile = window.matchMedia("(max-width: 768px)").matches;
-        bubble.style.position = 'fixed';
-        if (isMobile) {
-            bubble.style.top = '50%';
-            bubble.style.left = '50%';
-            bubble.style.transform = 'translate(-50%, -50%)';
-        } else {
-            const btnRect = btn.getBoundingClientRect();
-            bubble.style.top = `${btnRect.bottom + 8}px`;
-            bubble.style.left = `${btnRect.left}px`;
-            bubble.style.transform = '';
-        }
+            const isMobile = window.matchMedia("(max-width: 768px)").matches;
+            bubble.style.position = 'fixed';
+            if (isMobile) {
+                bubble.style.top = '50%';
+                bubble.style.left = '50%';
+                bubble.style.transform = 'translate(-50%, -50%)';
+            } else {
+                const btnRect = btn.getBoundingClientRect();
+                bubble.style.top = `${btnRect.bottom + 8}px`;
+                bubble.style.left = `${btnRect.left}px`;
+                bubble.style.transform = '';
+            }
 
-        setTimeout(() => {
-          document.addEventListener("click", docClickHandler, true);
-          document.addEventListener("keydown", keydownHandler);
-        }, 0);
-      };
+            // Listen for clicks to close, but on the next tick to avoid capturing the opening click
+            setTimeout(() => {
+              document.addEventListener("click", docClickHandler, true);
+            }, 0);
+        };
 
-      btn.addEventListener("click", (e) => {
-        e.stopPropagation();
-        if (wrap.classList.contains("open")) {
-          close();
-        } else {
-          open();
-        }
-      });
+        btn.addEventListener("click", (e) => {
+            e.stopPropagation(); // Prevent the click from bubbling up to the document
+            if (wrap.classList.contains("open")) {
+              close();
+            } else {
+              open();
+            }
+        });
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape" && wrap.classList.contains("open")) {
+              close();
+            }
+        });
     };
 
     initHelpBubble("gsPillarHelpWrap", "gsPillarHelpBtn");
