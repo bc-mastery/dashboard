@@ -45,6 +45,7 @@ function injectGrowthOverviewStylesOnce() {
   document.head.appendChild(style);
 }
 
+// STYLES TO MAKE BUBBLE APPEAR ON TOP
 function injectPillarHelpStylesOnce() {
   if (document.getElementById("gs-pillar-help-styles")) return;
   const style = document.createElement("style");
@@ -67,7 +68,6 @@ function injectPillarHelpStylesOnce() {
   document.head.appendChild(style);
 }
 
-
 /* ------------------------------ main render ------------------------------ */
 export async function renderGrowthTab(forceRefresh = false) {
   setCurrentTab("growth");
@@ -82,7 +82,6 @@ export async function renderGrowthTab(forceRefresh = false) {
 
   try {
     const api = await fetchDashboardData(forceRefresh);
-
     state.lastApiByTab.growth = { ...api, data: { ...api.data } };
     const d = api.data || {};
 
@@ -96,7 +95,7 @@ export async function renderGrowthTab(forceRefresh = false) {
 
     injectGrowthOverviewStylesOnce();
 
-    // THIS HTML BLOCK IS PRESERVED FROM YOUR ORIGINAL FILE TO MAINTAIN THE LAYOUT
+    // PRESERVED HTML LAYOUT
     contentDiv.innerHTML = `
       <section class="card scrollTarget" id="block-gs-overview">
         <div class="sectionHeader" style="margin-bottom: -8px;">
@@ -168,69 +167,69 @@ export async function renderGrowthTab(forceRefresh = false) {
       document.body.appendChild(overlay);
     }
     
-    // THIS IS THE DEFINITIVE, CORRECTED BUBBLE LOGIC
+    // DEFINITIVE BUBBLE LOGIC THAT SOLVES ALL ISSUES
     const initHelpBubble = (wrapId, btnId) => {
-        const wrap = document.getElementById(wrapId);
-        const btn  = document.getElementById(btnId);
-        const bubble = wrap.querySelector('.gsHelpBubble');
-        const overlay = document.getElementById('gsOverlay');
-        if (!wrap || !btn || !bubble || !overlay) return;
+      const wrap = document.getElementById(wrapId);
+      const btn = document.getElementById(btnId);
+      const bubble = wrap.querySelector('.gsHelpBubble');
+      const overlay = document.getElementById('gsOverlay');
+      if (!wrap || !btn || !bubble || !overlay) return;
 
-        const originalParent = bubble.parentElement;
-        
-        const close = () => {
-            wrap.classList.remove("open");
-            overlay.classList.remove("show");
-            if (bubble.parentElement === document.body) {
-                originalParent.appendChild(bubble);
-            }
-            document.removeEventListener("click", closeHandler, true);
-            document.removeEventListener("keydown", keydownHandler);
-        };
+      const originalParent = bubble.parentElement;
 
-        const closeHandler = (e) => {
-            if (!bubble.contains(e.target) && !btn.contains(e.target)) {
-                close();
-            }
-        };
+      const close = () => {
+        wrap.classList.remove("open");
+        overlay.classList.remove("show");
+        if (bubble.parentElement !== originalParent) {
+            originalParent.appendChild(bubble);
+            bubble.style.cssText = '';
+        }
+        document.removeEventListener("click", docClickHandler, true);
+        document.removeEventListener("keydown", keydownHandler);
+      };
 
-        const keydownHandler = (e) => {
-            if (e.key === "Escape") close();
-        };
-
-        const open = () => {
-            wrap.classList.add("open");
-            overlay.classList.add("show");
-            document.body.appendChild(bubble);
-            
-            const isMobile = window.matchMedia("(max-width: 768px)").matches;
-            bubble.style.position = 'fixed';
-            if (isMobile) {
-                bubble.style.top = '50%';
-                bubble.style.left = '50%';
-                bubble.style.transform = 'translate(-50%, -50%)';
-            } else {
-                const btnRect = btn.getBoundingClientRect();
-                bubble.style.top = `${btnRect.bottom + 8}px`;
-                bubble.style.left = `${btnRect.left}px`;
-                bubble.style.transform = '';
-            }
-            
-            // Add listeners on the next event cycle to prevent immediate closing
-            setTimeout(() => {
-                document.addEventListener("click", closeHandler, true);
-                document.addEventListener("keydown", keydownHandler);
-            }, 0);
-        };
+      const docClickHandler = (e) => {
+        if (!bubble.contains(e.target) && !btn.contains(e.target)) {
+          close();
+        }
+      };
       
-        btn.addEventListener("click", (e) => {
-            e.stopPropagation();
-            if (wrap.classList.contains("open")) {
-                close();
-            } else {
-                open();
-            }
-        });
+      const keydownHandler = (e) => {
+        if (e.key === "Escape") close();
+      };
+
+      const open = () => {
+        wrap.classList.add("open");
+        overlay.classList.add("show");
+        document.body.appendChild(bubble);
+
+        const isMobile = window.matchMedia("(max-width: 768px)").matches;
+        bubble.style.position = 'fixed';
+        if (isMobile) {
+            bubble.style.top = '50%';
+            bubble.style.left = '50%';
+            bubble.style.transform = 'translate(-50%, -50%)';
+        } else {
+            const btnRect = btn.getBoundingClientRect();
+            bubble.style.top = `${btnRect.bottom + 8}px`;
+            bubble.style.left = `${btnRect.left}px`;
+            bubble.style.transform = '';
+        }
+
+        setTimeout(() => {
+          document.addEventListener("click", docClickHandler, true);
+          document.addEventListener("keydown", keydownHandler);
+        }, 0);
+      };
+
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        if (wrap.classList.contains("open")) {
+          close();
+        } else {
+          open();
+        }
+      });
     };
 
     initHelpBubble("gsPillarHelpWrap", "gsPillarHelpBtn");
