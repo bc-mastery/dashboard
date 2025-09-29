@@ -197,7 +197,7 @@ export function updateFloatingCTA(tab) {
     marketing: "Marketing Strategy PDF",
     sales: "Sales Strategy PDF",
     mentoring: "Mentoring PDF",
-    knowledge: "Knowledge PDF",
+    knowledge: "Vault PDF",
   };
   const label = labelMap[tab] || "Strategy PDF";
 
@@ -376,3 +376,4 @@ export function initBlockChipDelegation() {
     true
   );
 }
+
