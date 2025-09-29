@@ -15,7 +15,6 @@ import { renderTargetingTab } from "./pages/targeting.js";
 import { renderOfferTab } from "./pages/offer.js";
 import { renderMarketingTab } from "./pages/marketing.js";
 import { renderSalesTab } from "./pages/sales.js";
-import { renderMentoringTab } from "./pages/mentoring.js";
 import { renderKnowledgeTab } from "./pages/knowledge.js";
 
 /* ----------------------------- helpers ----------------------------- */
@@ -84,3 +83,4 @@ document.addEventListener("DOMContentLoaded", () => {
     updateFloatingCTA(state.currentTab);
   });
 });
+
