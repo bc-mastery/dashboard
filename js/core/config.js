@@ -73,7 +73,7 @@ export const TAB_TITLES = {
   marketing: "Marketing Strategy",
   sales: "Sales Strategy",
   mentoring: "Mentoring",
-  knowledge: "Knowledge Hub",
+  knowledge: "Vault",
 };
 
 export const TAB_ICONS = {
@@ -82,8 +82,8 @@ export const TAB_ICONS = {
   offer:      `${PATHS.icons}Icon_offer.png?v=${ASSET_VER}`,
   marketing:  `${PATHS.icons}Icon_marketing.png?v=${ASSET_VER}`,
   sales:      `${PATHS.icons}Icon_sales.png?v=${ASSET_VER}`,
-  mentoring:  `${PATHS.icons}Icon_sales.png?v=${ASSET_VER}`,     // placeholder
-  knowledge:  `${PATHS.icons}Icon_marketing.png?v=${ASSET_VER}`, // placeholder
+  mentoring:  `${PATHS.icons}Icon_mentoring.png?v=${ASSET_VER}`,     // PLACEHOLDER
+  knowledge:  `${PATHS.icons}Icon_vault.png?v=${ASSET_VER}`, // PLACEHOLDER
 };
 
 // Used by ui.js for the CTA icon swap
@@ -103,3 +103,4 @@ export const ACCESS = {
   TARGETING_ONLY: "TARGETING_ONLY",
   FULL_4PBS: "FULL_4PBS",
 };
+
