@@ -43,7 +43,6 @@ async function loadTab(tabName) {
     case "offer":       await renderOfferTab(forceRefresh); break;
     case "marketing":   await renderMarketingTab(forceRefresh); break;
     case "sales":       await renderSalesTab(forceRefresh); break;
-    case "mentoring":   await renderMentoringTab(forceRefresh); break;
     case "knowledge":   await renderKnowledgeTab(forceRefresh); break;
     default:            await renderGrowthTab(forceRefresh); break;
   }
@@ -83,4 +82,5 @@ document.addEventListener("DOMContentLoaded", () => {
     updateFloatingCTA(state.currentTab);
   });
 });
+
 
