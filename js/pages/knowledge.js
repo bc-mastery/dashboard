@@ -27,7 +27,7 @@ export async function renderKnowledgeTab() {
 
   contentDiv.innerHTML = `
     <div class="card" id="block-knowledge">
-      <div class="sectionTitle">Knowledge Hub</div>
+      <div class="sectionTitle">Vault</div>
       <p class="muted">Loading your resources…</p>
     </div>
   `;
@@ -40,7 +40,7 @@ export async function renderKnowledgeTab() {
     if (!api || !api.ok) {
       contentDiv.innerHTML = `
         <div class="card scrollTarget" id="block-knowledge">
-          <div class="sectionTitle">Knowledge Hub</div>
+          <div class="sectionTitle">Vault</div>
           <p class="muted">${(api && api.message) || "No data found."}</p>
         </div>`;
       postRender();
@@ -176,7 +176,7 @@ function buildKnowledgeHTML(resources) {
 
   const search = `
     <div class="card" id="block-knowledge">
-      <div class="sectionTitle">Knowledge Hub</div>
+      <div class="sectionTitle">Vault</div>
       <div style="display:flex;gap:10px;align-items:center;margin:8px 0 12px">
         <input id="knowledgeSearch" type="search" placeholder="Search resources..."
                style="flex:1; padding:10px 12px; border-radius:10px; border:1px solid rgba(2,77,79,.2); font-size:14px" />
@@ -300,3 +300,4 @@ function slugify(s) {
 function postRender() {
   // Nothing special yet; hook for future enhancements if needed
 }
+
