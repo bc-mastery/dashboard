@@ -82,7 +82,7 @@ function paintOffer(api, allowFull = false) {
   const areas = parseAreas(d.D_AREA);
 
   let html = buildFirstBlockHTML({
-    title: "Offer Characteristics",
+    title: "Concept",
     subtitleLabel: "Offer Character",
     subtitleValue: d.O_CHARACTER,
     descText: d.O_CHARACTER_DESC,
@@ -92,15 +92,6 @@ function paintOffer(api, allowFull = false) {
 
   if (allowFull) {
     html += `
-      <div class="card scrollTarget" id="block-concept">
-        <div class="sectionTitle">Concept</div>
-        <p><span class="subtitle">Offer Character:</span><br>${esc(d.O_CHARACTER_DESC)}</p>
-        <p><span class="subtitle">${esc(d.O_CONCEPT_FACTOR_1)}</span><br>${esc(d.O_CONCEPT_FACTOR_1_DESC)}</p>
-        <p><span class="subtitle">${esc(d.O_CONCEPT_FACTOR_2)}</span><br>${esc(d.O_CONCEPT_FACTOR_2_DESC)}</p>
-        <p><span class="subtitle">${esc(d.O_CONCEPT_FACTOR_3)}</span><br>${esc(d.O_CONCEPT_FACTOR_3_DESC)}</p>
-        <p><span class="subtitle">${esc(d.O_CONCEPT_FACTOR_4)}</span><br>${esc(d.O_CONCEPT_FACTOR_4_DESC)}</p>
-      </div>
-
       <div class="card scrollTarget" id="block-characteristics">
         <div class="sectionTitle">Characteristics</div>
         <p><span class="subtitle">${esc(d.O_CHARACTERISTIC_1)}</span><br>${esc(d.O_CHARACTERISTIC_1_DESC)}</p>
