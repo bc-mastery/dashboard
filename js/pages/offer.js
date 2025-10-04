@@ -47,8 +47,11 @@ export async function renderOfferTab() {
       updateFloatingCTA("offer");
     }
 
-    // Allow full content if paid
-    const allowFull = !!d.OFFER_PAID || !!d["4PBS_PAID"];
+    // Allow full content if paid or if strategy has been sent
+    const isStrategySent =
+      d.OFFER_STRATEGY_SENT &&
+      new Date(d.OFFER_STRATEGY_SENT).getTime() < new Date().getTime();
+    const allowFull = !!d.OFFER_PAID || !!d["4PBS_PAID"] || isStrategySent;
     paintOffer(api, allowFull);
 
     // Secondary chips row
