@@ -78,7 +78,7 @@ function paintMarketing(api, allowFull = false) {
 
   let html = buildFirstBlockHTML({
     title: "Foundations",
-    subtitleLabel: "Marketing Character",
+    subtitleLabel: "Marketing Approach",
     subtitleValue: d.M_CHARACTER,
     descText: d.M_CHARACTER_DESC,
     areas,
@@ -109,3 +109,4 @@ function paintMarketing(api, allowFull = false) {
   contentDiv.innerHTML = html;
   hydrateABCMaps();
 }
+
