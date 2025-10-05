@@ -99,22 +99,7 @@ function paintMarketing(api, allowFull = false) {
       `;
     };
 
-    const buildCompositeBlock = (title, sections, id) => {
-      const content = sections
-        .map(section => section.value ? `<span class="subtitle">${esc(section.label)}:</span> ${esc(section.value)}` : "")
-        .filter(Boolean)
-        .join('<br><br>');
-
-      if (!content.trim()) return "";
-      return `
-        <div class="card scrollTarget" id="block-${id}">
-          <div class="sectionTitle">${esc(title)}</div>
-          <p class="preserve">${content}</p>
-        </div>
-      `;
-    };
-
-    html += buildBlock("Marketing Foundations", d.M_STRATEGY_INTRO, "marketing-foundations");
+    html += buildBlock("Strategy Introduction", d.M_STRATEGY_INTRO, "strategy-introduction");
     html += buildBlock("Objectives", d.M_OBJECTIVES, "objectives");
     html += buildBlock("Differentiation", d.M_DIFFERENTIATION, "differentiation");
     html += buildBlock("Engagement", d.M_ATTENTION_TRIGGERS, "engagement");
