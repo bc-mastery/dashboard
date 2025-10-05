@@ -52,7 +52,25 @@ function injectGrowthOverviewStylesOnce() {
       width:100%;
       max-width:360px;
       height:360px; /* explicit height keeps Google Charts crisp */
+      position: relative; /* Make it a positioning context for the center text */
     }
+
+    /* --- ADDED: Text inside the donut --- */
+    .donut-center-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      color: #555;
+      font-weight: 300; /* Lighter font weight */
+      font-size: 15px;
+      line-height: 1.3;
+      pointer-events: none; /* Allows hover events to pass through to the chart */
+      z-index: 10;
+    }
+    /* --- END ADDED --- */
+
 
     /* Mobile: stack + slightly smaller donut */
     @media (max-width: 860px){
@@ -65,6 +83,11 @@ function injectGrowthOverviewStylesOnce() {
         height:300px;
         margin:0 auto;
       }
+      /* --- ADDED: Adjust font size for mobile --- */
+      .donut-center-text {
+        font-size: 13px;
+      }
+      /* --- END ADDED --- */
     }
   `;
   document.head.appendChild(style);
@@ -275,7 +298,9 @@ export async function renderGrowthTab(forceRefresh = false) {
         </div>
         <div class="bfGrid">
           <div class="bfMap">
-            <div id="gsDonut" class="gsDonutChart"></div>
+            <div id="gsDonut" class="gsDonutChart">
+              <div class="donut-center-text">Hover over<br>the donut<br>parts!</div>
+            </div>
           </div>
           <div class="bfText">
 
