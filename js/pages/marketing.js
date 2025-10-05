@@ -80,10 +80,10 @@ function paintMarketing(api, allowFull = false) {
   const descText = d.M_DESC || d.M_SUMMARY || d.M_STRATEGY || d.M_OVERVIEW || d.M_OUTLINE || d.MARKETING_DESC || "";
 
   let html = buildFirstBlockHTML({
-    title: "Marketing Foundations",
-    subtitleLabel: "Primary Focus",
-    subtitleValue,
-    descText,
+    title: "Foundations",
+    subtitleLabel: "Marketing Character",
+    subtitleValue: M_CHARACTER
+    descText: M_CHARACTER_DESC
     areas,
   });
 
@@ -112,3 +112,4 @@ function paintMarketing(api, allowFull = false) {
   contentDiv.innerHTML = html;
   hydrateABCMaps();
 }
+
