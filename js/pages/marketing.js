@@ -48,7 +48,11 @@ export async function renderMarketingTab() {
       updateFloatingCTA("marketing");
     }
 
-    const allowFull = !!d.MARKETING_PAID || !!d["4PBS_PAID"];
+    // Allow full content if paid or if strategy has been sent
+    const isStrategySent =
+      d.OFFER_STRATEGY_SENT &&
+      new Date(d.OFFER_STRATEGY_SENT).getTime() < new Date().getTime();
+    const allowFull = !!d.MARKETING_PAID || !!d["4PBS_PAID"] || isStrategySent;
     paintMarketing(api, allowFull);
 
     const blockTabsRow = document.getElementById("blockTabsRow");
@@ -78,35 +82,48 @@ function paintMarketing(api, allowFull = false) {
 
   let html = buildFirstBlockHTML({
     title: "Foundations",
-    subtitleLabel: "Marketing Approach",
+    subtitleLabel: "Marketing Character",
     subtitleValue: d.M_CHARACTER,
     descText: d.M_CHARACTER_DESC,
     areas,
   });
 
   if (allowFull) {
-    const lines = [
-      d.M_CONCEPT && ["Concept", d.M_CONCEPT],
-      d.M_CHANNELS && ["Channels", d.M_CHANNELS],
-      d.M_CONTENT && ["Content Strategy", d.M_CONTENT],
-      d.M_SEQUENCING && ["Message Sequencing", d.M_SEQUENCING],
-      d.M_RETENTION && ["Retention Loop", d.M_RETENTION],
-      d.M_AUTOMATION && ["Automation", d.M_AUTOMATION],
-      d.M_BUDGET && ["Budget / Bids", d.M_BUDGET],
-      d.M_TIMING && ["Cadence & Timing", d.M_TIMING],
-      d.M_PROMOTION && ["Key Promotions", d.M_PROMOTION],
-      d.M_KPIS && ["Primary KPIs", d.M_KPIS],
-    ].filter(Boolean);
+    const buildBlock = (title, content, id) => {
+      if (!content || !String(content).trim()) return "";
+      return `
+        <div class="card scrollTarget" id="block-${id}">
+          <div class="sectionTitle">${esc(title)}</div>
+          <p class="preserve">${esc(content)}</p>
+        </div>
+      `;
+    };
 
-    if (lines.length) {
-      html += `<div class="card scrollTarget" id="block-marketing-details">
-        <div class="sectionTitle">Marketing Strategy</div>
-        ${lines.map(([label, val]) => `<p><span class="subtitle">${esc(label)}:</span> ${esc(val)}</p>`).join("")}
-      </div>`;
-    }
+    const buildCompositeBlock = (title, sections, id) => {
+      const content = sections
+        .map(section => section.value ? `<span class="subtitle">${esc(section.label)}:</span> ${esc(section.value)}` : "")
+        .filter(Boolean)
+        .join('<br><br>');
+
+      if (!content.trim()) return "";
+      return `
+        <div class="card scrollTarget" id="block-${id}">
+          <div class="sectionTitle">${esc(title)}</div>
+          <p class="preserve">${content}</p>
+        </div>
+      `;
+    };
+
+    html += buildBlock("Marketing Foundations", d.M_STRATEGY_INTRO, "marketing-foundations");
+    html += buildBlock("Objectives", d.M_OBJECTIVES, "objectives");
+    html += buildBlock("Differentiation", d.M_DIFFERENTIATION, "differentiation");
+    html += buildBlock("Engagement", d.M_ATTENTION_TRIGGERS, "engagement");
+    html += buildBlock("Messaging", d.M_MESSAGING_PRINCIPLES, "messaging");
+    html += buildBlock("Tone Of Voice", d.M_TONE_OF_VOICE, "tone-of-voice");
+    html += buildBlock("Customer Journey", d.M_CUSTOMER_JOURNEY, "customer-journey");
+    html += buildBlock("Lead Conversion", d.M_LEAD_CONVERSION, "lead-conversion");
   }
 
   contentDiv.innerHTML = html;
   hydrateABCMaps();
 }
-
