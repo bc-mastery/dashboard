@@ -90,11 +90,16 @@ function paintMarketing(api, allowFull = false) {
 
   if (allowFull) {
     const buildBlock = (title, content, id) => {
-      if (!content || !String(content).trim()) return "";
+      // Always render the block shell.
+      // If content is missing, show a placeholder.
+      const contentHtml = (content && String(content).trim())
+        ? `<p class="preserve">${esc(content)}</p>`
+        : '<p class="muted">Content not available.</p>';
+
       return `
         <div class="card scrollTarget" id="block-${id}">
           <div class="sectionTitle">${esc(title)}</div>
-          <p class="preserve">${esc(content)}</p>
+          ${contentHtml}
         </div>
       `;
     };
