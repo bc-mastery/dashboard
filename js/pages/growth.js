@@ -296,7 +296,7 @@ export async function renderGrowthTab(forceRefresh = false) {
         <div class="bfGrid">
           <div class="bfMap">
             <div id="gsDonut" class="gsDonutChart"></div>
-            <div class="donut-center-text">Hover over<br>the donut<br>parts!</div>
+            <div class="donut-center-text">Hover<br>or click on<br>the different<br>sections!</div>
           </div>
           <div class="bfText">
 
@@ -548,3 +548,4 @@ export async function renderGrowthTab(forceRefresh = false) {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
+
