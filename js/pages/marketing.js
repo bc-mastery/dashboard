@@ -48,11 +48,11 @@ export async function renderMarketingTab() {
       updateFloatingCTA("marketing");
     }
 
-    // Allow full content if 4PBS is paid or if strategy has been sent
+    // Allow full content if 4PBS is paid AND strategy has been sent
     const isStrategySent =
       d.OFFER_STRATEGY_SENT &&
       new Date(d.OFFER_STRATEGY_SENT).getTime() < new Date().getTime();
-    const allowFull = !!d["4PBS_PAID"] || isStrategySent;
+    const allowFull = !!d["4PBS_PAID"] && isStrategySent;
     paintMarketing(api, allowFull);
 
     const blockTabsRow = document.getElementById("blockTabsRow");
