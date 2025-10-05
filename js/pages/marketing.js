@@ -76,14 +76,11 @@ function paintMarketing(api, allowFull = false) {
   const d = (api && api.data) || {};
   const areas = parseAreas(d.D_AREA);
 
-  const subtitleValue = d.M_FOCUS || d.M_MESSAGE || d.M_CHANNELS || d.M_POSITIONING || d.M_ARCH || d.M_THEME || "";
-  const descText = d.M_DESC || d.M_SUMMARY || d.M_STRATEGY || d.M_OVERVIEW || d.M_OUTLINE || d.MARKETING_DESC || "";
-
   let html = buildFirstBlockHTML({
     title: "Foundations",
     subtitleLabel: "Marketing Character",
-    subtitleValue: M_CHARACTER
-    descText: M_CHARACTER_DESC
+    subtitleValue: d.M_CHARACTER,
+    descText: d.M_CHARACTER_DESC,
     areas,
   });
 
@@ -112,4 +109,3 @@ function paintMarketing(api, allowFull = false) {
   contentDiv.innerHTML = html;
   hydrateABCMaps();
 }
-
