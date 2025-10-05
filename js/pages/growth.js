@@ -41,8 +41,9 @@ function injectGrowthOverviewStylesOnce() {
       align-items:start;
       gap:22px;
     }
-    /* Center the donut box in its column */
+    /* --- MODIFIED: Make bfMap the positioning context --- */
     #block-gs-overview .bfMap{
+      position: relative; /* Make it a positioning context */
       display:flex;
       align-items:center;
       justify-content:center;
@@ -51,11 +52,10 @@ function injectGrowthOverviewStylesOnce() {
     #block-gs-overview #gsDonut{
       width:100%;
       max-width:360px;
-      height:360px; /* explicit height keeps Google Charts crisp */
-      position: relative; /* Make it a positioning context for the center text */
+      height:360px;
     }
 
-    /* --- ADDED: Text inside the donut --- */
+    /* --- MODIFIED: Text inside the donut --- */
     .donut-center-text {
       position: absolute;
       top: 50%;
@@ -63,14 +63,13 @@ function injectGrowthOverviewStylesOnce() {
       transform: translate(-50%, -50%);
       text-align: center;
       color: #555;
-      font-weight: 300; /* Lighter font weight */
+      font-weight: 300;
       font-size: 15px;
       line-height: 1.3;
-      pointer-events: none; /* Allows hover events to pass through to the chart */
-      z-index: 10;
+      pointer-events: none;
+      z-index: 10; /* Ensure it's on top */
     }
-    /* --- END ADDED --- */
-
+    /* --- END MODIFIED --- */
 
     /* Mobile: stack + slightly smaller donut */
     @media (max-width: 860px){
@@ -83,11 +82,9 @@ function injectGrowthOverviewStylesOnce() {
         height:300px;
         margin:0 auto;
       }
-      /* --- ADDED: Adjust font size for mobile --- */
       .donut-center-text {
         font-size: 13px;
       }
-      /* --- END ADDED --- */
     }
   `;
   document.head.appendChild(style);
@@ -298,9 +295,8 @@ export async function renderGrowthTab(forceRefresh = false) {
         </div>
         <div class="bfGrid">
           <div class="bfMap">
-            <div id="gsDonut" class="gsDonutChart">
-              <div class="donut-center-text">Hover over<br>the donut<br>parts!</div>
-            </div>
+            <div id="gsDonut" class="gsDonutChart"></div>
+            <div class="donut-center-text">Hover over<br>the donut<br>parts!</div>
           </div>
           <div class="bfText">
 
