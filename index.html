@@ -314,10 +314,17 @@
     }
 
     @media (min-width: 769px){
-      #tabs{ display: flex; gap: 5px; flex-wrap: wrap; }
-      #tabs .tabBtn{
-        display: inline-flex; align-items: center;
-        flex: 0 0 var(--primaryTabW); width: var(--primaryTabW); height: var(--primaryTabH);
+      #tabs {
+        display: flex;
+        gap: 8px;
+        width: 100%;
+      }
+      #tabs .tabBtn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 1;
+        height: var(--primaryTabH);
         padding: 0 10px;
         line-height: 1;
       }
@@ -587,4 +594,3 @@
   <script type="module" src="./js/main.js"></script>
 </body>
 </html>
-
