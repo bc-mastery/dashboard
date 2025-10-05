@@ -48,11 +48,11 @@ export async function renderMarketingTab() {
       updateFloatingCTA("marketing");
     }
 
-    // Allow full content if paid or if strategy has been sent
+    // Allow full content if 4PBS is paid or if strategy has been sent
     const isStrategySent =
       d.OFFER_STRATEGY_SENT &&
       new Date(d.OFFER_STRATEGY_SENT).getTime() < new Date().getTime();
-    const allowFull = !!d.MARKETING_PAID || !!d["4PBS_PAID"] || isStrategySent;
+    const allowFull = !!d["4PBS_PAID"] || isStrategySent;
     paintMarketing(api, allowFull);
 
     const blockTabsRow = document.getElementById("blockTabsRow");
@@ -102,8 +102,8 @@ function paintMarketing(api, allowFull = false) {
     html += buildBlock("Strategy Introduction", d.M_STRATEGY_INTRO, "strategy-introduction");
     html += buildBlock("Objectives", d.M_OBJECTIVES, "objectives");
     html += buildBlock("Differentiation", d.M_DIFFERENTIATION, "differentiation");
-    html += buildBlock("Engagement", d.M_ATTENTION_TRIGGERS, "engagement");
-    html += buildBlock("Messaging", d.M_MESSAGING_PRINCIPLES, "messaging");
+    html += buildBlock("Attention Triggers", d.M_ATTENTION_TRIGGERS, "attention-triggers");
+    html += buildBlock("Messaging Principles", d.M_MESSAGING_PRINCIPLES, "messaging-principles");
     html += buildBlock("Tone Of Voice", d.M_TONE_OF_VOICE, "tone-of-voice");
     html += buildBlock("Customer Journey", d.M_CUSTOMER_JOURNEY, "customer-journey");
     html += buildBlock("Lead Conversion", d.M_LEAD_CONVERSION, "lead-conversion");
