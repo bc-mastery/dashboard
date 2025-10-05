@@ -62,7 +62,7 @@ function injectGrowthOverviewStylesOnce() {
       left: 50%;
       transform: translate(-50%, -50%);
       text-align: center;
-      color: #777777;
+      color: #BABABA;
       font-weight: 300;
       font-size: 15px;
       line-height: 1.3;
@@ -548,5 +548,6 @@ export async function renderGrowthTab(forceRefresh = false) {
     contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading data: ${esc(err?.message || String(err))}</p></div>`;
   }
 }
+
 
 
