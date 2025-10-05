@@ -107,14 +107,13 @@ function paintMarketing(api, allowFull = false) {
     html += buildBlock("Introduction", d.M_STRATEGY_INTRO, "introduction");
     html += buildBlock("Objectives", d.M_OBJECTIVES, "objectives");
     html += buildBlock("Differentiation", d.M_DIFFERENTIATION, "differentiation");
-    html += buildBlock("Engagement", d.M_ATTENTION_TRIGGERS, "engagement");
+    html += buildBlock("Attention", d.M_ATTENTION_TRIGGERS, "engagment");
     html += buildBlock("Messaging", d.M_MESSAGING_PRINCIPLES, "messaging");
     html += buildBlock("Tone Of Voice", d.M_TONE_OF_VOICE, "tone-of-voice");
-    html += buildBlock("Customer Journey", d.M_CUSTOMER_JOURNEY, "customer-journey");
+    html += buildBlock("Journey", d.M_CUSTOMER_JOURNEY, "customer-journey");
     html += buildBlock("Conversion", d.M_LEAD_CONVERSION, "conversion");
   }
 
   contentDiv.innerHTML = html;
   hydrateABCMaps();
 }
-
