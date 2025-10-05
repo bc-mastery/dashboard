@@ -168,53 +168,39 @@ export function enforceDownloadProtection() {
 }
 
 export function updateFloatingCTA(tab) {
-  const btn = document.getElementById("downloadBtn");
-  if (!btn) return;
+  const downloadBtn = document.getElementById("downloadBtn");
+  if (!downloadBtn) return;
 
-  const labelSpan = btn.querySelector("#downloadText");
-  const icon = btn.querySelector(".download-icon");
-  let pdf = state.dynamicPdfLinks[tab];
-  const d = (state.lastApiByTab[tab] && state.lastApiByTab[tab].data) || {};
+  const downloadText = document.getElementById("downloadText");
+  const downloadIcon = downloadBtn.querySelector('.download-icon');
 
-  if (tab === "growth" && !pdf && d && d.GS_OUTPUT) {
-    pdf = toDownloadLink(d.GS_OUTPUT);
-    state.dynamicPdfLinks.growth = pdf;
-  }
+  if (!downloadText || !downloadIcon) return;
 
-  let hasAccess = false;
-  if (tab === "targeting") {
-    hasAccess = d["TS_PAID"] || d["4PBS_PAID"];
-  } else if (["offer", "marketing", "sales"].includes(tab)) {
-    hasAccess = d["4PBS_PAID"];
-  } else {
-    hasAccess = true;
-  }
-
-  const labelMap = {
-    growth: "Growth Scan PDF",
-    targeting: "Targeting Strategy PDF",
-    offer: "Offer Strategy PDF",
-    marketing: "Marketing Strategy PDF",
-    sales: "Sales Strategy PDF",
-    mentoring: "Mentoring PDF",
-    knowledge: "Vault PDF",
+  const buttonTextMap = {
+    growth: "Growth Scan",
+    targeting: "Targeting Strategy",
+    offer: "Offer Strategy",
+    marketing: "Marketing Strategy",
+    sales: "Sales Strategy",
   };
-  const label = labelMap[tab] || "Strategy PDF";
 
-  if (pdf && hasAccess) {
-    btn.classList.remove("disabled");
-    btn.removeAttribute("aria-disabled");
-    btn.setAttribute("href", pdf);
-    btn.setAttribute("download", "");
-    if (labelSpan) labelSpan.textContent = label;
-    if (icon) icon.src = UI_ICONS.download;
+  const link = state.dynamicPdfLinks[tab];
+  downloadBtn.style.display = "inline-flex";
+
+  if (link) {
+    downloadBtn.href = link;
+    downloadBtn.target = "_self";
+    downloadBtn.classList.remove('disabled');
+    downloadIcon.style.display = 'inline-block';
+    downloadText.textContent = buttonTextMap[tab] || "Download";
+    downloadBtn.onclick = null;
   } else {
-    btn.classList.add("disabled");
-    btn.setAttribute("aria-disabled", "true");
-    btn.removeAttribute("href");
-    btn.removeAttribute("download");
-    if (labelSpan) labelSpan.textContent = `${label} not available`;
-    if (icon) icon.src = UI_ICONS.lock;
+    downloadBtn.href = "#";
+    downloadBtn.target = "";
+    downloadBtn.classList.add('disabled');
+    downloadIcon.style.display = 'none';
+    downloadText.textContent = "Strategy not available";
+    downloadBtn.onclick = (e) => e.preventDefault();
   }
 }
 
@@ -376,4 +362,3 @@ export function initBlockChipDelegation() {
     true
   );
 }
-
