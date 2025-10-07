@@ -219,7 +219,6 @@ export function populateBlockTabsFromPage() {
   const blockTabs = document.getElementById("blockTabs");
   if (!blockTabsRow || !blockTabs) return;
 
-  const cta = document.getElementById("downloadBtn");
   blockTabs.querySelectorAll(".blockBtn").forEach((el) => el.remove());
 
   const allBlocks = document.querySelectorAll(".scrollTarget");
@@ -246,10 +245,6 @@ export function populateBlockTabsFromPage() {
 
     blockTabs.appendChild(chip);
   });
-
-  if (cta && cta.parentElement === blockTabs) {
-    blockTabs.appendChild(cta);
-  }
 
   const hasChips = blockTabs.querySelectorAll(".blockBtn").length > 0;
   blockTabsRow.style.visibility = hasChips ? "visible" : "hidden";
