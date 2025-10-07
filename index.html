@@ -331,27 +331,29 @@
       
       /* --- START: NEW DESKTOP LAYOUT FOR CHIPS AND DOWNLOAD BUTTON --- */
       #blockTabsRow {
-        position: relative; /* Needed for pop-up positioning */
+        position: relative;
         display: flex;
         justify-content: space-between;
-        align-items: flex-start; /* Align items to the top */
+        align-items: center;
         gap: 16px;
-        padding-bottom: 6px; /* Adds space below the entire row */
+        padding-bottom: 6px;
+        flex-wrap: nowrap; /* Prevents the button from wrapping below the chips */
       }
       #blockTabs {
-        flex: 1 1 auto; /* Allow grow, shrink, and auto basis */
+        flex: 1 1 auto;
         display: flex;
-        flex-wrap: wrap; /* This is the key for chip wrapping */
-        gap: 6px; /* Defines space between chips and between lines of chips */
+        flex-wrap: wrap;
+        gap: 6px;
+        min-width: 0; /* Allows the container to shrink */
       }
       #downloadBtn.ctaDocked {
-        margin-left: auto; /* Pushes button to the right */
-        flex-shrink: 0; /* Prevents button from shrinking */
+        margin-left: auto;
+        flex-shrink: 0;
       }
       .download-popup {
         position: absolute;
-        top: 100%; /* Position below the button row */
-        right: 0; /* Align to the right of the row */
+        top: 100%;
+        right: 0;
         background: white;
         border-radius: 8px;
         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
