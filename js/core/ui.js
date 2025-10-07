@@ -247,7 +247,11 @@ export function populateBlockTabsFromPage() {
   });
 
   const hasChips = blockTabs.querySelectorAll(".blockBtn").length > 0;
-  blockTabsRow.style.visibility = hasChips ? "visible" : "hidden";
+  
+  // THIS IS THE FIX: Only change visibility on desktop to prevent the "jump" on mobile.
+  if (window.matchMedia("(min-width: 769px)").matches) {
+    blockTabsRow.style.visibility = hasChips ? "visible" : "hidden";
+  }
 
   enforceDownloadProtection();
 
