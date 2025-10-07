@@ -19,7 +19,7 @@ See your complete Audience Map — order the 4-Pillar Business Strategy or book 
 The complete blueprint defines value positioning, retention levers, emotional anchors, and pricing psychology — the combination that makes an offer irresistible to your ideal audience.
 Without these details, your offer may be clear, but not compelling enough to outshine alternatives.
 
-View your full Offer Blueprint — upgrade to the 4-Pillar Business Strategy or schedule a short strategy call to explore the missing pieces.`,
+View your full Offer Blueprint — upgrade to the 4-Pillar Accelerator Strategy or schedule a short strategy call to explore the missing pieces.`,
   },
   marketing: {
     title: "Your Marketing Framework — Just the Starting Point",
@@ -27,7 +27,7 @@ View your full Offer Blueprint — upgrade to the 4-Pillar Business Strategy or 
 The complete framework reveals channel prioritization, content triggers, campaign timing, and message sequencing — a precision map for getting the right message to the right people at the right time.
 Without it, your marketing may reach people — but miss the critical moments when they’re most ready to engage.
 
-Access your complete Marketing Framework — get the 4-Pillar Business Strategy or book a quick consultation to see the full plan in action.`,
+Access your complete Marketing Framework — unlock your 4-Pillar Accelerator Strategy or book a quick consultation to see the full plan in action.`,
   },
   sales: {
     title: "Your Sales Strategy — First Step in the Journey",
@@ -35,7 +35,7 @@ Access your complete Marketing Framework — get the 4-Pillar Business Strategy 
 The complete view includes objection handling, relationship progression, persuasion timing, and follow-up psychology — the tools to move prospects from interested to committed.
 Without these, sales conversations risk stalling before they reach a decision point.
 
-Unlock your full Sales Strategy — order the 4-Pillar Business Strategy or reserve a strategic call to review the complete journey.`,
+Unlock your full Sales Strategy — order the 4-Pillar Accelerator Strategy or reserve a strategic call to review the complete journey.`,
   },
 };
 
@@ -107,3 +107,4 @@ export function hydrateABCMaps() {
     setABCMap({ container, mode: m, areas: a, overlayPath });
   });
 }
+
