@@ -225,8 +225,8 @@ export function populateBlockTabsFromPage() {
   const blockTabs = document.getElementById("blockTabs");
   if (!blockTabsRow || !blockTabs) return;
 
-  // --- START: MODIFIED CODE ---
-  // Use a DocumentFragment to build the new chips off-DOM, preventing layout shift.
+  // --- START: THE REAL FIX ---
+  // Use a DocumentFragment to build the new chips off-DOM. This is the key.
   const fragment = document.createDocumentFragment();
   const allBlocks = document.querySelectorAll(".scrollTarget");
 
@@ -242,7 +242,8 @@ export function populateBlockTabsFromPage() {
     chip.type = "button";
     chip.dataset.target = `#${id}`;
     chip.textContent = title;
-
+    
+    // We can add the event listener here directly
     chip.addEventListener("click", (ev) => {
         ev.preventDefault();
         ev.stopPropagation();
@@ -254,11 +255,11 @@ export function populateBlockTabsFromPage() {
     fragment.appendChild(chip);
   });
 
-  // Use .replaceChildren() for a single, atomic DOM update.
+  // Now, perform a single, atomic DOM update. This prevents the layout jump.
   blockTabs.replaceChildren(fragment);
-  // --- END: MODIFIED CODE ---
+  // --- END: THE REAL FIX ---
 
-  const hasChips = blockTabs.querySelectorAll(".blockBtn").length > 0;
+  const hasChips = blockTabs.hasChildNodes();
   blockTabsRow.style.visibility = hasChips ? "visible" : "hidden";
 
   enforceDownloadProtection();
