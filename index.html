@@ -15,7 +15,8 @@
       --bc-mint:#B4FDE5; --bc-white:#FFFFFF; --bc-red:#D34B4B;
       --headerBarH: 60px;
       --headerTabsH: 40px;
-      --headerH: calc(var(--headerBarH) + var(--headerTabsH) + 44px);
+      /* Increased header height to accommodate the new button row */
+      --headerH: calc(var(--headerBarH) + var(--headerTabsH) + 84px);
       --primaryTabW: 128px; --primaryTabH: 28px;
     }
 
@@ -207,7 +208,8 @@
     #blockTabs{ display:flex; flex-wrap:wrap; gap:4px; justify-content:flex-start; }
     .tabsRow, #blockTabsRow, #blockTabs { position: relative; z-index: 5; pointer-events: auto; }
     #blockTabs .blockBtn { position: relative; z-index: 6; pointer-events: auto; }
-    #blockTabsRow .floatingCTA { position: static !important; z-index: 4; top:auto; right:auto; display:inline-flex !important; align-items:center; gap:6px; padding:4px 10px; font-size:10px; line-height:1; border-radius:10px; height:auto; margin-left:6px; }
+    
+    /* REMOVED OLD DOCKED BUTTON RULE */
 
     .blockBtn {
       -webkit-appearance: none; appearance: none; font-family: Inter, system-ui, sans-serif;
@@ -246,14 +248,30 @@
     .btn-outline { background-color: transparent; color: var(--bc-teal); border-color: var(--bc-teal); }
     .btn-outline:hover { background-color: var(--bc-teal); color: var(--bc-white); transform: translateY(-1px); }
 
+    /* --- NEW: DOWNLOAD CONTAINER AND BUTTON STYLES --- */
+    #download-container {
+      display: flex;
+      justify-content: flex-start; /* Or 'center' if you prefer */
+      padding: 6px 0; /* Vertical padding */
+    }
+    
     .floatingCTA {
-      position: fixed; top: calc(var(--headerBarH) + 4px); right: 8px; z-index: 1100;
-      display:flex; align-items:center; justify-content:center; height:20px; padding:0 10px;
-      border:2px solid transparent;
-      border-radius:12px;
+      /* This is the main download button style now */
+      position: static;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      height: auto;
+      padding: 8px 16px;
+      border: 2px solid transparent;
+      border-radius: 12px;
       background: #024d4f;
-      color:var(--bc-white);
-      font-size:12px; font-weight:600; letter-spacing:0.2px; cursor:pointer; text-decoration:none;
+      color: var(--bc-white);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      cursor: pointer;
+      text-decoration: none;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), 0 4px 8px rgba(0,0,0,0.15), 0 1px 0 rgba(0,0,0,0.04);
       transition: transform 0.05s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
     }
@@ -267,7 +285,8 @@
       cursor: not-allowed;
       opacity: 0.7;
     }
-    .download-icon { width:12px; height:12px; margin-right:6px; flex-shrink:0; display:inline-block; }
+    .download-icon { width:14px; height:14px; margin:0; flex-shrink:0; display:inline-block; }
+    /* --- END NEW STYLES --- */
 
     .scrollTarget, [id^="block-"] { scroll-margin-top: calc(var(--headerH) + 11px); }
     body { display:flex; min-height:100vh; flex-direction:column; }
@@ -355,10 +374,20 @@
       #blockTabs .blockBtn{ display:none !important; }
       #blockTabsRow{ display:block; padding-top:0; }
       #blockTabs{ display:block; }
-      #blockTabsRow .floatingCTA{
-        display:block !important; width:auto; max-width:480px; box-sizing:border-box;
-        margin:8px auto 12px; text-align:center; font-size:13px;
-        padding:10px 14px; border-radius:8px;
+      
+      /* Center the download button on mobile */
+      #download-container {
+        justify-content: center;
+        padding: 8px 0 12px;
+      }
+      .floatingCTA {
+        width:auto; 
+        max-width:480px; 
+        box-sizing:border-box;
+        text-align:center; 
+        font-size:13px;
+        padding:10px 14px; 
+        border-radius:8px;
       }
 
       .main{ padding-top: calc(var(--headerH) - 40px); }
@@ -396,7 +425,7 @@
 
     .siteHeader { z-index: 4000; }
     .siteHeader .panel { pointer-events: auto; }
-    #tabs, #tabs .tabBtn, #blockTabsRow, #blockTabs, #blockTabs .blockBtn, #blockTabsRow .floatingCTA { pointer-events: auto; }
+    #tabs, #tabs .tabBtn, #blockTabsRow, #blockTabs, #blockTabs .blockBtn, #download-container, #download-container a { pointer-events: auto; }
     #blockTabsRow, #blockTabs { position: relative; z-index: 4001; }
     #blockTabs .blockBtn { z-index: 4002; }
 
@@ -500,11 +529,13 @@
           </div>
           <div class="tabs" id="blockTabsRow">
             <div id="blockTabs">
-              <a id="downloadBtn" class="floatingCTA ctaDocked" target="_self" href="#">
-                <img src="./assets/icons/Icon_download.png" class="download-icon" alt="">
-                <span id="downloadText">Download PDF</span>
-              </a>
-            </div>
+              </div>
+          </div>
+          <div id="download-container">
+            <a id="downloadBtn" class="floatingCTA" target="_self" href="#">
+              <img src="./assets/icons/Icon_download.png" class="download-icon" alt="">
+              <span id="downloadText">Download PDF</span>
+            </a>
           </div>
         </div>
       </div>
