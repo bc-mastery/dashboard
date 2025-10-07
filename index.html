@@ -207,8 +207,6 @@
     #blockTabs{ display:flex; flex-wrap:wrap; gap:4px; justify-content:flex-start; }
     .tabsRow, #blockTabsRow, #blockTabs { position: relative; z-index: 5; pointer-events: auto; }
     #blockTabs .blockBtn { position: relative; z-index: 6; pointer-events: auto; }
-    
-    /* This rule below is a legacy rule for the download button. We will override it for desktop in the media query. */
     #blockTabsRow .floatingCTA { position: static !important; z-index: 4; top:auto; right:auto; display:inline-flex !important; align-items:center; gap:6px; padding:4px 10px; font-size:10px; line-height:1; border-radius:10px; height:auto; margin-left:6px; }
 
     .blockBtn {
@@ -331,20 +329,28 @@
         line-height: 1;
       }
       
-      /* --- START: THE DEFINITIVE FIX FOR THE DOWNLOAD BUTTON --- */
+      /* --- START: RESILIENT FIX FOR THE DOWNLOAD BUTTON JUMP --- */
       #blockTabsRow {
         display: flex;
         align-items: center;
+        flex-wrap: nowrap;   /* This is the most critical part: PREVENT WRAPPING. */
         gap: 16px;
       }
 
-      /* No special rules needed for #blockTabs, it will just take the space it needs */
+      #blockTabs {
+        flex-grow: 1;       /* Tell the chips container to take all available space. */
+        min-width: 0;       /* A flexbox trick to allow it to shrink below its content size. */
+        
+        /* These rules are for the chips *inside* this container, allowing them to wrap. */
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
 
       #downloadBtn.ctaDocked {
-        margin-left: auto;   /* THIS IS THE KEY: It pushes the button to the far right. */
-        flex-shrink: 0;     /* Prevents the button from being squished */
+        flex-shrink: 0;     /* Prevent the download button from getting squished. */
       }
-      /* --- END: THE DEFINITIVE FIX --- */
+      /* --- END: RESILIENT FIX --- */
       
       .download-popup {
         position: absolute;
