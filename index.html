@@ -383,13 +383,13 @@
       }
 
       #blockTabs .blockBtn{ display:none !important; }
-      #blockTabsRow{ display:block; padding-top:0; }
-      #blockTabs{ display:block; }
+      /* THIS IS THE FIX: HIDE THE EMPTY CONTAINER */
+      #blockTabsRow { display: none; }
       
       /* Center the download button on mobile */
       #download-container {
         justify-content: center;
-        padding: 4px 0 8px;
+        padding-top: 8px;
         margin-top: 0; /* Reset negative margin for mobile */
       }
       .floatingCTA {
