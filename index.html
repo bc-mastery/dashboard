@@ -204,12 +204,10 @@
       z-index: 1; transition: background 200ms ease;
     }
     
-    #blockTabsRow { min-height:42px; display:flex; align-items:center; flex-wrap:wrap; padding-top:2px; padding-bottom:0; gap:6px; }
+    #blockTabsRow { min-height:30px; display:flex; align-items:center; flex-wrap:wrap; padding-top:2px; padding-bottom:0; gap:6px; }
     #blockTabs{ display:flex; flex-wrap:wrap; gap:4px; justify-content:flex-start; }
     .tabsRow, #blockTabsRow, #blockTabs { position: relative; z-index: 5; pointer-events: auto; }
     #blockTabs .blockBtn { position: relative; z-index: 6; pointer-events: auto; }
-    
-    /* REMOVED OLD DOCKED BUTTON RULE */
 
     .blockBtn {
       -webkit-appearance: none; appearance: none; font-family: Inter, system-ui, sans-serif;
@@ -252,7 +250,7 @@
     #download-container {
       display: flex;
       justify-content: flex-start; /* Or 'center' if you prefer */
-      padding: 6px 0; /* Vertical padding */
+      padding: 0; /* Spacing is handled by .tabsRow gap property */
     }
     
     .floatingCTA {
@@ -260,32 +258,44 @@
       position: static;
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px; /* Space between icon and text */
       height: auto;
-      padding: 8px 16px;
+      padding: 4px 10px; /* Matched to chip vertical padding */
       border: 2px solid transparent;
-      border-radius: 12px;
+      border-radius: 8px; /* Matched to chip border-radius */
       background: #024d4f;
       color: var(--bc-white);
-      font-size: 13px;
+      font-size: 11px; /* Matched to chip font-size */
       font-weight: 600;
       letter-spacing: 0.2px;
       cursor: pointer;
       text-decoration: none;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), 0 4px 8px rgba(0,0,0,0.15), 0 1px 0 rgba(0,0,0,0.04);
-      transition: transform 0.05s ease, box-shadow 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.1);
+      transition: transform 0.05s ease, box-shadow 0.2s ease, background-color 0.2s ease;
     }
     .floatingCTA:hover {
       background: #333333;
       color: var(--bc-white);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
     }
-    .floatingCTA:active { transform: translateY(1px); background:#d5d5d5; box-shadow: inset 0 1px 3px rgba(0,0,0,0.2), 0 1px 1px rgba(0,0,0,0.08); }
+    .floatingCTA:active { 
+      transform: translateY(1px); 
+      background: #111; 
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.2); 
+    }
     .floatingCTA.disabled {
       background: #aaa;
       cursor: not-allowed;
       opacity: 0.7;
     }
-    .download-icon { width:14px; height:14px; margin:0; flex-shrink:0; display:inline-block; }
+    .download-icon { 
+      width: 12px; 
+      height: 12px; 
+      margin: 0; 
+      flex-shrink: 0; 
+      display: inline-block; 
+    }
     /* --- END NEW STYLES --- */
 
     .scrollTarget, [id^="block-"] { scroll-margin-top: calc(var(--headerH) + 11px); }
