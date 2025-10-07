@@ -334,8 +334,9 @@
         position: relative; /* Needed for pop-up positioning */
         display: flex;
         justify-content: space-between;
-        align-items: flex-start; /* Align to the top */
+        align-items: flex-start; /* Aligns items to the top if they wrap */
         gap: 16px;
+        flex-wrap: wrap; /* Allows chips to wrap to a new line */
       }
       #blockTabs {
         flex-grow: 1; /* Allows chips to take up available space and wrap */
