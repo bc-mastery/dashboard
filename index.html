@@ -15,8 +15,8 @@
       --bc-mint:#B4FDE5; --bc-white:#FFFFFF; --bc-red:#D34B4B;
       --headerBarH: 60px;
       --headerTabsH: 40px;
-      /* Adjusted header height for the 2px upward shift */
-      --headerH: calc(var(--headerBarH) + var(--headerTabsH) + 84px);
+      /* Final header height adjustment */
+      --headerH: calc(var(--headerBarH) + var(--headerTabsH) + 88px);
       --primaryTabW: 128px; --primaryTabH: 28px;
     }
 
@@ -246,12 +246,12 @@
     .btn-outline { background-color: transparent; color: var(--bc-teal); border-color: var(--bc-teal); }
     .btn-outline:hover { background-color: var(--bc-teal); color: var(--bc-white); transform: translateY(-1px); }
 
-    /* --- NEW: DOWNLOAD CONTAINER AND BUTTON STYLES --- */
+    /* --- FINAL DOWNLOAD CONTAINER AND BUTTON STYLES --- */
     #download-container {
       display: flex;
       justify-content: flex-start; /* Or 'center' if you prefer */
-      padding-bottom: 6px;
-      margin-top: -2px; /* This moves the button up by 2px */
+      padding-bottom: 12px; /* Final padding value */
+      margin-top: -4px; /* Final margin value */
     }
     
     .floatingCTA {
@@ -297,7 +297,7 @@
       flex-shrink: 0; 
       display: inline-block; 
     }
-    /* --- END NEW STYLES --- */
+    /* --- END STYLES --- */
 
     .scrollTarget, [id^="block-"] { scroll-margin-top: calc(var(--headerH) + 11px); }
     body { display:flex; min-height:100vh; flex-direction:column; }
