@@ -167,47 +167,41 @@ export function enforceDownloadProtection() {
   cta.style.display = allowed ? "inline-flex" : "none";
 }
 
-/**
- * NEW LOGIC: This function now only controls the visibility and state of the main download button.
- * The pop-up logic is handled separately in the event listener.
- */
 export function updateFloatingCTA(tab) {
-    const downloadBtn = document.getElementById("downloadBtn");
-    if (!downloadBtn) return;
+  const downloadBtn = document.getElementById("downloadBtn");
+  if (!downloadBtn) return;
 
-    const downloadText = document.getElementById("downloadText");
-    if (!downloadText) return;
+  const downloadText = document.getElementById("downloadText");
+  const downloadIcon = downloadBtn.querySelector('.download-icon');
 
-    // Define all potential PDF sources for all tabs.
-    // When you have a second PDF, add its key here, e.g., { key: 'M_SUMMARY_OUTPUT', label: 'Download Summary' }
-    const potentialPdfs = {
-        growth: [{ key: 'GS_OUTPUT', label: 'Download Growth Scan' }],
-        targeting: [{ key: 'T_STRATEGY_OUTPUT', label: 'Download Targeting Strategy' }],
-        offer: [{ key: 'O_STRATEGY_OUTPUT', label: 'Download Offer Strategy' }],
-        marketing: [{ key: 'M_STRATEGY_OUTPUT', label: 'Download Marketing Strategy' }],
-        sales: [{ key: 'S_STRATEGY_OUTPUT', label: 'Download Sales Strategy' }],
-    };
+  if (!downloadText || !downloadIcon) return;
 
-    const sources = potentialPdfs[tab] || [];
-    const data = state.lastApiByTab[tab]?.data || {};
-    
-    // Check if at least one valid PDF link exists for the current tab.
-    const hasDownloads = sources.some(source => {
-        const rawLink = data[source.key];
-        return !!toDownloadLink(rawLink);
-    });
+  const buttonTextMap = {
+    growth: "Growth Scan",
+    targeting: "Targeting Strategy",
+    offer: "Offer Strategy",
+    marketing: "Marketing Strategy",
+    sales: "Sales Strategy",
+  };
 
-    downloadBtn.style.display = "inline-flex"; // Always show the button structure
+  const link = state.dynamicPdfLinks[tab];
+  downloadBtn.style.display = "inline-flex";
 
-    if (hasDownloads) {
-        downloadBtn.classList.remove('disabled');
-        downloadBtn.setAttribute('aria-disabled', 'false');
-        downloadText.textContent = "Download"; // Generic text
-    } else {
-        downloadBtn.classList.add('disabled');
-        downloadBtn.setAttribute('aria-disabled', 'true');
-        downloadText.textContent = "Not Available"; // Or "Download" if you prefer
-    }
+  if (link) {
+    downloadBtn.href = link;
+    downloadBtn.target = "_self";
+    downloadBtn.classList.remove('disabled');
+    downloadIcon.style.display = 'inline-block';
+    downloadText.textContent = buttonTextMap[tab] || "Download";
+    downloadBtn.onclick = null;
+  } else {
+    downloadBtn.href = "#";
+    downloadBtn.target = "";
+    downloadBtn.classList.add('disabled');
+    downloadIcon.style.display = 'none';
+    downloadText.textContent = "Strategy not available";
+    downloadBtn.onclick = (e) => e.preventDefault();
+  }
 }
 
 /* --------------------------------- Scrolling -------------------------------- */
@@ -225,11 +219,10 @@ export function populateBlockTabsFromPage() {
   const blockTabs = document.getElementById("blockTabs");
   if (!blockTabsRow || !blockTabs) return;
 
-  // --- START: THE REAL FIX ---
-  // Use a DocumentFragment to build the new chips off-DOM. This is the key.
-  const fragment = document.createDocumentFragment();
-  const allBlocks = document.querySelectorAll(".scrollTarget");
+  const cta = document.getElementById("downloadBtn");
+  blockTabs.querySelectorAll(".blockBtn").forEach((el) => el.remove());
 
+  const allBlocks = document.querySelectorAll(".scrollTarget");
   allBlocks.forEach((block) => {
     const title =
       block.querySelector(".sectionTitle")?.textContent?.trim() ||
@@ -242,8 +235,7 @@ export function populateBlockTabsFromPage() {
     chip.type = "button";
     chip.dataset.target = `#${id}`;
     chip.textContent = title;
-    
-    // We can add the event listener here directly
+
     chip.addEventListener("click", (ev) => {
         ev.preventDefault();
         ev.stopPropagation();
@@ -252,14 +244,14 @@ export function populateBlockTabsFromPage() {
       }, { capture: true }
     );
 
-    fragment.appendChild(chip);
+    blockTabs.appendChild(chip);
   });
 
-  // Now, perform a single, atomic DOM update. This prevents the layout jump.
-  blockTabs.replaceChildren(fragment);
-  // --- END: THE REAL FIX ---
+  if (cta && cta.parentElement === blockTabs) {
+    blockTabs.appendChild(cta);
+  }
 
-  const hasChips = blockTabs.hasChildNodes();
+  const hasChips = blockTabs.querySelectorAll(".blockBtn").length > 0;
   blockTabsRow.style.visibility = hasChips ? "visible" : "hidden";
 
   enforceDownloadProtection();
@@ -268,97 +260,73 @@ export function populateBlockTabsFromPage() {
   activateScrollSpy();
 }
 
-
-/* ------------------- NEW: Manages the download button and its pop-up --------------- */
+/* ------------------- Make the download button self-sufficient --------------- */
 export function initDownloadButtonIsolation() {
-    const btn = document.getElementById("downloadBtn");
-    if (!btn) return;
+  const btn = document.getElementById("downloadBtn");
+  if (!btn) return;
 
-    // A function to close any open popup
-    const closePopup = () => {
-        const existingPopup = document.querySelector('.download-popup');
-        if (existingPopup) {
-            existingPopup.remove();
+  btn.classList.remove("tabBtn");
+  btn.removeAttribute("data-tab");
+  btn.setAttribute("target", "_self");
+  btn.setAttribute("rel", "noopener");
+
+  const clean = btn.cloneNode(true);
+  clean.id = btn.id;
+
+  btn.replaceWith(clean);
+
+  clean.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const tab = state.currentTab;
+    let link = state.dynamicPdfLinks[tab];
+
+    if (!link) {
+      const data = state.lastApiByTab[tab]?.data || {};
+      const fieldMap = {
+        targeting: "T_STRATEGY_OUTPUT",
+        offer: "O_STRATEGY_OUTPUT",
+        marketing: "M_STRATEGY_OUTPUT",
+        sales: "S_STRATEGY_OUTPUT",
+        growth: "GS_OUTPUT",
+        mentoring: "MENTORING_STRATEGY_OUTPUT",
+        knowledge: "KNOWLEDGE_STRATEGY_OUTPUT",
+      };
+
+      const fallbacks = {
+        growth: ["GS_OUTPUT", "GROWTH_STRATEGY_OUTPUT"],
+        knowledge: ["KNOWLEDGE_OUTPUT", "K_MASTER_PDF", "KNOWLEDGE_PDF", "KNOWLEDGE_STRATEGY_OUTPUT"],
+      };
+
+      const primaryField = fieldMap[tab];
+      let raw = primaryField ? data[primaryField] : "";
+
+      if (!raw && fallbacks[tab]) {
+        for (const k of fallbacks[tab]) {
+          if (data[k]) { raw = data[k]; break; }
         }
-    };
+      }
 
-    btn.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
+      if (raw) {
+        link = toDownloadLink(raw);
+        state.dynamicPdfLinks[tab] = link;
+        updateFloatingCTA(tab);
+      }
+    }
 
-        // If the button is disabled, do nothing
-        if (btn.classList.contains('disabled')) {
-            return;
-        }
-
-        // If a popup is already open, this click should close it and do nothing else.
-        const existingPopup = document.querySelector('.download-popup');
-        if (existingPopup) {
-            closePopup();
-            return;
-        }
-
-        const tab = state.currentTab;
-        const data = state.lastApiByTab[tab]?.data || {};
-        
-        // Define all known PDF sources here. This makes it easy to add more later.
-        const pdfSources = {
-            growth: [{ key: 'GS_OUTPUT', label: 'Download Growth Scan' }],
-            targeting: [{ key: 'T_STRATEGY_OUTPUT', label: 'Download Targeting Strategy' }],
-            offer: [{ key: 'O_STRATEGY_OUTPUT', label: 'Download Offer Strategy' }],
-            marketing: [{ key: 'M_STRATEGY_OUTPUT', label: 'Download Marketing Strategy' }],
-            // Example for when you add a second PDF:
-            // marketing: [
-            //   { key: 'M_STRATEGY_OUTPUT', label: 'Download Full Strategy' },
-            //   { key: 'M_SUMMARY_OUTPUT', label: 'Download Summary' }
-            // ],
-            sales: [{ key: 'S_STRATEGY_OUTPUT', label: 'Download Sales Strategy' }],
-        };
-
-        const availableDownloads = (pdfSources[tab] || [])
-            .map(source => {
-                const rawLink = data[source.key];
-                const finalLink = toDownloadLink(rawLink);
-                return finalLink ? { url: finalLink, label: source.label } : null;
-            })
-            .filter(Boolean); // Filter out any nulls
-
-        if (availableDownloads.length === 0) {
-            console.warn("Download button clicked, but no links found for tab:", tab);
-            return;
-        }
-
-        // If there's only one link, just trigger the download directly
-        if (availableDownloads.length === 1) {
-            window.location.href = availableDownloads[0].url;
-            return;
-        }
-        
-        // If there are multiple links, create and show the pop-up
-        const popup = document.createElement('div');
-        popup.className = 'download-popup';
-
-        availableDownloads.forEach(download => {
-            const link = document.createElement('a');
-            link.href = download.url;
-            link.textContent = download.label;
-            link.target = '_self'; // Ensure it doesn't open a new tab
-            popup.appendChild(link);
-        });
-
-        const parent = btn.closest('#blockTabsRow');
-        if(parent) parent.appendChild(popup);
-
-        // Add a one-time event listener to close the popup when clicking anywhere else
-        setTimeout(() => {
-            document.addEventListener('click', function closeHandler(event) {
-                if (!popup.contains(event.target)) {
-                    closePopup();
-                    document.removeEventListener('click', closeHandler);
-                }
-            });
-        }, 100);
-    });
+    if (link) {
+      const a = document.createElement("a");
+      a.href = link;
+      a.download = "";
+      a.style.display = "none";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    } else {
+      console.warn("No valid PDF data returned for tab:", tab);
+    }
+  });
 }
 
 export function initBlockChipDelegation() {
