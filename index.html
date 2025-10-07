@@ -328,67 +328,18 @@
         padding: 0 10px;
         line-height: 1;
       }
-      
-      /* --- START: RESILIENT FIX FOR THE DOWNLOAD BUTTON JUMP --- */
-      #blockTabsRow {
-        display: flex;
-        align-items: center;
-        flex-wrap: nowrap;   /* This is the most critical part: PREVENT WRAPPING. */
-        gap: 16px;
-      }
-
-      #blockTabs {
-        flex-grow: 1;       /* Tell the chips container to take all available space. */
-        min-width: 0;       /* A flexbox trick to allow it to shrink below its content size. */
-        
-        /* These rules are for the chips *inside* this container, allowing them to wrap. */
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-      }
-
-      #downloadBtn.ctaDocked {
-        flex-shrink: 0;     /* Prevent the download button from getting squished. */
-      }
-      /* --- END: RESILIENT FIX --- */
-      
-      .download-popup {
-        position: absolute;
-        top: 100%;
-        right: 0;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        border: 1px solid #ddd;
-        z-index: 1200;
-        min-width: 220px;
-        padding: 8px;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
-      }
-      .download-popup a {
-        display: block;
-        padding: 8px 12px;
-        text-decoration: none;
-        color: var(--bc-dark);
-        border-radius: 6px;
-        font-size: 13px;
-        font-weight: 500;
-      }
-      .download-popup a:hover {
-        background-color: #f0f0f0;
-        color: var(--bc-teal);
-      }
     }
     
     /* ====================== MOBILE-ONLY OVERRIDES ====================== */
     @media (max-width: 768px){
       .siteHeader{ position: sticky; top: 0; }
-      .bar{ grid-template-columns: 1fr; }
-      .brandName{ display: none; }
+      .bar{ grid-template-columns: 1fr 1fr; }
+      .brandName{
+        font-size:12px; line-height:1.2; max-width:42vw;
+        white-space:nowrap; overflow:hidden; text-overflow:ellipsis; justify-self:end;
+      }
       .titleBlock img{ width:24px; height:24px; }
-      .pageTitle{ font-size: clamp(18px, 4.6vw, 22px); }
+      .pageTitle{ font-size: clamp(18px, 4.6vw, 22px); max-width:50vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
       :root{ --headerBarH: 44px; --headerTabsH: 0px; --headerH: calc(var(--headerBarH) + 16px); }
 
       #tabs{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width:100%; }
@@ -549,11 +500,11 @@
           </div>
           <div class="tabs" id="blockTabsRow">
             <div id="blockTabs">
-              </div>
-            <a id="downloadBtn" class="floatingCTA ctaDocked" href="#">
-              <img src="./assets/icons/Icon_download.png" class="download-icon" alt="">
-              <span id="downloadText">Download</span>
-            </a>
+              <a id="downloadBtn" class="floatingCTA ctaDocked" target="_self" href="#">
+                <img src="./assets/icons/Icon_download.png" class="download-icon" alt="">
+                <span id="downloadText">Download PDF</span>
+              </a>
+            </div>
           </div>
         </div>
       </div>
