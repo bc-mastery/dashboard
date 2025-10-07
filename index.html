@@ -15,8 +15,8 @@
       --bc-mint:#B4FDE5; --bc-white:#FFFFFF; --bc-red:#D34B4B;
       --headerBarH: 60px;
       --headerTabsH: 40px;
-      /* Adjusted header height to account for the new bottom padding */
-      --headerH: calc(var(--headerBarH) + var(--headerTabsH) + 90px);
+      /* Adjusted header height to account for the tighter gap */
+      --headerH: calc(var(--headerBarH) + var(--headerTabsH) + 86px);
       --primaryTabW: 128px; --primaryTabH: 28px;
     }
 
@@ -70,7 +70,7 @@
       -webkit-line-clamp: 2; line-height:1.25;
     }
 
-    .tabsRow { display:flex; flex-direction:column; gap:6px; padding-top:2px; padding-bottom:0; }
+    .tabsRow { display:flex; flex-direction:column; gap:4px; padding-top:2px; padding-bottom:0; }
 
     /* --- START: FINAL BUTTON STYLING --- */
     .tabBtn {
