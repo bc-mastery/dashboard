@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-f-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Strategy Dashboard</title>
 
@@ -333,13 +333,10 @@
     /* ====================== MOBILE-ONLY OVERRIDES ====================== */
     @media (max-width: 768px){
       .siteHeader{ position: sticky; top: 0; }
-      .bar{ grid-template-columns: 1fr 1fr; }
-      .brandName{
-        font-size:12px; line-height:1.2; max-width:42vw;
-        white-space:nowrap; overflow:hidden; text-overflow:ellipsis; justify-self:end;
-      }
+      .bar{ grid-template-columns: 1fr; }
+      .brandName{ display: none; }
       .titleBlock img{ width:24px; height:24px; }
-      .pageTitle{ font-size: clamp(18px, 4.6vw, 22px); max-width:50vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+      .pageTitle{ font-size: clamp(18px, 4.6vw, 22px); }
       :root{ --headerBarH: 44px; --headerTabsH: 0px; --headerH: calc(var(--headerBarH) + 16px); }
 
       #tabs{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width:100%; }
