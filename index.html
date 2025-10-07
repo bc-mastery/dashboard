@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-f-8" />
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Strategy Dashboard</title>
 
@@ -328,6 +328,51 @@
         padding: 0 10px;
         line-height: 1;
       }
+      
+      /* --- START: NEW DESKTOP LAYOUT FOR CHIPS AND DOWNLOAD BUTTON --- */
+      #blockTabsRow {
+        position: relative; /* Needed for pop-up positioning */
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start; /* Align to the top */
+        gap: 16px;
+      }
+      #blockTabs {
+        flex-grow: 1; /* Allows chips to take up available space and wrap */
+      }
+      #downloadBtn.ctaDocked {
+        margin-left: auto; /* Pushes button to the right */
+        flex-shrink: 0; /* Prevents button from shrinking */
+      }
+      .download-popup {
+        position: absolute;
+        top: 100%; /* Position below the button row */
+        right: 0; /* Align to the right of the row */
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        border: 1px solid #ddd;
+        z-index: 1200;
+        min-width: 220px;
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .download-popup a {
+        display: block;
+        padding: 8px 12px;
+        text-decoration: none;
+        color: var(--bc-dark);
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+      }
+      .download-popup a:hover {
+        background-color: #f0f0f0;
+        color: var(--bc-teal);
+      }
+      /* --- END: NEW DESKTOP LAYOUT --- */
     }
     
     /* ====================== MOBILE-ONLY OVERRIDES ====================== */
@@ -497,11 +542,11 @@
           </div>
           <div class="tabs" id="blockTabsRow">
             <div id="blockTabs">
-              <a id="downloadBtn" class="floatingCTA ctaDocked" target="_self" href="#">
-                <img src="./assets/icons/Icon_download.png" class="download-icon" alt="">
-                <span id="downloadText">Download PDF</span>
-              </a>
-            </div>
+              </div>
+            <a id="downloadBtn" class="floatingCTA ctaDocked" href="#">
+              <img src="./assets/icons/Icon_download.png" class="download-icon" alt="">
+              <span id="downloadText">Download</span>
+            </a>
           </div>
         </div>
       </div>
