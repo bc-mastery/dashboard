@@ -15,8 +15,8 @@
       --bc-mint:#B4FDE5; --bc-white:#FFFFFF; --bc-red:#D34B4B;
       --headerBarH: 60px;
       --headerTabsH: 40px;
-      /* Final header height adjustment */
-      --headerH: calc(var(--headerBarH) + var(--headerTabsH) + 88px);
+      /* Adjusted header height for the 2px upward shift */
+      --headerH: calc(var(--headerBarH) + var(--headerTabsH) + 84px);
       --primaryTabW: 128px; --primaryTabH: 28px;
     }
 
@@ -250,8 +250,8 @@
     #download-container {
       display: flex;
       justify-content: flex-start; /* Or 'center' if you prefer */
-      padding-bottom: 12px; /* Final padding value */
-      margin-top: -4px; /* Final margin value */
+      padding-bottom: 6px;
+      margin-top: -4px; /* This moves the button up by 2px */
     }
     
     .floatingCTA {
@@ -389,7 +389,7 @@
       /* Center the download button on mobile */
       #download-container {
         justify-content: center;
-        padding: 8px 0 12px;
+        padding: 4px 0 8px;
         margin-top: 0; /* Reset negative margin for mobile */
       }
       .floatingCTA {
