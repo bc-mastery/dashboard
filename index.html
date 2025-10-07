@@ -207,6 +207,8 @@
     #blockTabs{ display:flex; flex-wrap:wrap; gap:4px; justify-content:flex-start; }
     .tabsRow, #blockTabsRow, #blockTabs { position: relative; z-index: 5; pointer-events: auto; }
     #blockTabs .blockBtn { position: relative; z-index: 6; pointer-events: auto; }
+    
+    /* This rule below is a legacy rule for the download button. We will override it for desktop in the media query. */
     #blockTabsRow .floatingCTA { position: static !important; z-index: 4; top:auto; right:auto; display:inline-flex !important; align-items:center; gap:6px; padding:4px 10px; font-size:10px; line-height:1; border-radius:10px; height:auto; margin-left:6px; }
 
     .blockBtn {
@@ -329,29 +331,20 @@
         line-height: 1;
       }
       
-      /* --- START: REVISED DESKTOP LAYOUT FOR CHIPS AND DOWNLOAD BUTTON --- */
+      /* --- START: THE DEFINITIVE FIX FOR THE DOWNLOAD BUTTON --- */
       #blockTabsRow {
-        display: flex;          /* Establishes the flex container */
-        align-items: center;    /* Vertically aligns the chips and button */
-        flex-wrap: nowrap;      /* CRITICAL: Prevents the button from ever wrapping below */
-        gap: 16px;              /* Maintains space between the two items */
+        display: flex;
+        align-items: center;
+        gap: 16px;
       }
 
-      #blockTabs {
-        flex-grow: 1;           /* KEY: Makes the chip container expand to fill all free space */
-        min-width: 0;           /* A flexbox trick to allow shrinking even if content is wide */
-        
-        /* These existing rules for the chips inside are still correct */
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-      }
+      /* No special rules needed for #blockTabs, it will just take the space it needs */
 
       #downloadBtn.ctaDocked {
-        flex-shrink: 0;         /* Prevents the download button from shrinking or being squished */
-        /* margin-left: auto; is no longer needed because flex-grow handles the positioning */
+        margin-left: auto;   /* THIS IS THE KEY: It pushes the button to the far right. */
+        flex-shrink: 0;     /* Prevents the button from being squished */
       }
-      /* --- END: REVISED DESKTOP LAYOUT --- */
+      /* --- END: THE DEFINITIVE FIX --- */
       
       .download-popup {
         position: absolute;
