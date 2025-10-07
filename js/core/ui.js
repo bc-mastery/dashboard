@@ -225,10 +225,11 @@ export function populateBlockTabsFromPage() {
   const blockTabs = document.getElementById("blockTabs");
   if (!blockTabsRow || !blockTabs) return;
 
-  // Clear only the chips, leaving the download button untouched.
-  blockTabs.innerHTML = '';
-
+  // --- START: MODIFIED CODE ---
+  // Use a DocumentFragment to build the new chips off-DOM, preventing layout shift.
+  const fragment = document.createDocumentFragment();
   const allBlocks = document.querySelectorAll(".scrollTarget");
+
   allBlocks.forEach((block) => {
     const title =
       block.querySelector(".sectionTitle")?.textContent?.trim() ||
@@ -250,8 +251,12 @@ export function populateBlockTabsFromPage() {
       }, { capture: true }
     );
 
-    blockTabs.appendChild(chip);
+    fragment.appendChild(chip);
   });
+
+  // Use .replaceChildren() for a single, atomic DOM update.
+  blockTabs.replaceChildren(fragment);
+  // --- END: MODIFIED CODE ---
 
   const hasChips = blockTabs.querySelectorAll(".blockBtn").length > 0;
   blockTabsRow.style.visibility = hasChips ? "visible" : "hidden";
@@ -261,6 +266,7 @@ export function populateBlockTabsFromPage() {
   // ✅ ACTIVATE SCROLL SPY
   activateScrollSpy();
 }
+
 
 /* ------------------- NEW: Manages the download button and its pop-up --------------- */
 export function initDownloadButtonIsolation() {
