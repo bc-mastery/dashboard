@@ -334,17 +334,17 @@
         position: relative;
         display: flex;
         justify-content: space-between;
-        align-items: center;
+        align-items: center; /* This vertically aligns the button with the (first) row of chips */
         gap: 16px;
         padding-bottom: 6px;
-        flex-wrap: nowrap; /* Prevents the button from wrapping below the chips */
+        flex-wrap: nowrap; /* THE FIX: Prevents the button from wrapping below the chips */
       }
       #blockTabs {
         flex: 1 1 auto;
         display: flex;
         flex-wrap: wrap;
         gap: 6px;
-        min-width: 0; /* Allows the container to shrink */
+        min-width: 0;
       }
       #downloadBtn.ctaDocked {
         margin-left: auto;
