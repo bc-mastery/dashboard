@@ -363,17 +363,16 @@
     /* ====================== MOBILE-ONLY OVERRIDES ====================== */
     @media (max-width: 768px){
       .siteHeader{ position: sticky; top: 0; }
-      .bar{ grid-template-columns: 1fr 1fr; } /* Keep 2-column layout */
+      .bar{ grid-template-columns: 1fr 1fr; }
       .brandName{ display: none; } /* Hide company name on mobile */
       
       .titleBlock img{ width:24px; height:24px; }
       .pageTitle{ 
         font-size: clamp(18px, 4.6vw, 22px); 
-        /* Remove rules that would truncate the title */
-        max-width: none; 
-        white-space: normal; 
+        white-space: nowrap; /* Prevent line break */
         overflow: visible; 
         text-overflow: clip; 
+        max-width: none;
       }
       :root{ --headerBarH: 44px; --headerTabsH: 0px; --headerH: calc(var(--headerBarH) + 16px); }
 
@@ -389,7 +388,6 @@
 
       #blockTabsRow { display: none !important; }
       
-      /* Center the download button on mobile */
       #download-container {
         justify-content: center;
         padding-top: 8px;
