@@ -62,12 +62,10 @@
     .pageTitle{
       font-family: 'INTER', serif; font-weight: 700; letter-spacing:.3px; font-size: 26px;
       line-height:1; color: var(--bc-dark); text-shadow: 0 2px 0 rgba(0,0,0,.12); margin:0;
+      white-space: nowrap; /* Ensure it stays on one line */
     }
     .brandName{
-      justify-self:end; font-weight:700; font-size:20px; color:var(--bc-white);
-      text-shadow: 0 2px 0 rgba(0,0,0,.12); width:30ch; max-width:30ch; text-align:right;
-      white-space:normal; overflow:hidden; display:-webkit-box; -webkit-box-orient: vertical;
-      -webkit-line-clamp: 2; line-height:1.25;
+      display: none !important; /* This hides the company name */
     }
 
     .tabsRow { display:flex; flex-direction:column; gap:4px; padding-top:2px; padding-bottom:0; }
@@ -363,13 +361,12 @@
     /* ====================== MOBILE-ONLY OVERRIDES ====================== */
     @media (max-width: 768px){
       .siteHeader{ position: sticky; top: 0; }
-      .bar{ grid-template-columns: 1fr 1fr; }
-      .brandName{
-        font-size:12px; line-height:1.2; max-width:42vw;
-        white-space:nowrap; overflow:hidden; text-overflow:ellipsis; justify-self:end;
+      .bar{ grid-template-columns: 1fr; } /* Changed to 1fr to give full width to title */
+      .titleBlock { justify-content: center; } /* Center the title block */
+      .pageTitle { 
+        font-size: clamp(18px, 4.6vw, 22px); 
+        /* Removed truncation styles */
       }
-      .titleBlock img{ width:24px; height:24px; }
-      .pageTitle{ font-size: clamp(18px, 4.6vw, 22px); max-width:50vw; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
       :root{ --headerBarH: 44px; --headerTabsH: 0px; --headerH: calc(var(--headerBarH) + 16px); }
 
       #tabs{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; width:100%; }
