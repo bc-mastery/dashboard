@@ -15,8 +15,8 @@
       --bc-mint:#B4FDE5; --bc-white:#FFFFFF; --bc-red:#D34B4B;
       --headerBarH: 60px;
       --headerTabsH: 40px;
-      /* Increased header height to accommodate the new button row */
-      --headerH: calc(var(--headerBarH) + var(--headerTabsH) + 84px);
+      /* Adjusted header height to account for the new bottom padding */
+      --headerH: calc(var(--headerBarH) + var(--headerTabsH) + 90px);
       --primaryTabW: 128px; --primaryTabH: 28px;
     }
 
@@ -250,7 +250,7 @@
     #download-container {
       display: flex;
       justify-content: flex-start; /* Or 'center' if you prefer */
-      padding: 0; /* Spacing is handled by .tabsRow gap property */
+      padding-bottom: 6px; /* Added bottom padding */
     }
     
     .floatingCTA {
@@ -260,8 +260,8 @@
       align-items: center;
       gap: 6px; /* Space between icon and text */
       height: auto;
-      padding: 4px 10px; /* Matched to chip vertical padding */
-      border: 2px solid transparent;
+      padding: 4px 8px; /* Matched to chip */
+      border: none; /* Matched to chip */
       border-radius: 8px; /* Matched to chip border-radius */
       background: #024d4f;
       color: var(--bc-white);
