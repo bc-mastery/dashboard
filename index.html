@@ -249,26 +249,25 @@
     /* --- FINAL DOWNLOAD CONTAINER AND BUTTON STYLES --- */
     #download-container {
       display: flex;
-      justify-content: flex-start; /* Or 'center' if you prefer */
+      justify-content: flex-start;
       padding-bottom: 6px;
-      margin-top: -4px; /* This moves the button up by 2px */
+      margin-top: -4px;
     }
     
     .floatingCTA {
-      /* This is the main download button style now */
       position: static;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 6px; /* Space between icon and text */
-      width: calc((100% - 8px) / 2);
+      gap: 6px;
+      width: calc((100% - 32px) / 5); /* Same width as one of the 5 primary tabs */
       height: auto;
-      padding: 4px 8px; /* Matched to chip */
-      border: none; /* Matched to chip */
-      border-radius: 8px; /* Matched to chip border-radius */
+      padding: 4px 8px;
+      border: none;
+      border-radius: 8px;
       background: #024d4f;
       color: var(--bc-white);
-      font-size: 11px; /* Matched to chip font-size */
+      font-size: 11px;
       font-weight: 600;
       letter-spacing: 0.2px;
       cursor: pointer;
@@ -391,18 +390,22 @@
       #blockTabsRow { display: none !important; }
       
       #download-container {
-        justify-content: center;
+        justify-content: flex-start; /* MODIFIED: Align to the left */
         padding-top: 8px;
-        margin-top: 0; /* Reset negative margin for mobile */
+        margin-top: 0;
       }
       .floatingCTA {
-        width:auto; 
-        max-width:480px; 
-        box-sizing:border-box;
-        text-align:center; 
-        font-size:13px;
-        padding:10px 14px; 
-        border-radius:8px;
+        width: calc((100% - 8px) / 2); /* MODIFIED: Set specific width */
+        max-width: none;
+        box-sizing: border-box;
+        font-size: 13px;
+        padding: 10px 14px;
+        border-radius: 8px;
+        /* Re-add flex properties to keep content centered */
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
       }
 
       .main{ padding-top: calc(var(--headerH) - 40px); }
