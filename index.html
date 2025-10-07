@@ -329,27 +329,30 @@
         line-height: 1;
       }
       
-      /* --- START: NEW DESKTOP LAYOUT FOR CHIPS AND DOWNLOAD BUTTON --- */
+      /* --- START: REVISED DESKTOP LAYOUT FOR CHIPS AND DOWNLOAD BUTTON --- */
       #blockTabsRow {
-        position: relative;
-        display: flex;
-        justify-content: space-between;
-        align-items: center; /* This vertically aligns the button with the (first) row of chips */
-        gap: 16px;
-        padding-bottom: 6px;
-        flex-wrap: nowrap; /* THE FIX: Prevents the button from wrapping below the chips */
+        display: flex;          /* Establishes the flex container */
+        align-items: center;    /* Vertically aligns the chips and button */
+        flex-wrap: nowrap;      /* CRITICAL: Prevents the button from ever wrapping below */
+        gap: 16px;              /* Maintains space between the two items */
       }
+
       #blockTabs {
-        flex: 1 1 auto;
+        flex-grow: 1;           /* KEY: Makes the chip container expand to fill all free space */
+        min-width: 0;           /* A flexbox trick to allow shrinking even if content is wide */
+        
+        /* These existing rules for the chips inside are still correct */
         display: flex;
         flex-wrap: wrap;
         gap: 6px;
-        min-width: 0;
       }
+
       #downloadBtn.ctaDocked {
-        margin-left: auto;
-        flex-shrink: 0;
+        flex-shrink: 0;         /* Prevents the download button from shrinking or being squished */
+        /* margin-left: auto; is no longer needed because flex-grow handles the positioning */
       }
+      /* --- END: REVISED DESKTOP LAYOUT --- */
+      
       .download-popup {
         position: absolute;
         top: 100%;
@@ -378,7 +381,6 @@
         background-color: #f0f0f0;
         color: var(--bc-teal);
       }
-      /* --- END: NEW DESKTOP LAYOUT --- */
     }
     
     /* ====================== MOBILE-ONLY OVERRIDES ====================== */
