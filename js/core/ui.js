@@ -1,17 +1,17 @@
 // /js/core/ui.js
-import { TAB_TITLES, TAB_ICONS, UI_ICONS } from "./config.js";
-import { getMinTabsRequiredForDownload, toDownloadLink } from "./utils.js";
+import { TAB_TITLES } from "./config.js";
 import { state } from "./state.js";
+import { esc } from "./utils.js";
 
 // ✅ --- START: SCROLL SPY LOGIC ---
 let scrollSpyObserver = null;
-let currentActiveSectionId = null; // Keep track of the active section
+let currentActiveSectionId = null;
 
 function activateScrollSpy() {
   if (scrollSpyObserver) {
     scrollSpyObserver.disconnect();
   }
-  currentActiveSectionId = null; // Reset for the new page
+  currentActiveSectionId = null;
 
   const sections = Array.from(document.querySelectorAll(".scrollTarget"));
   const chips = document.querySelectorAll("#blockTabs .blockBtn");
@@ -20,7 +20,6 @@ function activateScrollSpy() {
 
   const headerHeight = document.querySelector(".siteHeader")?.offsetHeight || 150;
 
-  // The observer will fire frequently as sections move through the viewport.
   const observerOptions = {
     rootMargin: `-${headerHeight}px 0px -50px 0px`,
     threshold: 0,
@@ -30,14 +29,12 @@ function activateScrollSpy() {
     let bestSection = null;
     let maxScore = -Infinity;
 
-    // The ideal position for a section's top is just below the sticky header.
     const idealPosition = headerHeight;
 
     sections.forEach(section => {
         const rect = section.getBoundingClientRect();
         const top = rect.top;
 
-        // Ignore sections completely off-screen.
         if (rect.bottom < idealPosition || top > window.innerHeight) {
             return;
         }
@@ -46,12 +43,8 @@ function activateScrollSpy() {
         let score;
 
         if (distance <= 0) {
-            // Section is at or above the ideal line (already scrolled past).
-            // Penalize it more heavily the further up it goes.
-            score = 1000 + distance; // `distance` is negative, so this decreases the score.
+            score = 1000 + distance;
         } else {
-            // Section is below the ideal line (approaching).
-            // Penalize it less to give it priority.
             score = 1000 - (distance * 1.5);
         }
 
@@ -63,7 +56,6 @@ function activateScrollSpy() {
 
     const newActiveId = bestSection ? bestSection.id : null;
 
-    // Only update the UI if the active section has changed.
     if (newActiveId !== currentActiveSectionId) {
         currentActiveSectionId = newActiveId;
         
@@ -77,14 +69,12 @@ function activateScrollSpy() {
   scrollSpyObserver = new IntersectionObserver(observerCallback, observerOptions);
   sections.forEach((section) => scrollSpyObserver.observe(section));
   
-  // Also attach to the main scroll event for maximum responsiveness.
   let scrollTimeout;
   window.addEventListener('scroll', () => {
     clearTimeout(scrollTimeout);
     scrollTimeout = setTimeout(observerCallback, 50);
   }, { passive: true });
   
-  // Run it once on load to set the initial state correctly.
   observerCallback();
 }
 // ✅ --- END: SCROLL SPY LOGIC ---
@@ -92,12 +82,10 @@ function activateScrollSpy() {
 
 /* --------------------------- Header title + icon --------------------------- */
 export function setTitleAndIcon(tab) {
-  // This function is now much simpler. It ONLY toggles the active class.
-  // All styling is handled by the CSS in index.html for robustness.
   document.querySelectorAll("#tabs .tabBtn").forEach((btn) => {
     const isActive = btn.dataset.tab === tab;
     btn.classList.toggle("tab-active", isActive);
-    btn.classList.toggle("active", isActive); // for legacy compatibility if needed
+    btn.classList.toggle("active", isActive);
   });
 }
 
@@ -149,61 +137,6 @@ export function toggleFloatingCallBtn(show) {
   }
 }
 
-/* ---------------------- Download CTA: access + visibility ------------------ */
-export function enforceDownloadProtection() {
-  const cta = document.getElementById("downloadBtn");
-  if (!cta) return;
-
-  const tab = state.currentTab || document.body.getAttribute("data-current-tab") || "";
-  if (tab === "growth") {
-    cta.style.display = "inline-flex";
-    return;
-  }
-
-  const chips = document.querySelectorAll("#blockTabs .blockBtn").length;
-  const minTabs = getMinTabsRequiredForDownload();
-  const allowed = chips >= minTabs;
-
-  cta.style.display = allowed ? "inline-flex" : "none";
-}
-
-export function updateFloatingCTA(tab) {
-  const downloadBtn = document.getElementById("downloadBtn");
-  if (!downloadBtn) return;
-
-  const downloadText = document.getElementById("downloadText");
-  const downloadIcon = downloadBtn.querySelector('.download-icon');
-
-  if (!downloadText || !downloadIcon) return;
-
-  const buttonTextMap = {
-    growth: "Growth Scan",
-    targeting: "Targeting Strategy",
-    offer: "Offer Strategy",
-    marketing: "Marketing Strategy",
-    sales: "Sales Strategy",
-  };
-
-  const link = state.dynamicPdfLinks[tab];
-  downloadBtn.style.display = "inline-flex";
-
-  if (link) {
-    downloadBtn.href = link;
-    downloadBtn.target = "_self";
-    downloadBtn.classList.remove('disabled');
-    downloadIcon.style.display = 'inline-block';
-    downloadText.textContent = buttonTextMap[tab] || "Download";
-    downloadBtn.onclick = null;
-  } else {
-    downloadBtn.href = "#";
-    downloadBtn.target = "";
-    downloadBtn.classList.add('disabled');
-    downloadIcon.style.display = 'none';
-    downloadText.textContent = "Strategy not available";
-    downloadBtn.onclick = (e) => e.preventDefault();
-  }
-}
-
 /* --------------------------------- Scrolling -------------------------------- */
 export function scrollToTarget(el) {
   const scrollMarginTop = parseInt(getComputedStyle(el).scrollMarginTop) || 0;
@@ -219,8 +152,7 @@ export function populateBlockTabsFromPage() {
   const blockTabs = document.getElementById("blockTabs");
   if (!blockTabsRow || !blockTabs) return;
 
-  const cta = document.getElementById("downloadBtn");
-  blockTabs.querySelectorAll(".blockBtn").forEach((el) => el.remove());
+  blockTabs.innerHTML = ''; // Clear previous chips
 
   const allBlocks = document.querySelectorAll(".scrollTarget");
   allBlocks.forEach((block) => {
@@ -247,118 +179,92 @@ export function populateBlockTabsFromPage() {
     blockTabs.appendChild(chip);
   });
 
-  if (cta && cta.parentElement === blockTabs) {
-    blockTabs.appendChild(cta);
-  }
-
   const hasChips = blockTabs.querySelectorAll(".blockBtn").length > 0;
   blockTabsRow.style.visibility = hasChips ? "visible" : "hidden";
 
-  enforceDownloadProtection();
-
-  // ✅ ACTIVATE SCROLL SPY
   activateScrollSpy();
 }
 
-/* ------------------- Make the download button self-sufficient --------------- */
-export function initDownloadButtonIsolation() {
-  const btn = document.getElementById("downloadBtn");
-  if (!btn) return;
 
-  btn.classList.remove("tabBtn");
-  btn.removeAttribute("data-tab");
-  btn.setAttribute("target", "_self");
-  btn.setAttribute("rel", "noopener");
+/* ---------------- NEW UNIVERSAL DOWNLOAD BUTTON LOGIC ---------------- */
+let isDownloadButtonInitialized = false;
 
-  const clean = btn.cloneNode(true);
-  clean.id = btn.id;
+export function initDownloadButton() {
+  if (isDownloadButtonInitialized) return;
 
-  btn.replaceWith(clean);
+  const container = document.getElementById('universal-download-container');
+  const button = document.getElementById('universal-download-button');
+  const popover = document.getElementById('download-popover');
 
-  clean.addEventListener("click", (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+  if (!container || !button || !popover) return;
 
-    const tab = state.currentTab;
-    let link = state.dynamicPdfLinks[tab];
+  const showPopover = () => {
+    updateDownloadPopover(); // Populate content before showing
+    popover.classList.add('visible');
+  };
 
-    if (!link) {
-      const data = state.lastApiByTab[tab]?.data || {};
-      const fieldMap = {
-        targeting: "T_STRATEGY_OUTPUT",
-        offer: "O_STRATEGY_OUTPUT",
-        marketing: "M_STRATEGY_OUTPUT",
-        sales: "S_STRATEGY_OUTPUT",
-        growth: "GS_OUTPUT",
-        mentoring: "MENTORING_STRATEGY_OUTPUT",
-        knowledge: "KNOWLEDGE_STRATEGY_OUTPUT",
-      };
+  const hidePopover = () => {
+    popover.classList.remove('visible');
+  };
 
-      const fallbacks = {
-        growth: ["GS_OUTPUT", "GROWTH_STRATEGY_OUTPUT"],
-        knowledge: ["KNOWLEDGE_OUTPUT", "K_MASTER_PDF", "KNOWLEDGE_PDF", "KNOWLEDGE_STRATEGY_OUTPUT"],
-      };
-
-      const primaryField = fieldMap[tab];
-      let raw = primaryField ? data[primaryField] : "";
-
-      if (!raw && fallbacks[tab]) {
-        for (const k of fallbacks[tab]) {
-          if (data[k]) { raw = data[k]; break; }
-        }
-      }
-
-      if (raw) {
-        link = toDownloadLink(raw);
-        state.dynamicPdfLinks[tab] = link;
-        updateFloatingCTA(tab);
-      }
-    }
-
-    if (link) {
-      const a = document.createElement("a");
-      a.href = link;
-      a.download = "";
-      a.style.display = "none";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
+  button.addEventListener('click', (event) => {
+    event.stopPropagation();
+    if (popover.classList.contains('visible')) {
+      hidePopover();
     } else {
-      console.warn("No valid PDF data returned for tab:", tab);
+      showPopover();
     }
   });
+
+  document.addEventListener('click', (event) => {
+    if (!container.contains(event.target) && popover.classList.contains('visible')) {
+      hidePopover();
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && popover.classList.contains('visible')) {
+      hidePopover();
+    }
+  });
+
+  isDownloadButtonInitialized = true;
 }
 
-export function initBlockChipDelegation() {
-  if (window.__bcBlockChipDelegated) return;
-  window.__bcBlockChipDelegated = true;
+export function updateDownloadPopover() {
+  const popoverContent = document.getElementById('popover-content');
+  const button = document.getElementById('universal-download-button');
+  if (!popoverContent || !button) return;
 
-  document.addEventListener(
-    "click",
-    (e) => {
-      const chip = e.target.closest("#blockTabs .blockBtn");
-      if (!chip) return;
+  const tab = state.currentTab;
+  const downloads = state.dynamicPdfLinks[tab] || [];
 
-      e.preventDefault();
-      e.stopPropagation();
+  popoverContent.innerHTML = ''; // Clear previous content
 
-      const sel = (chip.dataset.target || chip.getAttribute("href") || "").trim();
-      const id = sel.replace(/^#/, "");
-      if (!id) return;
-      const el = document.getElementById(id);
-      if (el) scrollToTarget(el);
-    },
-    true
-  );
-
-  document.addEventListener(
-    "keydown",
-    (e) => {
-      if ((e.key !== "Enter" && e.key !== " ") || !e.target.closest("#blockTabs .blockBtn")) return;
-      e.preventDefault();
-      e.stopPropagation();
-      e.target.click();
-    },
-    true
-  );
+  if (downloads.length > 0) {
+    button.disabled = false;
+    downloads.forEach(item => {
+      const link = document.createElement('a');
+      link.textContent = item.title || 'Download';
+      
+      if (item.enabled) {
+        link.href = item.url;
+        link.setAttribute('download', '');
+      } else {
+        link.href = '#';
+        link.classList.add('disabled');
+        link.addEventListener('click', e => e.preventDefault());
+      }
+      popoverContent.appendChild(link);
+    });
+  } else {
+    // No downloads for this tab, create a single disabled item
+    button.disabled = false; // Keep button clickable to show the message
+    const link = document.createElement('a');
+    link.textContent = `${TAB_TITLES[tab] || 'Strategy'} not available`;
+    link.href = '#';
+    link.classList.add('disabled');
+    link.addEventListener('click', e => e.preventDefault());
+    popoverContent.appendChild(link);
+  }
 }
