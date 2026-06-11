@@ -3,11 +3,7 @@
 import { ACCESS } from "../core/config.js";
 import { state, setCurrentTab } from "../core/state.js";
 import { inferAccess, parseAreas, toDownloadLink, esc } from "../core/utils.js";
-import {
-  buildFirstBlockHTML,
-  hydrateABCMaps,
-  finalBlockContent,
-} from "../components/blocks.js";
+import { buildFirstBlockHTML, hydrateABCMaps, finalBlockContent } from "../components/blocks.js";
 import {
   populateBlockTabsFromPage,
   toggleFloatingCallBtn,
@@ -17,7 +13,6 @@ import {
 } from "../core/ui.js";
 import { fetchDashboardData } from "../services/api.js";
 
-/* ------------------ Foolproof Column Value Helper ------------------ */
 function getSpreadsheetValue(data, columnName) {
   if (!data) return "";
   const target = columnName.toLowerCase().trim();
@@ -30,7 +25,6 @@ function getSpreadsheetValue(data, columnName) {
   return "";
 }
 
-/* ------------------------------ main render ------------------------------ */
 export async function renderOfferTab(forceRefresh = false) {
   setCurrentTab("offer");
   document.body.setAttribute("data-current-tab", "offer");
@@ -43,7 +37,6 @@ export async function renderOfferTab(forceRefresh = false) {
 
   try {
     const api = await fetchDashboardData(forceRefresh);
-
     if (!api || !api.ok) {
       contentDiv.innerHTML = `<div class="card"><p class="muted">${api?.message || "No data found."}</p></div>`;
       return;
@@ -56,9 +49,7 @@ export async function renderOfferTab(forceRefresh = false) {
     const brandEl = document.getElementById("brandName");
     if (brandEl) {
       const full = String(d.Brand || d["{{Brand}}"] || "");
-      const short = full.length > 80 ? full.slice(0, 80) : full;
-      brandEl.textContent = short;
-      brandEl.title = full;
+      brandEl.textContent = full.length > 80 ? full.slice(0, 80) : full;
     }
 
     const view = d.O_STRATEGY_OUTPUT || d["{{O_STRATEGY_OUTPUT}}"] || "";
@@ -67,8 +58,10 @@ export async function renderOfferTab(forceRefresh = false) {
       updateFloatingCTA("offer");
     }
 
-    /* --- GATE CHECK --- */
+    /* --- GATE CHECK WITH ACTIVE CONSOLE LOGGING --- */
     const osReadyValue = getSpreadsheetValue(d, "OS_READY");
+    console.log("🔍 Debug Gate Verification (Offer): Found raw value for OS_READY =", `"${osReadyValue}"`);
+    
     const allowFull = osReadyValue !== "";
     
     paintOffer(api, allowFull);
@@ -91,7 +84,6 @@ export async function renderOfferTab(forceRefresh = false) {
   }
 }
 
-/* ------------------------------ page painter ----------------------------- */
 function paintOffer(api, allowFull = false) {
   const contentDiv = document.getElementById("content");
   if (!contentDiv) return;
@@ -123,7 +115,6 @@ function paintOffer(api, allowFull = false) {
         <p><span class="subtitle">${esc(d.O_CHARACTERISTIC_6 || d["{{O_CHARACTERISTIC_6}}"] || "")}</span><br>${esc(d.O_CHARACTERISTIC_6_DESC || d["{{O_CHARACTERISTIC_6_DESC}}"] || "")}</p>
         <p><span class="subtitle">${esc(d.O_CHARACTERISTIC_7 || d["{{O_CHARACTERISTIC_7}}"] || "")}</span><br>${esc(d.O_CHARACTERISTIC_7_DESC || d["{{O_CHARACTERISTIC_7_DESC}}"] || "")}</p>
       </div>
-
       <div class="card scrollTarget" id="block-features">
         <div class="sectionTitle">Features and Services</div>
         <p><span class="subtitle">${esc(d.O_FEATURE_1 || d["{{O_FEATURE_1}}"] || "")}</span><br>${esc(d.O_FEATURE_1_DESC || d["{{O_FEATURE_1_DESC}}"] || "")}</p>
@@ -132,7 +123,6 @@ function paintOffer(api, allowFull = false) {
         <p><span class="subtitle">${esc(d.O_FEATURE_4 || d["{{O_FEATURE_4}}"] || "")}</span><br>${esc(d.O_FEATURE_4_DESC || d["{{O_FEATURE_4_DESC}}"] || "")}</p>
         <p><span class="subtitle">${esc(d.O_FEATURE_5 || d["{{O_FEATURE_5}}"] || "")}</span><br>${esc(d.O_FEATURE_5_DESC || d["{{O_FEATURE_5_DESC}}"] || "")}</p>
       </div>
-
       <div class="card scrollTarget" id="block-value-triggers">
         <div class="sectionTitle">Value Triggers</div>
         <p><span class="subtitle">${esc(d.O_VALUE_1 || d["{{O_VALUE_1}}"] || "")}</span><br>${esc(d.O_VALUE_1_DESC || d["{{O_VALUE_1_DESC}}"] || "")}</p>
@@ -141,7 +131,6 @@ function paintOffer(api, allowFull = false) {
         <p><span class="subtitle">${esc(d.O_VALUE_4 || d["{{O_VALUE_4}}"] || "")}</span><br>${esc(d.O_VALUE_4_DESC || d["{{O_VALUE_4_DESC}}"] || "")}</p>
         <p><span class="subtitle">${esc(d.O_VALUE_5 || d["{{O_VALUE_5}}"] || "")}</span><br>${esc(d.O_VALUE_5_DESC || d["{{O_VALUE_5_DESC}}"] || "")}</p>
       </div>
-
       <div class="card scrollTarget" id="block-retention">
         <div class="sectionTitle">Retention Factors</div>
         <p><span class="subtitle">${esc(d.O_RETENTION_1 || d["{{O_RETENTION_1}}"] || "")}</span><br>${esc(d.O_RETENTION_1_DESC || d["{{O_RETENTION_1_DESC}}"] || "")}</p>
@@ -150,7 +139,6 @@ function paintOffer(api, allowFull = false) {
         <p><span class="subtitle">${esc(d.O_RETENTION_4 || d["{{O_RETENTION_4}}"] || "")}</span><br>${esc(d.O_RETENTION_4_DESC || d["{{O_RETENTION_4_DESC}}"] || "")}</p>
         <p><span class="subtitle">${esc(d.O_RETENTION_5 || d["{{O_RETENTION_5}}"] || "")}</span><br>${esc(d.O_RETENTION_5_DESC || d["{{O_RETENTION_5_DESC}}"] || "")}</p>
       </div>
-
       <div class="card scrollTarget" id="block-appearance">
         <div class="sectionTitle">Appearance</div>
         <p><span class="subtitle">${esc(d.O_APPEARANCE_1 || d["{{O_APPEARANCE_1}}"] || "")}</span><br>${esc(d.O_APPEARANCE_1_DESC || d["{{O_APPEARANCE_1_DESC}}"] || "")}</p>
@@ -159,7 +147,6 @@ function paintOffer(api, allowFull = false) {
         <p><span class="subtitle">${esc(d.O_APPEARANCE_4 || d["{{O_APPEARANCE_4}}"] || "")}</span><br>${esc(d.O_APPEARANCE_4_DESC || d["{{O_APPEARANCE_4_DESC}}"] || "")}</p>
         <p><span class="subtitle">${esc(d.O_APPEARANCE_5 || d["{{O_APPEARANCE_5}}"] || "")}</span><br>${esc(d.O_APPEARANCE_5_DESC || d["{{O_APPEARANCE_5_DESC}}"] || "")}</p>
       </div>
-
       <div class="card scrollTarget" id="block-pricing">
         <div class="sectionTitle">Pricing</div>
         <p><span class="subtitle">${esc(d.O_PRICING_POSITIONING || d["{{O_PRICING_POSITIONING}}"] || "")}</span><br>${esc(d.O_PRICING_POSITIONING_DESC || d["{{O_PRICING_POSITIONING_DESC}}"] || "")}</p>
