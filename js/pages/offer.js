@@ -17,9 +17,20 @@ import {
 } from "../core/ui.js";
 import { fetchDashboardData } from "../services/api.js";
 
+/* ------------------ Case-Insensitive Column Value Helper ------------------ */
+function getSpreadsheetValue(data, columnName) {
+  if (!data) return "";
+  const target = columnName.toLowerCase().trim();
+  for (const key of Object.keys(data)) {
+    if (key.toLowerCase().trim() === target) {
+      return String(data[key]).trim();
+    }
+  }
+  return "";
+}
+
 /* ------------------------------ main render ------------------------------ */
 export async function renderOfferTab(forceRefresh = false) {
-  // Sync page state and clean up upgrade blocks from previous tabs
   setCurrentTab("offer");
   document.body.setAttribute("data-current-tab", "offer");
   clearUpgradeBlock();
@@ -37,12 +48,10 @@ export async function renderOfferTab(forceRefresh = false) {
       return;
     }
 
-    // Cache + access inference
     state.lastApiByTab.offer = { ...api, data: { ...api.data } };
     const d = api.data || {};
     state.lastAccess = inferAccess(d);
 
-    // Header brand text
     const brandEl = document.getElementById("brandName");
     if (brandEl) {
       const full = String(d.Brand || "");
@@ -51,36 +60,29 @@ export async function renderOfferTab(forceRefresh = false) {
       brandEl.title = full;
     }
 
-    // Pre-fill direct PDF link
     const view = d.O_STRATEGY_OUTPUT || "";
     if (view) {
       state.dynamicPdfLinks.offer = toDownloadLink(view);
       updateFloatingCTA("offer");
     }
 
-    /* --- SIMPLIFIED SPREADSHEET GATE LOGIC ---
-      1. Concept block is always visible.
-      2. Full content triggers ONLY if Column LZ (OS_READY) contains manual data.
-    */
-    const allowFull = d.OS_READY && String(d.OS_READY).trim() !== "";
+    /* --- FOOLPROOF SPREADSHEET GATE CHECK --- */
+    const osReadyValue = getSpreadsheetValue(d, "OS_READY");
+    const allowFull = osReadyValue !== "";
     
-    // Render the layout
     paintOffer(api, allowFull);
 
-    // Secondary navigation chips row
     const blockTabsRow = document.getElementById("blockTabsRow");
     if (blockTabsRow) blockTabsRow.style.display = "block";
     populateBlockTabsFromPage();
     updateFloatingCTA("offer");
 
-    // Insert upgrade block for preview users (global overrides handle button text/links)
     maybeInsertUniversalUpgradeBlock({
       tab: "offer",
       isPreviewOnly: !allowFull,
       content: finalBlockContent.offer,
     });
 
-    // Floating call button for GS-only users
     toggleFloatingCallBtn(state.lastAccess === ACCESS.GS_ONLY);
   } catch (err) {
     console.error(err);
