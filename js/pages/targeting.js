@@ -15,21 +15,30 @@ import { finalBlockContent } from "../components/blocks.js";
 import { centerLockChart } from "../core/charts.js";
 import { fetchDashboardData } from "../services/api.js";
 
+/* ------------------ Case-Insensitive Column Value Helper ------------------ */
+function getSpreadsheetValue(data, columnName) {
+  if (!data) return "";
+  const target = columnName.toLowerCase().trim();
+  for (const key of Object.keys(data)) {
+    if (key.toLowerCase().trim() === target) {
+      return String(data[key]).trim();
+    }
+  }
+  return "";
+}
+
 /* ------------------------------ styles ------------------------------ */
 function injectTargetingStylesOnce() {
   if (document.getElementById("targeting-styles")) return;
   const style = document.createElement("style");
   style.id = "targeting-styles";
   style.textContent = `
-    /* Desktop: 2:1 text:map */
     #content .card .bfGrid {
       display: grid;
       grid-template-columns: 2fr 1fr;
       align-items: start;
       gap: 22px;
     }
-
-    /* Map wrapper (square, shared by overlay + donut host) */
     #content .bfMap .abc-wrap {
       position: relative;
       width: 100%;
@@ -37,8 +46,6 @@ function injectTargetingStylesOnce() {
       aspect-ratio: 1 / 1;
       margin-left: auto;
     }
-
-    /* Overlay fills the wrapper */
     #content .bfMap .abc-wrap .overlay {
       position: absolute;
       inset: 0;
@@ -49,8 +56,6 @@ function injectTargetingStylesOnce() {
       user-select: none;
       display: block;
     }
-
-    /* Donut fills the wrapper (conic-gradient painted in JS) */
     #content .bfMap .abc-wrap .donut {
       position: absolute;
       inset: 0;
@@ -59,8 +64,6 @@ function injectTargetingStylesOnce() {
       --donut-nudge-x: 0px;
       --donut-nudge-y: 0px;
     }
-
-    /* Mobile: stack and center */
     @media (max-width: 860px) {
       #content .card .bfGrid {
         grid-template-columns: 1fr;
@@ -126,10 +129,10 @@ export async function renderTargetingTab(forceRefresh = false) {
       updateFloatingCTA("targeting");
     }
 
-    /* --- SPREADSHEET GATE LOGIC ---
-      Checks Column LY (TS_READY). If it is not empty, allow full visibility.
-    */
-    const allowFull = d.TS_READY && String(d.TS_READY).trim() !== "";
+    /* --- FOOLPROOF SPREADSHEET GATE CHECK --- */
+    const tsReadyValue = getSpreadsheetValue(d, "TS_READY");
+    const allowFull = tsReadyValue !== "";
+
     paintTargeting(api, allowFull);
 
     const blockTabsRow = document.getElementById("blockTabsRow");
