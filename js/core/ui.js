@@ -94,6 +94,10 @@ export function clearUpgradeBlock() {
 }
 
 export function maybeInsertUniversalUpgradeBlock({ tab, isPreviewOnly, content }) {
+  // 1️⃣ ALWAYS clear any old placeholder box first, before checking permission states!
+  clearUpgradeBlock();
+
+  // If the user has full access, stop right here and do not insert a new box
   if (!isPreviewOnly) return;
 
   const current = document.body.getAttribute("data-current-tab") || state.currentTab || "";
@@ -102,8 +106,6 @@ export function maybeInsertUniversalUpgradeBlock({ tab, isPreviewOnly, content }
   const tpl = document.getElementById("universalUpgradeBlock");
   const footer = document.querySelector(".siteFooter");
   if (!tpl || !footer) return;
-
-  clearUpgradeBlock();
 
   const node = tpl.content.cloneNode(true);
 
@@ -117,8 +119,8 @@ export function maybeInsertUniversalUpgradeBlock({ tab, isPreviewOnly, content }
   }
   
   if (acall) {
-    acall.textContent = "Book a call"; // 👈 Clean label text
-    acall.setAttribute("href", "https://calendly.com/bc-businesscanvas/30min"); // 👈 Link hidden "behind the curtain"
+    acall.textContent = "Book a call";
+    acall.setAttribute("href", "https://calendly.com/bc-businesscanvas/30min");
   }
 
   const titleEl = node.querySelector(".upgradeTitle") || node.querySelector("#upgradeBlockTitle");
