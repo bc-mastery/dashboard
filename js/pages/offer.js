@@ -2,7 +2,7 @@
 
 import { ACCESS } from "../core/config.js";
 import { state, setCurrentTab } from "../core/state.js";
-import { inferAccess, parseAreas, toDownloadLink, esc, truthyFlag } from "../core/utils.js";
+import { inferAccess, parseAreas, toDownloadLink, esc } from "../core/utils.js";
 import {
   buildFirstBlockHTML,
   hydrateABCMaps,
@@ -30,7 +30,6 @@ export async function renderOfferTab(forceRefresh = false) {
   contentDiv.innerHTML = `<div class="card"><p class="muted">Loading Offer Strategy…</p></div>`;
 
   try {
-    // Fetch data using the shared service
     const api = await fetchDashboardData(forceRefresh);
 
     if (!api || !api.ok) {
@@ -43,7 +42,7 @@ export async function renderOfferTab(forceRefresh = false) {
     const d = api.data || {};
     state.lastAccess = inferAccess(d);
 
-    // Header brand text update
+    // Header brand text
     const brandEl = document.getElementById("brandName");
     if (brandEl) {
       const full = String(d.Brand || "");
@@ -52,7 +51,7 @@ export async function renderOfferTab(forceRefresh = false) {
       brandEl.title = full;
     }
 
-    // Pre-fill direct PDF link if it exists (generated via Apps Script)
+    // Pre-fill direct PDF link
     const view = d.O_STRATEGY_OUTPUT || "";
     if (view) {
       state.dynamicPdfLinks.offer = toDownloadLink(view);
@@ -60,16 +59,16 @@ export async function renderOfferTab(forceRefresh = false) {
     }
 
     /* --- GATE CONTROL LOGIC ---
-      1. Concept block is always visible and filled.
+      1. Concept block is always visible.
       2. Full content requires both:
          - The user has paid (or strategy trigger timer has elapsed)
-         - Column LZ (OS_READY) has data and is not an empty cell.
+         - Column LZ (OS_READY) has data and is an empty cell.
     */
     const isStrategySent =
       d.OFFER_STRATEGY_SENT &&
       new Date(d.OFFER_STRATEGY_SENT).getTime() < new Date().getTime();
       
-    const hasPaid = truthyFlag(d.OFFER_PAID) || truthyFlag(d["4PBS_PAID"]) || isStrategySent;
+    const hasPaid = !!d.OFFER_PAID || !!d["4PBS_PAID"] || isStrategySent;
     const isModuleReleased = d.OS_READY && String(d.OS_READY).trim() !== "";
 
     const allowFull = hasPaid && isModuleReleased;
@@ -83,29 +82,14 @@ export async function renderOfferTab(forceRefresh = false) {
     populateBlockTabsFromPage();
     updateFloatingCTA("offer");
 
-    // Insert upgrade/placeholder box if eligibility check fails
+    // Insert upgrade block for preview users (global overrides handle button text/links)
     maybeInsertUniversalUpgradeBlock({
       tab: "offer",
       isPreviewOnly: !allowFull,
       content: finalBlockContent.offer,
     });
 
-    // Apply custom text and actions to placeholder box buttons when content is locked
-    if (!allowFull) {
-      const greenBtn = document.getElementById("cta-4pbs");
-      const whiteBtn = document.getElementById("cta-call");
-
-      if (greenBtn) {
-        greenBtn.textContent = "Unlock your 4-Pillar Strategy";
-        greenBtn.setAttribute("href", "mailto:bc@businesscanvas.io");
-      }
-      if (whiteBtn) {
-        whiteBtn.textContent = "https://calendly.com/bc-businesscanvas/30min";
-        whiteBtn.setAttribute("href", "https://calendly.com/bc-businesscanvas/30min");
-      }
-    }
-
-    // Toggle floating action button for Growth Scan preview clients
+    // Floating call button for GS-only users
     toggleFloatingCallBtn(state.lastAccess === ACCESS.GS_ONLY);
   } catch (err) {
     console.error(err);
@@ -121,7 +105,6 @@ function paintOffer(api, allowFull = false) {
   const d = (api && api.data) || {};
   const areas = parseAreas(d.D_AREA);
 
-  // Concept Block (Always populated and visible)
   let html = buildFirstBlockHTML({
     title: "Concept",
     subtitleLabel: "Offer Character",
@@ -131,7 +114,6 @@ function paintOffer(api, allowFull = false) {
     page: "offer",
   });
 
-  // Deep Breakdown Blocks (Injected only when user is fully eligible)
   if (allowFull) {
     html += `
       <div class="card scrollTarget" id="block-characteristics">
