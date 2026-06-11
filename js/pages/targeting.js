@@ -15,12 +15,10 @@ import { finalBlockContent } from "../components/blocks.js";
 import { centerLockChart } from "../core/charts.js";
 import { fetchDashboardData } from "../services/api.js";
 
-/* ------------------ Foolproof Column Value Helper ------------------ */
 function getSpreadsheetValue(data, columnName) {
   if (!data) return "";
   const target = columnName.toLowerCase().trim();
   for (const key of Object.keys(data)) {
-    // Strips out any hidden double curly braces {{ }} from the sheet keys
     const cleanKey = key.replace(/[{}]/g, "").toLowerCase().trim();
     if (cleanKey === target) {
       return String(data[key]).trim();
@@ -29,7 +27,6 @@ function getSpreadsheetValue(data, columnName) {
   return "";
 }
 
-/* ------------------------------ styles ------------------------------ */
 function injectTargetingStylesOnce() {
   if (document.getElementById("targeting-styles")) return;
   const style = document.createElement("style");
@@ -38,40 +35,31 @@ function injectTargetingStylesOnce() {
     #content .card .bfGrid { display: grid; grid-template-columns: 2fr 1fr; align-items: start; gap: 22px; }
     #content .bfMap .abc-wrap { position: relative; width: 100%; max-width: 360px; aspect-ratio: 1 / 1; margin-left: auto; }
     #content .bfMap .abc-wrap .overlay { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; user-select: none; display: block; }
-    #content .bfMap .abc-wrap .donut { position: absolute; inset: 0; width: 100%; height: 100%; --donut-nudge-x: 0px; --donut-nudge-y: 0px; }
+    #content .bfMap .abc-wrap .donut { position: absolute; inset: 0; width: 100%; height: 100%; }
     @media (max-width: 860px) {
       #content .card .bfGrid { grid-template-columns: 1fr; gap: 16px; }
       #content .bfMap { display: flex; justify-content: center; }
       #content .bfMap .abc-wrap { max-width: 300px; margin-left: 0; }
-      #content .bfMap .abc-wrap .donut { --donut-nudge-y: 0px; }
     }
   `;
   document.head.appendChild(style);
 }
 
-/* ------------------------------ main render ------------------------------ */
 export async function renderTargetingTab(forceRefresh = false) {
   setCurrentTab("targeting");
   document.body.setAttribute("data-current-tab", "targeting");
   clearUpgradeBlock();
-
   injectTargetingStylesOnce();
 
   const contentDiv = document.getElementById("content");
   if (!contentDiv) return;
 
-  if (!token) {
-    contentDiv.innerHTML = `<div class="card"><p class="muted">No token provided in URL.</p></div>`;
-    return;
-  }
-
   contentDiv.innerHTML = `<div class="card"><p class="muted">Loading Targeting Strategy…</p></div>`;
 
   try {
     const api = await fetchDashboardData(forceRefresh);
-
     if (!api || !api.ok) {
-      contentDiv.innerHTML = `<div class="card"><p class="muted">${(api && api.message) || "No data found."}</p></div>`;
+      contentDiv.innerHTML = `<div class="card"><p class="muted">${api?.message || "No data found."}</p></div>`;
       return;
     }
 
@@ -82,9 +70,7 @@ export async function renderTargetingTab(forceRefresh = false) {
     const brandEl = document.getElementById("brandName");
     if (brandEl) {
       const full = String(d.Brand || d["{{Brand}}"] || "");
-      const short = full.length > 80 ? full.slice(0, 80) : full;
-      brandEl.textContent = short;
-      brandEl.title = full;
+      brandEl.textContent = full.length > 80 ? full.slice(0, 80) : full;
     }
 
     const view = d.T_STRATEGY_OUTPUT || d["{{T_STRATEGY_OUTPUT}}"] || "";
@@ -93,8 +79,10 @@ export async function renderTargetingTab(forceRefresh = false) {
       updateFloatingCTA("targeting");
     }
 
-    /* --- GATE CHECK --- */
+    /* --- GATE CHECK WITH ACTIVE CONSOLE LOGGING --- */
     const tsReadyValue = getSpreadsheetValue(d, "TS_READY");
+    console.log("🔍 Debug Gate Verification (Targeting): Found raw value for TS_READY =", `"${tsReadyValue}"`);
+    
     const allowFull = tsReadyValue !== "";
 
     paintTargeting(api, allowFull);
@@ -117,7 +105,6 @@ export async function renderTargetingTab(forceRefresh = false) {
   }
 }
 
-/* ------------------------------ page painter ----------------------------- */
 function paintTargeting(api, allowFull = false) {
   const contentDiv = document.getElementById("content");
   if (!contentDiv) return;
@@ -126,7 +113,6 @@ function paintTargeting(api, allowFull = false) {
   const areas = parseAreas(d.D_AREA || d["{{D_AREA}}"]);
   const mode = detectMode(areas);
 
-  // Extract variables safely regardless of bracket structures
   const dDriver = d.D_DRIVER || d["{{D_DRIVER}}"] || "";
   const dDriverDesc = d.D_DRIVER_DESC || d["{{D_DRIVER_DESC}}"] || "";
   const dArea = d.D_AREA || d["{{D_AREA}}"] || "";
@@ -141,10 +127,7 @@ function paintTargeting(api, allowFull = false) {
           ${dDriverDesc ? `<p class="bfDesc preserve">${esc(dDriverDesc)}</p>` : ""}
         </div>
         <div class="bfMap">
-          <div class="abc-wrap"
-               data-mode="${esc(mode)}"
-               data-areas="${areas.map(String).map(esc).join("|")}"
-               data-overlay="${esc(IMAGES.abcFrame)}">
+          <div class="abc-wrap" data-mode="${esc(mode)}" data-areas="${areas.map(String).map(esc).join("|")}" data-overlay="${esc(IMAGES.abcFrame)}">
             <div class="donut"></div>
             <img class="overlay" src="${IMAGES.abcFrame}" alt="ABC overlay">
           </div>
@@ -174,7 +157,6 @@ function paintTargeting(api, allowFull = false) {
         ${tCharacter ? `<p><span class="subtitle">Customer Label:</span> ${esc(tCharacter)}</p>` : ""}
         ${tCharacterDesc ? `<p class="preserve">${esc(tCharacterDesc)}</p>` : ""}
       </div>
-
       <div class="card scrollTarget" id="block-macro">
         <div class="sectionTitle">Macro-behavior</div>
         ${tDecision ? `<p><span class="subtitle">Decision-making of your customers:</span> ${esc(tDecision)}</p>` : ""}
@@ -184,7 +166,6 @@ function paintTargeting(api, allowFull = false) {
         ${tApproach ? `<p><span class="subtitle">Mindset of your customers:</span> ${esc(tApproach)}</p>` : ""}
         ${tApproachDesc ? `<p class="preserve">${esc(tApproachDesc)}</p>` : ""}
       </div>
-
       <div class="card scrollTarget" id="block-persona">
         <div class="sectionTitle">Target Persona</div>
         ${d.TP_NAME || d["{{TP_NAME}}"] ? `<p><span class="subtitle">Name of the Target Persona:</span> ${esc(d.TP_NAME || d["{{TP_NAME}}"])}</p>` : ""}
@@ -205,16 +186,7 @@ function paintTargeting(api, allowFull = false) {
   document.querySelectorAll(".abc-wrap").forEach((wrapper) => {
     const m = (wrapper.dataset.mode || "B2B").toUpperCase();
     const a = (wrapper.dataset.areas || "").split("|").map((s) => s.trim()).filter(Boolean);
-    const overlayPath = wrapper.dataset.overlay || IMAGES.abcFrame;
-
-    setABCMap({ container: wrapper, mode: m, areas: a, overlayPath });
-    const host = wrapper.querySelector(".donut");
-    centerLockChart({ wrapper, host, mobileYOffset: -20 });
-
-    if (window.matchMedia("(max-width: 860px)").matches) {
-      host.classList.add("gc-nudge-up");
-    } else {
-      host.classList.remove("gc-nudge-up");
-    }
+    setABCMap({ container: wrapper, mode: m, areas: a, overlayPath: IMAGES.abcFrame });
+    centerLockChart({ wrapper, host: wrapper.querySelector(".donut"), mobileYOffset: -20 });
   });
 }
