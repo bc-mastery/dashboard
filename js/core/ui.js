@@ -121,13 +121,21 @@ export function maybeInsertUniversalUpgradeBlock({ tab, isPreviewOnly, content }
 
   const node = tpl.content.cloneNode(true);
 
-  const stripe4pbs = document.body.getAttribute("data-stripe-4pbs");
-  const calendly   = document.body.getAttribute("data-calendly-url");
+  // 🌍 GLOBAL BUTTON AND LINK DEFINITIONS
   const a4pbs = node.querySelector("#cta-4pbs");
   const acall = node.querySelector("#cta-call");
-  if (a4pbs && stripe4pbs) a4pbs.setAttribute("href", stripe4pbs);
-  if (acall && calendly)   acall.setAttribute("href", calendly);
 
+  if (a4pbs) {
+    a4pbs.textContent = "Unlock your 4-Pillar Strategy";
+    a4pbs.setAttribute("href", "mailto:bc@businesscanvas.io");
+  }
+  
+  if (acall) {
+    acall.textContent = "https://calendly.com/bc-businesscanvas/30min";
+    acall.setAttribute("href", "https://calendly.com/bc-businesscanvas/30min");
+  }
+
+  // Handle title and text descriptions contextually per page
   const titleEl = node.querySelector(".upgradeTitle") || node.querySelector("#upgradeBlockTitle");
   const textEl = node.querySelector(".upgradeText") || node.querySelector(".upgradeBlock p.muted");
   if (titleEl && content?.title) titleEl.textContent = content.title;
