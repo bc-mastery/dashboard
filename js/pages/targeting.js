@@ -15,12 +15,14 @@ import { finalBlockContent } from "../components/blocks.js";
 import { centerLockChart } from "../core/charts.js";
 import { fetchDashboardData } from "../services/api.js";
 
-/* ------------------ Case-Insensitive Column Value Helper ------------------ */
+/* ------------------ Foolproof Column Value Helper ------------------ */
 function getSpreadsheetValue(data, columnName) {
   if (!data) return "";
   const target = columnName.toLowerCase().trim();
   for (const key of Object.keys(data)) {
-    if (key.toLowerCase().trim() === target) {
+    // Strips out any hidden double curly braces {{ }} from the sheet keys
+    const cleanKey = key.replace(/[{}]/g, "").toLowerCase().trim();
+    if (cleanKey === target) {
       return String(data[key]).trim();
     }
   }
@@ -33,53 +35,15 @@ function injectTargetingStylesOnce() {
   const style = document.createElement("style");
   style.id = "targeting-styles";
   style.textContent = `
-    #content .card .bfGrid {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      align-items: start;
-      gap: 22px;
-    }
-    #content .bfMap .abc-wrap {
-      position: relative;
-      width: 100%;
-      max-width: 360px;
-      aspect-ratio: 1 / 1;
-      margin-left: auto;
-    }
-    #content .bfMap .abc-wrap .overlay {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      pointer-events: none;
-      user-select: none;
-      display: block;
-    }
-    #content .bfMap .abc-wrap .donut {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      --donut-nudge-x: 0px;
-      --donut-nudge-y: 0px;
-    }
+    #content .card .bfGrid { display: grid; grid-template-columns: 2fr 1fr; align-items: start; gap: 22px; }
+    #content .bfMap .abc-wrap { position: relative; width: 100%; max-width: 360px; aspect-ratio: 1 / 1; margin-left: auto; }
+    #content .bfMap .abc-wrap .overlay { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; user-select: none; display: block; }
+    #content .bfMap .abc-wrap .donut { position: absolute; inset: 0; width: 100%; height: 100%; --donut-nudge-x: 0px; --donut-nudge-y: 0px; }
     @media (max-width: 860px) {
-      #content .card .bfGrid {
-        grid-template-columns: 1fr;
-        gap: 16px;
-      }
-      #content .bfMap {
-        display: flex;
-        justify-content: center;
-      }
-      #content .bfMap .abc-wrap {
-        max-width: 300px;
-        margin-left: 0;
-      }
-      #content .bfMap .abc-wrap .donut {
-        --donut-nudge-y: 0px;
-      }
+      #content .card .bfGrid { grid-template-columns: 1fr; gap: 16px; }
+      #content .bfMap { display: flex; justify-content: center; }
+      #content .bfMap .abc-wrap { max-width: 300px; margin-left: 0; }
+      #content .bfMap .abc-wrap .donut { --donut-nudge-y: 0px; }
     }
   `;
   document.head.appendChild(style);
@@ -117,19 +81,19 @@ export async function renderTargetingTab(forceRefresh = false) {
 
     const brandEl = document.getElementById("brandName");
     if (brandEl) {
-      const full = String(d.Brand || "");
+      const full = String(d.Brand || d["{{Brand}}"] || "");
       const short = full.length > 80 ? full.slice(0, 80) : full;
       brandEl.textContent = short;
       brandEl.title = full;
     }
 
-    const view = d.T_STRATEGY_OUTPUT || "";
+    const view = d.T_STRATEGY_OUTPUT || d["{{T_STRATEGY_OUTPUT}}"] || "";
     if (view) {
       state.dynamicPdfLinks.targeting = toDownloadLink(view);
       updateFloatingCTA("targeting");
     }
 
-    /* --- FOOLPROOF SPREADSHEET GATE CHECK --- */
+    /* --- GATE CHECK --- */
     const tsReadyValue = getSpreadsheetValue(d, "TS_READY");
     const allowFull = tsReadyValue !== "";
 
@@ -159,17 +123,22 @@ function paintTargeting(api, allowFull = false) {
   if (!contentDiv) return;
 
   const d = (api && api.data) || {};
-  const areas = parseAreas(d.D_AREA);
+  const areas = parseAreas(d.D_AREA || d["{{D_AREA}}"]);
   const mode = detectMode(areas);
+
+  // Extract variables safely regardless of bracket structures
+  const dDriver = d.D_DRIVER || d["{{D_DRIVER}}"] || "";
+  const dDriverDesc = d.D_DRIVER_DESC || d["{{D_DRIVER_DESC}}"] || "";
+  const dArea = d.D_AREA || d["{{D_AREA}}"] || "";
 
   let html = `
     <div class="card scrollTarget" id="block-behavioral">
       <div class="bfGrid">
         <div class="bfText">
           <div class="bfTitle">Behavioral Factors</div>
-          ${d.D_AREA ? `<p><span class="bfSub">Demand Area(s):</span> ${esc(d.D_AREA)}</p>` : ""}
-          ${d.D_DRIVER ? `<p><span class="bfSub">Driver(s):</span> ${esc(d.D_DRIVER)}</p>` : ""}
-          ${d.D_DRIVER_DESC ? `<p class="bfDesc preserve">${esc(d.D_DRIVER_DESC)}</p>` : ""}
+          ${dArea ? `<p><span class="bfSub">Demand Area(s):</span> ${esc(dArea)}</p>` : ""}
+          ${dDriver ? `<p><span class="bfSub">Driver(s):</span> ${esc(dDriver)}</p>` : ""}
+          ${dDriverDesc ? `<p class="bfDesc preserve">${esc(dDriverDesc)}</p>` : ""}
         </div>
         <div class="bfMap">
           <div class="abc-wrap"
@@ -185,36 +154,48 @@ function paintTargeting(api, allowFull = false) {
   `;
 
   if (allowFull) {
+    const dSegment = d.D_SEGMENT || d["{{D_SEGMENT}}"] || "";
+    const dSegmentDesc = d.D_SEGMENT_DESC || d["{{D_SEGMENT_DESC}}"] || "";
+    const tCharacter = d.T_CHARACTER || d["{{T_CHARACTER}}"] || "";
+    const tCharacterDesc = d.T_CHARACTER_DESC || d["{{T_CHARACTER_DESC}}"] || "";
+
+    const tDecision = d.T_DECISION || d["{{T_DECISION}}"] || "";
+    const tDecisionDesc = d.T_DECISION_DESC || d["{{T_DECISION_DESC}}"] || "";
+    const tAction = d.T_ACTION || d["{{T_ACTION}}"] || "";
+    const tActionDesc = d.T_ACTION_DESC || d["{{T_ACTION_DESC}}"] || "";
+    const tApproach = d.T_APPROACH || d["{{T_APPROACH}}"] || "";
+    const tApproachDesc = d.T_APPROACH_DESC || d["{{T_APPROACH_DESC}}"] || "";
+
     html += `
       <div class="card scrollTarget" id="block-positioning">
         <div class="sectionTitle">Positioning</div>
-        ${d.D_SEGMENT ? `<p><span class="subtitle">Target Segment:</span> ${esc(d.D_SEGMENT)}</p>` : ""}
-        ${d.D_SEGMENT_DESC ? `<p class="preserve">${esc(d.D_SEGMENT_DESC)}</p>` : ""}
-        ${d.T_CHARACTER ? `<p><span class="subtitle">Customer Label:</span> ${esc(d.T_CHARACTER)}</p>` : ""}
-        ${d.T_CHARACTER_DESC ? `<p class="preserve">${esc(d.T_CHARACTER_DESC)}</p>` : ""}
+        ${dSegment ? `<p><span class="subtitle">Target Segment:</span> ${esc(dSegment)}</p>` : ""}
+        ${dSegmentDesc ? `<p class="preserve">${esc(dSegmentDesc)}</p>` : ""}
+        ${tCharacter ? `<p><span class="subtitle">Customer Label:</span> ${esc(tCharacter)}</p>` : ""}
+        ${tCharacterDesc ? `<p class="preserve">${esc(tCharacterDesc)}</p>` : ""}
       </div>
 
       <div class="card scrollTarget" id="block-macro">
         <div class="sectionTitle">Macro-behavior</div>
-        ${d.T_DECISION ? `<p><span class="subtitle">Decision-making of your customers:</span> ${esc(d.T_DECISION)}</p>` : ""}
-        ${d.T_DECISION_DESC ? `<p class="preserve">${esc(d.T_DECISION_DESC)}</p>` : ""}
-        ${d.T_ACTION ? `<p><span class="subtitle">Action pattern of your customers:</span> ${esc(d.T_ACTION)}</p>` : ""}
-        ${d.T_ACTION_DESC ? `<p class="preserve">${esc(d.T_ACTION_DESC)}</p>` : ""}
-        ${d.T_APPROACH ? `<p><span class="subtitle">Mindset of your customers:</span> ${esc(d.T_APPROACH)}</p>` : ""}
-        ${d.T_APPROACH_DESC ? `<p class="preserve">${esc(d.T_APPROACH_DESC)}</p>` : ""}
+        ${tDecision ? `<p><span class="subtitle">Decision-making of your customers:</span> ${esc(tDecision)}</p>` : ""}
+        ${tDecisionDesc ? `<p class="preserve">${esc(tDecisionDesc)}</p>` : ""}
+        ${tAction ? `<p><span class="subtitle">Action pattern of your customers:</span> ${esc(tAction)}</p>` : ""}
+        ${tActionDesc ? `<p class="preserve">${esc(tActionDesc)}</p>` : ""}
+        ${tApproach ? `<p><span class="subtitle">Mindset of your customers:</span> ${esc(tApproach)}</p>` : ""}
+        ${tApproachDesc ? `<p class="preserve">${esc(tApproachDesc)}</p>` : ""}
       </div>
 
       <div class="card scrollTarget" id="block-persona">
         <div class="sectionTitle">Target Persona</div>
-        ${d.TP_NAME ? `<p><span class="subtitle">Name of the Target Persona:</span> ${esc(d.TP_NAME)}</p>` : ""}
-        ${d.TP_ROLE ? `<p><span class="subtitle">Role and objectives:</span> ${esc(d.TP_ROLE)}</p>` : ""}
-        ${d.TP_INTENT ? `<p><span class="subtitle">Intent and purchasing behavior:</span> ${esc(d.TP_INTENT)}</p>` : ""}
-        ${d.TP_TRIGGERS ? `<p><span class="subtitle">Behavior, mindset and decision triggers:</span> ${esc(d.TP_TRIGGERS)}</p>` : ""}
-        ${d.TP_DRIVERS ? `<p><span class="subtitle">Emotional drivers and motivations:</span> ${esc(d.TP_DRIVERS)}</p>` : ""}
-        ${d.TP_FEARS ? `<p><span class="subtitle">Underlying fears and sensitivities:</span> ${esc(d.TP_FEARS)}</p>` : ""}
-        ${d.TP_OFFER_FIT ? `<p><span class="subtitle">Brand and offering fit:</span> ${esc(d.TP_OFFER_FIT)}</p>` : ""}
-        ${d.TP_COMM_STYLE ? `<p><span class="subtitle">Ideal communication style:</span> ${esc(d.TP_COMM_STYLE)}</p>` : ""}
-        ${d.TP_SUMMARY ? `<p><span class="subtitle">Persona summary statement:</span> ${esc(d.TP_SUMMARY)}</p>` : ""}
+        ${d.TP_NAME || d["{{TP_NAME}}"] ? `<p><span class="subtitle">Name of the Target Persona:</span> ${esc(d.TP_NAME || d["{{TP_NAME}}"])}</p>` : ""}
+        ${d.TP_ROLE || d["{{TP_ROLE}}"] ? `<p><span class="subtitle">Role and objectives:</span> ${esc(d.TP_ROLE || d["{{TP_ROLE}}"])}</p>` : ""}
+        ${d.TP_INTENT || d["{{TP_INTENT}}"] ? `<p><span class="subtitle">Intent and purchasing behavior:</span> ${esc(d.TP_INTENT || d["{{TP_INTENT}}"])}</p>` : ""}
+        ${d.TP_TRIGGERS || d["{{TP_TRIGGERS}}"] ? `<p><span class="subtitle">Behavior, mindset and decision triggers:</span> ${esc(d.TP_TRIGGERS || d["{{TP_TRIGGERS}}"])}</p>` : ""}
+        ${d.TP_DRIVERS || d["{{TP_DRIVERS}}"] ? `<p><span class="subtitle">Emotional drivers and motivations:</span> ${esc(d.TP_DRIVERS || d["{{TP_DRIVERS}}"])}</p>` : ""}
+        ${d.TP_FEARS || d["{{TP_FEARS}}"] ? `<p><span class="subtitle">Underlying fears and sensitivities:</span> ${esc(d.TP_FEARS || d["{{TP_FEARS}}"])}</p>` : ""}
+        ${d.TP_OFFER_FIT || d["{{TP_OFFER_FIT}}"] ? `<p><span class="subtitle">Brand and offering fit:</span> ${esc(d.TP_OFFER_FIT || d["{{TP_OFFER_FIT}}"])}</p>` : ""}
+        ${d.TP_COMM_STYLE || d["{{TP_COMM_STYLE}}"] ? `<p><span class="subtitle">Ideal communication style:</span> ${esc(d.TP_COMM_STYLE || d["{{TP_COMM_STYLE}}"])}</p>` : ""}
+        ${d.TP_SUMMARY || d["{{TP_SUMMARY}}"] ? `<p><span class="subtitle">Persona summary statement:</span> ${esc(d.TP_SUMMARY || d["{{TP_SUMMARY}}"])}</p>` : ""}
       </div>
     `;
   }
@@ -223,14 +204,10 @@ function paintTargeting(api, allowFull = false) {
 
   document.querySelectorAll(".abc-wrap").forEach((wrapper) => {
     const m = (wrapper.dataset.mode || "B2B").toUpperCase();
-    const a = (wrapper.dataset.areas || "")
-      .split("|")
-      .map((s) => s.trim())
-      .filter(Boolean);
+    const a = (wrapper.dataset.areas || "").split("|").map((s) => s.trim()).filter(Boolean);
     const overlayPath = wrapper.dataset.overlay || IMAGES.abcFrame;
 
     setABCMap({ container: wrapper, mode: m, areas: a, overlayPath });
-
     const host = wrapper.querySelector(".donut");
     centerLockChart({ wrapper, host, mobileYOffset: -20 });
 
