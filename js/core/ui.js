@@ -117,8 +117,8 @@ export function maybeInsertUniversalUpgradeBlock({ tab, isPreviewOnly, content }
   }
   
   if (acall) {
-    acall.textContent = "https://calendly.com/bc-businesscanvas/30min";
-    acall.setAttribute("href", "https://calendly.com/bc-businesscanvas/30min");
+    acall.textContent = "Book a call"; // 👈 Clean label text
+    acall.setAttribute("href", "https://calendly.com/bc-businesscanvas/30min"); // 👈 Link hidden "behind the curtain"
   }
 
   const titleEl = node.querySelector(".upgradeTitle") || node.querySelector("#upgradeBlockTitle");
