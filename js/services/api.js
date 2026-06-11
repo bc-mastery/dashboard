@@ -1,87 +1,65 @@
 // /js/services/api.js
-import { APPS_SCRIPT_URL, token, nocacheFlag } from "../core/config.js";
+import { APPS_SCRIPT_URL, token } from "../core/config.js";
 
 const CACHE_KEY = `dashboard_cache_${token}`;
 const CACHE_DURATION_MS = 60 * 60 * 1000; // 1 hour
 
-/**
- * Retrieves cached data from localStorage if it's valid and not expired.
- * @returns {object|null} The parsed API data or null if not found/expired.
- */
 function getCachedData() {
   const cached = localStorage.getItem(CACHE_KEY);
-  if (!cached) {
-    return null;
-  }
+  if (!cached) return null;
 
   try {
     const { timestamp, data } = JSON.parse(cached);
     if (Date.now() - timestamp > CACHE_DURATION_MS) {
-      console.log("Cache expired. Fetching fresh data.");
       localStorage.removeItem(CACHE_KEY);
       return null;
     }
-    console.log("Loading data from cache.");
     return data;
   } catch (error) {
-    console.error("Failed to parse cached data:", error);
     localStorage.removeItem(CACHE_KEY);
     return null;
   }
 }
 
-/**
- * Stores fresh API data in localStorage with a timestamp.
- * @param {object} data The API data to store.
- */
 function setCachedData(data) {
   try {
-    const cachePayload = {
-      timestamp: Date.now(),
-      data: data,
-    };
-    localStorage.setItem(CACHE_KEY, JSON.stringify(cachePayload));
-    console.log("Data saved to cache.");
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data }));
   } catch (error) {
-    console.error("Failed to save data to cache:", error);
+    console.error("Failed to save cache:", error);
   }
 }
 
-/**
- * Fetches data for the dashboard, using a cache-first strategy.
- * @param {boolean} forceRefresh - If true, bypasses the cache to fetch fresh data.
- * @returns {Promise<object>} The full API response object.
- */
 export async function fetchDashboardData(forceRefresh = false) {
-  if (!token) {
-    throw new Error("No token provided in URL.");
-  }
+  if (!token) throw new Error("No token provided in URL.");
 
-  if (!forceRefresh) {
+  // Check if browser navigation or explicit refresh tells us to fetch fresh data
+  const isPageReload = window.performance && window.performance.navigation.type === 1;
+  
+  if (!forceRefresh && !isPageReload) {
     const cachedData = getCachedData();
     if (cachedData) {
+      console.log("📦 Cache Active: Loading stored data snapshot.");
       return cachedData;
     }
   }
 
-  console.log("Fetching fresh data from server...");
+  console.log("🌐 Cache Bypassed: Fetching live data from Google Sheet...");
   const url = `${APPS_SCRIPT_URL}?token=${encodeURIComponent(token)}&nocache=1`;
 
   try {
     const response = await fetch(url);
-    if (!response.ok) {
-      throw new Error(`Network response was not ok (status: ${response.status})`);
-    }
+    if (!response.ok) throw new Error(`Network error: ${response.status}`);
     const api = await response.json();
 
-    if (!api || !api.ok) {
-      throw new Error(api?.message || "API returned an error or no data.");
-    }
+    if (!api || !api.ok) throw new Error(api?.message || "Invalid API payload response.");
 
-    setCachedData(api); // Cache the new data
+    setCachedData(api);
     return api;
   } catch (error) {
-    console.error("Failed to fetch dashboard data:", error);
+    console.error("Dashboard fetch failed:", error);
+    // Graceful fallback to cache if server fails
+    const fallback = getCachedData();
+    if (fallback) return fallback;
     throw error;
   }
 }
