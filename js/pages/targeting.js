@@ -13,7 +13,7 @@ import {
 } from "../core/ui.js";
 import { finalBlockContent } from "../components/blocks.js";
 import { centerLockChart } from "../core/charts.js";
-import { fetchDashboardData } from "../services/api.js"; // <-- Import new service
+import { fetchDashboardData } from "../services/api.js";
 
 /* ------------------------------ styles ------------------------------ */
 function injectTargetingStylesOnce() {
@@ -56,7 +56,6 @@ function injectTargetingStylesOnce() {
       inset: 0;
       width: 100%;
       height: 100%;
-      /* default: no nudge */
       --donut-nudge-x: 0px;
       --donut-nudge-y: 0px;
     }
@@ -75,7 +74,6 @@ function injectTargetingStylesOnce() {
         max-width: 300px;
         margin-left: 0;
       }
-      /* Mobile-only fine-tune: lift donut a few px (negative = up) */
       #content .bfMap .abc-wrap .donut {
         --donut-nudge-y: 0px;
       }
@@ -128,7 +126,10 @@ export async function renderTargetingTab(forceRefresh = false) {
       updateFloatingCTA("targeting");
     }
 
-    const allowFull = !!d.TS_PAID || !!d["4PBS_PAID"];
+    /* --- SPREADSHEET GATE LOGIC ---
+      Checks Column LY (TS_READY). If it is not empty, allow full visibility.
+    */
+    const allowFull = d.TS_READY && String(d.TS_READY).trim() !== "";
     paintTargeting(api, allowFull);
 
     const blockTabsRow = document.getElementById("blockTabsRow");
@@ -217,7 +218,6 @@ function paintTargeting(api, allowFull = false) {
 
   contentDiv.innerHTML = html;
 
-  // Render + center-lock the donut vs overlay
   document.querySelectorAll(".abc-wrap").forEach((wrapper) => {
     const m = (wrapper.dataset.mode || "B2B").toUpperCase();
     const a = (wrapper.dataset.areas || "")
@@ -229,11 +229,8 @@ function paintTargeting(api, allowFull = false) {
     setABCMap({ container: wrapper, mode: m, areas: a, overlayPath });
 
     const host = wrapper.querySelector(".donut");
-
-    // Center-lock first
     centerLockChart({ wrapper, host, mobileYOffset: -20 });
 
-    // Add or remove the CSS nudge class on mobile
     if (window.matchMedia("(max-width: 860px)").matches) {
       host.classList.add("gc-nudge-up");
     } else {
@@ -241,5 +238,3 @@ function paintTargeting(api, allowFull = false) {
     }
   });
 }
-
-
