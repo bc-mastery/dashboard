@@ -5,13 +5,13 @@ import { state } from "./state.js";
 
 // ✅ --- START: SCROLL SPY LOGIC ---
 let scrollSpyObserver = null;
-let currentActiveSectionId = null; // Keep track of the active section
+let currentActiveSectionId = null;
 
 function activateScrollSpy() {
   if (scrollSpyObserver) {
     scrollSpyObserver.disconnect();
   }
-  currentActiveSectionId = null; // Reset for the new page
+  currentActiveSectionId = null;
 
   const sections = Array.from(document.querySelectorAll(".scrollTarget"));
   const chips = document.querySelectorAll("#blockTabs .blockBtn");
@@ -20,7 +20,6 @@ function activateScrollSpy() {
 
   const headerHeight = document.querySelector(".siteHeader")?.offsetHeight || 150;
 
-  // The observer will fire frequently as sections move through the viewport.
   const observerOptions = {
     rootMargin: `-${headerHeight}px 0px -50px 0px`,
     threshold: 0,
@@ -29,15 +28,12 @@ function activateScrollSpy() {
   const observerCallback = () => {
     let bestSection = null;
     let maxScore = -Infinity;
-
-    // The ideal position for a section's top is just below the sticky header.
     const idealPosition = headerHeight;
 
     sections.forEach(section => {
         const rect = section.getBoundingClientRect();
         const top = rect.top;
 
-        // Ignore sections completely off-screen.
         if (rect.bottom < idealPosition || top > window.innerHeight) {
             return;
         }
@@ -46,12 +42,8 @@ function activateScrollSpy() {
         let score;
 
         if (distance <= 0) {
-            // Section is at or above the ideal line (already scrolled past).
-            // Penalize it more heavily the further up it goes.
-            score = 1000 + distance; // `distance` is negative, so this decreases the score.
+            score = 1000 + distance;
         } else {
-            // Section is below the ideal line (approaching).
-            // Penalize it less to give it priority.
             score = 1000 - (distance * 1.5);
         }
 
@@ -63,7 +55,6 @@ function activateScrollSpy() {
 
     const newActiveId = bestSection ? bestSection.id : null;
 
-    // Only update the UI if the active section has changed.
     if (newActiveId !== currentActiveSectionId) {
         currentActiveSectionId = newActiveId;
         
@@ -77,27 +68,22 @@ function activateScrollSpy() {
   scrollSpyObserver = new IntersectionObserver(observerCallback, observerOptions);
   sections.forEach((section) => scrollSpyObserver.observe(section));
   
-  // Also attach to the main scroll event for maximum responsiveness.
   let scrollTimeout;
   window.addEventListener('scroll', () => {
     clearTimeout(scrollTimeout);
     scrollTimeout = setTimeout(observerCallback, 50);
   }, { passive: true });
   
-  // Run it once on load to set the initial state correctly.
   observerCallback();
 }
 // ✅ --- END: SCROLL SPY LOGIC ---
 
-
 /* --------------------------- Header title + icon --------------------------- */
 export function setTitleAndIcon(tab) {
-  // This function is now much simpler. It ONLY toggles the active class.
-  // All styling is handled by the CSS in index.html for robustness.
   document.querySelectorAll("#tabs .tabBtn").forEach((btn) => {
     const isActive = btn.dataset.tab === tab;
     btn.classList.toggle("tab-active", isActive);
-    btn.classList.toggle("active", isActive); // for legacy compatibility if needed
+    btn.classList.toggle("active", isActive);
   });
 }
 
@@ -121,7 +107,7 @@ export function maybeInsertUniversalUpgradeBlock({ tab, isPreviewOnly, content }
 
   const node = tpl.content.cloneNode(true);
 
-  // 🌍 GLOBAL BUTTON AND LINK DEFINITIONS
+  // 🌍 GLOBAL BUTTON OVERRIDES (Applies to all placeholder boxes uniformly)
   const a4pbs = node.querySelector("#cta-4pbs");
   const acall = node.querySelector("#cta-call");
 
@@ -135,7 +121,6 @@ export function maybeInsertUniversalUpgradeBlock({ tab, isPreviewOnly, content }
     acall.setAttribute("href", "https://calendly.com/bc-businesscanvas/30min");
   }
 
-  // Handle title and text descriptions contextually per page
   const titleEl = node.querySelector(".upgradeTitle") || node.querySelector("#upgradeBlockTitle");
   const textEl = node.querySelector(".upgradeText") || node.querySelector(".upgradeBlock p.muted");
   if (titleEl && content?.title) titleEl.textContent = content.title;
@@ -256,14 +241,11 @@ export function populateBlockTabsFromPage() {
 
   const hasChips = blockTabs.querySelectorAll(".blockBtn").length > 0;
   
-  // THIS IS THE FIX: Only change visibility on desktop to prevent the "jump" on mobile.
   if (window.matchMedia("(min-width: 769px)").matches) {
     blockTabsRow.style.visibility = hasChips ? "visible" : "hidden";
   }
 
   enforceDownloadProtection();
-
-  // ✅ ACTIVATE SCROLL SPY
   activateScrollSpy();
 }
 
@@ -279,7 +261,6 @@ export function initDownloadButtonIsolation() {
 
   const clean = btn.cloneNode(true);
   clean.id = btn.id;
-
   btn.replaceWith(clean);
 
   clean.addEventListener("click", (e) => {
