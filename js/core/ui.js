@@ -3,7 +3,7 @@ import { TAB_TITLES, TAB_ICONS, UI_ICONS } from "./config.js";
 import { getMinTabsRequiredForDownload, toDownloadLink } from "./utils.js";
 import { state } from "./state.js";
 
-// ✅ --- START: SCROLL SPY LOGIC ---
+// --- SCROLL SPY LOGIC ---
 let scrollSpyObserver = null;
 let currentActiveSectionId = null;
 
@@ -76,7 +76,6 @@ function activateScrollSpy() {
   
   observerCallback();
 }
-// ✅ --- END: SCROLL SPY LOGIC ---
 
 /* --------------------------- Header title + icon --------------------------- */
 export function setTitleAndIcon(tab) {
@@ -94,10 +93,10 @@ export function clearUpgradeBlock() {
 }
 
 export function maybeInsertUniversalUpgradeBlock({ tab, isPreviewOnly, content }) {
-  // 1️⃣ ALWAYS clear any old placeholder box first, before checking permission states!
+  // Always wipe clean old upgrade overlays first
   clearUpgradeBlock();
 
-  // If the user has full access, stop right here and do not insert a new box
+  // If page access rules allow full content, stop immediately
   if (!isPreviewOnly) return;
 
   const current = document.body.getAttribute("data-current-tab") || state.currentTab || "";
@@ -109,7 +108,7 @@ export function maybeInsertUniversalUpgradeBlock({ tab, isPreviewOnly, content }
 
   const node = tpl.content.cloneNode(true);
 
-  // 🌍 GLOBAL BUTTON OVERRIDES (Applies to all placeholder boxes uniformly)
+  // Global button setups
   const a4pbs = node.querySelector("#cta-4pbs");
   const acall = node.querySelector("#cta-call");
 
@@ -145,23 +144,6 @@ export function toggleFloatingCallBtn(show) {
 }
 
 /* ---------------------- Download CTA: access + visibility ------------------ */
-export function enforceDownloadProtection() {
-  const cta = document.getElementById("downloadBtn");
-  if (!cta) return;
-
-  const tab = state.currentTab || document.body.getAttribute("data-current-tab") || "";
-  if (tab === "growth") {
-    cta.style.display = "inline-flex";
-    return;
-  }
-
-  const chips = document.querySelectorAll("#blockTabs .blockBtn").length;
-  const minTabs = getMinTabsRequiredForDownload();
-  const allowed = chips >= minTabs;
-
-  cta.style.display = allowed ? "inline-flex" : "none";
-}
-
 export function updateFloatingCTA(tab) {
   const downloadBtn = document.getElementById("downloadBtn");
   if (!downloadBtn) return;
@@ -247,7 +229,7 @@ export function populateBlockTabsFromPage() {
     blockTabsRow.style.visibility = hasChips ? "visible" : "hidden";
   }
 
-  enforceDownloadProtection();
+  // Legacy protection intercept loop removed from here to prevent double-render lockouts!
   activateScrollSpy();
 }
 
@@ -280,23 +262,10 @@ export function initDownloadButtonIsolation() {
         marketing: "M_STRATEGY_OUTPUT",
         sales: "S_STRATEGY_OUTPUT",
         growth: "GS_OUTPUT",
-        mentoring: "MENTORING_STRATEGY_OUTPUT",
-        knowledge: "KNOWLEDGE_STRATEGY_OUTPUT",
-      };
-
-      const fallbacks = {
-        growth: ["GS_OUTPUT", "GROWTH_STRATEGY_OUTPUT"],
-        knowledge: ["KNOWLEDGE_OUTPUT", "K_MASTER_PDF", "KNOWLEDGE_PDF", "KNOWLEDGE_STRATEGY_OUTPUT"],
       };
 
       const primaryField = fieldMap[tab];
       let raw = primaryField ? data[primaryField] : "";
-
-      if (!raw && fallbacks[tab]) {
-        for (const k of fallbacks[tab]) {
-          if (data[k]) { raw = data[k]; break; }
-        }
-      }
 
       if (raw) {
         link = toDownloadLink(raw);
@@ -313,8 +282,6 @@ export function initDownloadButtonIsolation() {
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
-    } else {
-      console.warn("No valid PDF data returned for tab:", tab);
     }
   });
 }
@@ -323,9 +290,7 @@ export function initBlockChipDelegation() {
   if (window.__bcBlockChipDelegated) return;
   window.__bcBlockChipDelegated = true;
 
-  document.addEventListener(
-    "click",
-    (e) => {
+  document.addEventListener("click", (e) => {
       const chip = e.target.closest("#blockTabs .blockBtn");
       if (!chip) return;
 
@@ -337,18 +302,6 @@ export function initBlockChipDelegation() {
       if (!id) return;
       const el = document.getElementById(id);
       if (el) scrollToTarget(el);
-    },
-    true
-  );
-
-  document.addEventListener(
-    "keydown",
-    (e) => {
-      if ((e.key !== "Enter" && e.key !== " ") || !e.target.closest("#blockTabs .blockBtn")) return;
-      e.preventDefault();
-      e.stopPropagation();
-      e.target.click();
-    },
-    true
+    }, true
   );
 }
