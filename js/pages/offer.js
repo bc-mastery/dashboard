@@ -58,20 +58,11 @@ export async function renderOfferTab(forceRefresh = false) {
       updateFloatingCTA("offer");
     }
 
-    /* --- GATE CONTROL LOGIC ---
+    /* --- SIMPLIFIED SPREADSHEET GATE LOGIC ---
       1. Concept block is always visible.
-      2. Full content requires both:
-         - The user has paid (or strategy trigger timer has elapsed)
-         - Column LZ (OS_READY) has data and is an empty cell.
+      2. Full content triggers ONLY if Column LZ (OS_READY) contains manual data.
     */
-    const isStrategySent =
-      d.OFFER_STRATEGY_SENT &&
-      new Date(d.OFFER_STRATEGY_SENT).getTime() < new Date().getTime();
-      
-    const hasPaid = !!d.OFFER_PAID || !!d["4PBS_PAID"] || isStrategySent;
-    const isModuleReleased = d.OS_READY && String(d.OS_READY).trim() !== "";
-
-    const allowFull = hasPaid && isModuleReleased;
+    const allowFull = d.OS_READY && String(d.OS_READY).trim() !== "";
     
     // Render the layout
     paintOffer(api, allowFull);
