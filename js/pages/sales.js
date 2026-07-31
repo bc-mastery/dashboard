@@ -65,9 +65,9 @@ function paintSales(api, allowFull = false) {
 
   let html = buildFirstBlockHTML({
     title: "Sales Characteristics",
-    subtitleLabel: "Sales Style",
-    subtitleValue: d.S_AUDIENCE_VISION,
-    descText: d.S_COMMUNICATION_FOCUS,
+    subtitleLabel: "Sales Character",
+    subtitleValue: d.S_APPROACH,
+    descText: d.S_APPROACH_DESC,
     areas,
   });
 
