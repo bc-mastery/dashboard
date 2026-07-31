@@ -81,7 +81,7 @@ function paintMarketing(api, allowFull = false) {
   const areas = parseAreas(d.D_AREA);
 
   let html = buildFirstBlockHTML({
-    title: "Foundations",
+    title: "Characteristics",
     subtitleLabel: "Marketing Character",
     subtitleValue: d.M_CHARACTER,
     descText: d.M_CHARACTER_DESC,
