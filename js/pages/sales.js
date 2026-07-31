@@ -64,7 +64,7 @@ function paintSales(api, allowFull = false) {
   const areas = parseAreas(d.D_AREA);
 
   let html = buildFirstBlockHTML({
-    title: "Sales Characteristics",
+    title: "Concept",
     subtitleLabel: "Sales Character",
     subtitleValue: d.S_APPROACH,
     descText: d.S_APPROACH_DESC,
