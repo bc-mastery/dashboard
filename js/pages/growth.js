@@ -48,7 +48,7 @@ function growthPercentRange(value) {
   if (!isFinite(n)) return "~0–5%";
   const lower = Math.floor(n / 5) * 5;
   const upper = lower + 5;
-  return `~${lower}–${upper}%`;
+  return `~${lower}-${upper}%`;
 }
 const pctLabel = (n) => `${toPercent(n)}%`;
 
