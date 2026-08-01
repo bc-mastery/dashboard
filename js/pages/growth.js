@@ -273,8 +273,10 @@ export async function renderGrowthTab(forceRefresh = false) {
 
     const rawGP = String(d.GS_GROWTH_POTENTIAL ?? "");
     const isRange = /~?\s*\d+(\.\d+)?\s*[–-]\s*\d+(\.\d+)?\s*%?/.test(rawGP);
-    const growthPotential = toPercent(d.GS_GROWTH_POTENTIAL);
-    const growthPotentialLabel = isRange ? rawGP : pctLabel(growthPotential);
+    const growthPotential = toGrowthPercent(d.GS_GROWTH_POTENTIAL);
+    const growthPotentialLabel = isRange
+      ? rawGP
+      : `${growthPotential}%`;
 
     /* styles must exist before we paint */
     injectGrowthOverviewStylesOnce();
