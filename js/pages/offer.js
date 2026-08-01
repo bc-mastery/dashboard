@@ -13,6 +13,7 @@ import {
 } from "../core/ui.js";
 import { fetchDashboardData } from "../services/api.js";
 
+
 function getSpreadsheetValue(data, columnName) {
   if (!data) return "";
 
@@ -31,6 +32,7 @@ function getSpreadsheetValue(data, columnName) {
 
   return "";
 }
+
 
 export async function renderOfferTab(forceRefresh = false) {
   setCurrentTab("offer");
@@ -69,8 +71,9 @@ export async function renderOfferTab(forceRefresh = false) {
 
     state.lastAccess = inferAccess(d);
 
+
     // ------------------------------------------------------------
-    // Brand
+    // BRAND
     // ------------------------------------------------------------
 
     const brandEl = document.getElementById("brandName");
@@ -88,8 +91,9 @@ export async function renderOfferTab(forceRefresh = false) {
           : full;
     }
 
+
     // ------------------------------------------------------------
-    // Offer PDF
+    // OFFER PDF
     // ------------------------------------------------------------
 
     const view =
@@ -104,25 +108,14 @@ export async function renderOfferTab(forceRefresh = false) {
       updateFloatingCTA("offer");
     }
 
+
     // ------------------------------------------------------------
-    // OFFER ACCESS CHECKS
+    // FULL OFFER STRATEGY GATE
+    //
+    // IMPORTANT:
+    // OS_READY controls ONLY the full strategy.
+    // It does NOT control the first Concept section.
     // ------------------------------------------------------------
-
-    // First/demo section:
-    // visible whenever BOTH O_CHARACTER and O_CHARACTER_DESC exist.
-
-    const oCharacterValue =
-      getSpreadsheetValue(d, "O_CHARACTER");
-
-    const oCharacterDescValue =
-      getSpreadsheetValue(d, "O_CHARACTER_DESC");
-
-    const allowPreview =
-      oCharacterValue !== "" &&
-      oCharacterDescValue !== "";
-
-    // Full Offer strategy:
-    // controlled ONLY by OS_READY.
 
     const osReadyValue =
       getSpreadsheetValue(d, "OS_READY");
@@ -131,8 +124,8 @@ export async function renderOfferTab(forceRefresh = false) {
       osReadyValue !== "";
 
     console.log(
-      "🔍 Offer preview available:",
-      allowPreview
+      "🔍 Offer OS_READY:",
+      `"${osReadyValue}"`
     );
 
     console.log(
@@ -140,33 +133,28 @@ export async function renderOfferTab(forceRefresh = false) {
       allowFull
     );
 
-    console.log(
-      "🔍 O_CHARACTER:",
-      `"${oCharacterValue}"`
-    );
 
+    // Debug first-section fields
     console.log(
-      "🔍 O_CHARACTER_DESC:",
-      `"${oCharacterDescValue}"`
+      "🔍 Offer O_CHARACTER:",
+      `"${getSpreadsheetValue(d, "O_CHARACTER")}"`
     );
 
     console.log(
-      "🔍 OS_READY:",
-      `"${osReadyValue}"`
+      "🔍 Offer O_CHARACTER_DESC:",
+      `"${getSpreadsheetValue(d, "O_CHARACTER_DESC")}"`
     );
 
-    // ------------------------------------------------------------
-    // Paint page
-    // ------------------------------------------------------------
-
-    paintOffer(
-      api,
-      allowFull,
-      allowPreview
-    );
 
     // ------------------------------------------------------------
-    // Block tabs
+    // PAINT OFFER PAGE
+    // ------------------------------------------------------------
+
+    paintOffer(api, allowFull);
+
+
+    // ------------------------------------------------------------
+    // BLOCK TABS
     // ------------------------------------------------------------
 
     const blockTabsRow =
@@ -177,11 +165,15 @@ export async function renderOfferTab(forceRefresh = false) {
     }
 
     populateBlockTabsFromPage();
-
     updateFloatingCTA("offer");
 
+
     // ------------------------------------------------------------
-    // Demo / upgrade message
+    // DEMO / UPGRADE MESSAGE
+    //
+    // If OS_READY is empty:
+    // First section remains visible,
+    // but full strategy stays locked.
     // ------------------------------------------------------------
 
     maybeInsertUniversalUpgradeBlock({
@@ -189,6 +181,7 @@ export async function renderOfferTab(forceRefresh = false) {
       isPreviewOnly: !allowFull,
       content: finalBlockContent.offer,
     });
+
 
     toggleFloatingCallBtn(
       state.lastAccess === ACCESS.GS_ONLY
@@ -208,11 +201,8 @@ export async function renderOfferTab(forceRefresh = false) {
   }
 }
 
-function paintOffer(
-  api,
-  allowFull = false,
-  allowPreview = false
-) {
+
+function paintOffer(api, allowFull = false) {
   const contentDiv =
     document.getElementById("content");
 
@@ -221,317 +211,275 @@ function paintOffer(
   const d =
     (api && api.data) || {};
 
+
+  // ------------------------------------------------------------
+  // DEMAND AREAS
+  // ------------------------------------------------------------
+
   const areas = parseAreas(
     d.D_AREA ||
     d["{{D_AREA}}"]
   );
 
+
+  // ------------------------------------------------------------
+  // FIRST OFFER SECTION
+  //
+  // These are independent of OS_READY.
+  // If the fields exist in the API response,
+  // they are displayed here.
+  // ------------------------------------------------------------
+
   const oCharacter =
-    d.O_CHARACTER ||
-    d["{{O_CHARACTER}}"] ||
-    "";
+    getSpreadsheetValue(d, "O_CHARACTER");
 
   const oCharacterDesc =
-    d.O_CHARACTER_DESC ||
-    d["{{O_CHARACTER_DESC}}"] ||
-    "";
+    getSpreadsheetValue(d, "O_CHARACTER_DESC");
 
-  let html = "";
 
-  // ------------------------------------------------------------
-  // FIRST / DEMO SECTION
-  // ------------------------------------------------------------
+  // FIRST BLOCK IS ALWAYS BUILT.
+  // OS_READY has no influence on it.
 
-  if (allowPreview) {
-    html += buildFirstBlockHTML({
-      title: "Concept",
-      subtitleLabel: "Offer Character",
-      subtitleValue: oCharacter,
-      descText: oCharacterDesc,
-      areas,
-      page: "offer",
-    });
-  }
+  let html = buildFirstBlockHTML({
+    title: "Concept",
+    subtitleLabel: "Offer Character",
+    subtitleValue: oCharacter,
+    descText: oCharacterDesc,
+    areas,
+    page: "offer",
+  });
+
 
   // ------------------------------------------------------------
   // FULL OFFER STRATEGY
+  //
+  // Everything below this point requires OS_READY.
   // ------------------------------------------------------------
 
   if (allowFull) {
+
     html += `
       <div class="card scrollTarget" id="block-characteristics">
         <div class="sectionTitle">Characteristics</div>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_CHARACTERISTIC_1 || d["{{O_CHARACTERISTIC_1}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_CHARACTERISTIC_1 || d["{{O_CHARACTERISTIC_1}}"] || "")}</span>
           <br>
           ${esc(d.O_CHARACTERISTIC_1_DESC || d["{{O_CHARACTERISTIC_1_DESC}}"] || "")}
         </p>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_CHARACTERISTIC_2 || d["{{O_CHARACTERISTIC_2}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_CHARACTERISTIC_2 || d["{{O_CHARACTERISTIC_2}}"] || "")}</span>
           <br>
           ${esc(d.O_CHARACTERISTIC_2_DESC || d["{{O_CHARACTERISTIC_2_DESC}}"] || "")}
         </p>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_CHARACTERISTIC_3 || d["{{O_CHARACTERISTIC_3}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_CHARACTERISTIC_3 || d["{{O_CHARACTERISTIC_3}}"] || "")}</span>
           <br>
           ${esc(d.O_CHARACTERISTIC_3_DESC || d["{{O_CHARACTERISTIC_3_DESC}}"] || "")}
         </p>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_CHARACTERISTIC_4 || d["{{O_CHARACTERISTIC_4}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_CHARACTERISTIC_4 || d["{{O_CHARACTERISTIC_4}}"] || "")}</span>
           <br>
           ${esc(d.O_CHARACTERISTIC_4_DESC || d["{{O_CHARACTERISTIC_4_DESC}}"] || "")}
         </p>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_CHARACTERISTIC_5 || d["{{O_CHARACTERISTIC_5}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_CHARACTERISTIC_5 || d["{{O_CHARACTERISTIC_5}}"] || "")}</span>
           <br>
           ${esc(d.O_CHARACTERISTIC_5_DESC || d["{{O_CHARACTERISTIC_5_DESC}}"] || "")}
         </p>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_CHARACTERISTIC_6 || d["{{O_CHARACTERISTIC_6}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_CHARACTERISTIC_6 || d["{{O_CHARACTERISTIC_6}}"] || "")}</span>
           <br>
           ${esc(d.O_CHARACTERISTIC_6_DESC || d["{{O_CHARACTERISTIC_6_DESC}}"] || "")}
         </p>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_CHARACTERISTIC_7 || d["{{O_CHARACTERISTIC_7}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_CHARACTERISTIC_7 || d["{{O_CHARACTERISTIC_7}}"] || "")}</span>
           <br>
           ${esc(d.O_CHARACTERISTIC_7_DESC || d["{{O_CHARACTERISTIC_7_DESC}}"] || "")}
         </p>
       </div>
 
+
       <div class="card scrollTarget" id="block-features">
         <div class="sectionTitle">Features and Services</div>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_FEATURE_1 || d["{{O_FEATURE_1}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_FEATURE_1 || d["{{O_FEATURE_1}}"] || "")}</span>
           <br>
           ${esc(d.O_FEATURE_1_DESC || d["{{O_FEATURE_1_DESC}}"] || "")}
         </p>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_FEATURE_2 || d["{{O_FEATURE_2}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_FEATURE_2 || d["{{O_FEATURE_2}}"] || "")}</span>
           <br>
           ${esc(d.O_FEATURE_2_DESC || d["{{O_FEATURE_2_DESC}}"] || "")}
         </p>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_FEATURE_3 || d["{{O_FEATURE_3}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_FEATURE_3 || d["{{O_FEATURE_3}}"] || "")}</span>
           <br>
           ${esc(d.O_FEATURE_3_DESC || d["{{O_FEATURE_3_DESC}}"] || "")}
         </p>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_FEATURE_4 || d["{{O_FEATURE_4}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_FEATURE_4 || d["{{O_FEATURE_4}}"] || "")}</span>
           <br>
           ${esc(d.O_FEATURE_4_DESC || d["{{O_FEATURE_4_DESC}}"] || "")}
         </p>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_FEATURE_5 || d["{{O_FEATURE_5}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_FEATURE_5 || d["{{O_FEATURE_5}}"] || "")}</span>
           <br>
           ${esc(d.O_FEATURE_5_DESC || d["{{O_FEATURE_5_DESC}}"] || "")}
         </p>
       </div>
 
+
       <div class="card scrollTarget" id="block-value-triggers">
         <div class="sectionTitle">Value Triggers</div>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_VALUE_1 || d["{{O_VALUE_1}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_VALUE_1 || d["{{O_VALUE_1}}"] || "")}</span>
           <br>
           ${esc(d.O_VALUE_1_DESC || d["{{O_VALUE_1_DESC}}"] || "")}
         </p>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_VALUE_2 || d["{{O_VALUE_2}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_VALUE_2 || d["{{O_VALUE_2}}"] || "")}</span>
           <br>
           ${esc(d.O_VALUE_2_DESC || d["{{O_VALUE_2_DESC}}"] || "")}
         </p>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_VALUE_3 || d["{{O_VALUE_3}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_VALUE_3 || d["{{O_VALUE_3}}"] || "")}</span>
           <br>
           ${esc(d.O_VALUE_3_DESC || d["{{O_VALUE_3_DESC}}"] || "")}
         </p>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_VALUE_4 || d["{{O_VALUE_4}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_VALUE_4 || d["{{O_VALUE_4}}"] || "")}</span>
           <br>
           ${esc(d.O_VALUE_4_DESC || d["{{O_VALUE_4_DESC}}"] || "")}
         </p>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_VALUE_5 || d["{{O_VALUE_5}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_VALUE_5 || d["{{O_VALUE_5}}"] || "")}</span>
           <br>
           ${esc(d.O_VALUE_5_DESC || d["{{O_VALUE_5_DESC}}"] || "")}
         </p>
       </div>
 
+
       <div class="card scrollTarget" id="block-retention">
         <div class="sectionTitle">Retention Factors</div>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_RETENTION_1 || d["{{O_RETENTION_1}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_RETENTION_1 || d["{{O_RETENTION_1}}"] || "")}</span>
           <br>
           ${esc(d.O_RETENTION_1_DESC || d["{{O_RETENTION_1_DESC}}"] || "")}
         </p>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_RETENTION_2 || d["{{O_RETENTION_2}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_RETENTION_2 || d["{{O_RETENTION_2}}"] || "")}</span>
           <br>
           ${esc(d.O_RETENTION_2_DESC || d["{{O_RETENTION_2_DESC}}"] || "")}
         </p>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_RETENTION_3 || d["{{O_RETENTION_3}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_RETENTION_3 || d["{{O_RETENTION_3}}"] || "")}</span>
           <br>
           ${esc(d.O_RETENTION_3_DESC || d["{{O_RETENTION_3_DESC}}"] || "")}
         </p>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_RETENTION_4 || d["{{O_RETENTION_4}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_RETENTION_4 || d["{{O_RETENTION_4}}"] || "")}</span>
           <br>
           ${esc(d.O_RETENTION_4_DESC || d["{{O_RETENTION_4_DESC}}"] || "")}
         </p>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_RETENTION_5 || d["{{O_RETENTION_5}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_RETENTION_5 || d["{{O_RETENTION_5}}"] || "")}</span>
           <br>
           ${esc(d.O_RETENTION_5_DESC || d["{{O_RETENTION_5_DESC}}"] || "")}
         </p>
       </div>
 
+
       <div class="card scrollTarget" id="block-appearance">
         <div class="sectionTitle">Appearance</div>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_APPEARANCE_1 || d["{{O_APPEARANCE_1}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_APPEARANCE_1 || d["{{O_APPEARANCE_1}}"] || "")}</span>
           <br>
           ${esc(d.O_APPEARANCE_1_DESC || d["{{O_APPEARANCE_1_DESC}}"] || "")}
         </p>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_APPEARANCE_2 || d["{{O_APPEARANCE_2}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_APPEARANCE_2 || d["{{O_APPEARANCE_2}}"] || "")}</span>
           <br>
           ${esc(d.O_APPEARANCE_2_DESC || d["{{O_APPEARANCE_2_DESC}}"] || "")}
         </p>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_APPEARANCE_3 || d["{{O_APPEARANCE_3}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_APPEARANCE_3 || d["{{O_APPEARANCE_3}}"] || "")}</span>
           <br>
           ${esc(d.O_APPEARANCE_3_DESC || d["{{O_APPEARANCE_3_DESC}}"] || "")}
         </p>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_APPEARANCE_4 || d["{{O_APPEARANCE_4}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_APPEARANCE_4 || d["{{O_APPEARANCE_4}}"] || "")}</span>
           <br>
           ${esc(d.O_APPEARANCE_4_DESC || d["{{O_APPEARANCE_4_DESC}}"] || "")}
         </p>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_APPEARANCE_5 || d["{{O_APPEARANCE_5}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_APPEARANCE_5 || d["{{O_APPEARANCE_5}}"] || "")}</span>
           <br>
           ${esc(d.O_APPEARANCE_5_DESC || d["{{O_APPEARANCE_5_DESC}}"] || "")}
         </p>
       </div>
 
+
       <div class="card scrollTarget" id="block-pricing">
         <div class="sectionTitle">Pricing</div>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_PRICING_POSITIONING || d["{{O_PRICING_POSITIONING}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_PRICING_POSITIONING || d["{{O_PRICING_POSITIONING}}"] || "")}</span>
           <br>
           ${esc(d.O_PRICING_POSITIONING_DESC || d["{{O_PRICING_POSITIONING_DESC}}"] || "")}
         </p>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_PRICING_PRICE_POINT || d["{{O_PRICING_PRICE_POINT}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_PRICING_PRICE_POINT || d["{{O_PRICING_PRICE_POINT}}"] || "")}</span>
           <br>
           ${esc(d.O_PRICING_PRICE_POINT_DESC || d["{{O_PRICING_PRICE_POINT_DESC}}"] || "")}
         </p>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_PRICING_PRICING_LOGIC || d["{{O_PRICING_PRICING_LOGIC}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_PRICING_PRICING_LOGIC || d["{{O_PRICING_PRICING_LOGIC}}"] || "")}</span>
           <br>
           ${esc(d.O_PRICING_PRICING_LOGIC_DESC || d["{{O_PRICING_PRICING_LOGIC_DESC}}"] || "")}
         </p>
 
         <p>
-          <span class="subtitle">
-            ${esc(d.O_PRICING_FRICTION_REDUCTION || d["{{O_PRICING_FRICTION_REDUCTION}}"] || "")}
-          </span>
+          <span class="subtitle">${esc(d.O_PRICING_FRICTION_REDUCTION || d["{{O_PRICING_FRICTION_REDUCTION}}"] || "")}</span>
           <br>
           ${esc(d.O_PRICING_FRICTION_REDUCTION_DESC || d["{{O_PRICING_FRICTION_REDUCTION_DESC}}"] || "")}
         </p>
       </div>
     `;
   }
+
+
+  // ------------------------------------------------------------
+  // RENDER
+  // ------------------------------------------------------------
 
   contentDiv.innerHTML = html;
 
