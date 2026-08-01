@@ -26,6 +26,23 @@ function toPercent(val) {
   if (n > 100) n = 100;
   return Math.round(n * 100) / 100;
 }
+function toGrowthPercent(val) {
+  if (val === null || val === undefined || val === "") return 0;
+  let s = String(val).trim().replace(",", ".");
+  const hasPercent = s.includes("%");
+  if (hasPercent) {
+    s = s.replace("%", "");
+  }
+  let n = parseFloat(s);
+  if (!isFinite(n)) return 0;
+  // Google Sheets percentage values arrive as decimals:
+  // 0.8 = 80%, 1.5 = 150%, 2 = 200%
+  if (!hasPercent) {
+    n *= 100;
+  }
+  if (n < 0) n = 0;
+  return Math.round(n * 100) / 100;
+}
 const pctLabel = (n) => `${toPercent(n)}%`;
 
 /* ------------------------------ local styles (Block #1 layout + help bubble/overlay) ------------------------------ */
