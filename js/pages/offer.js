@@ -259,8 +259,8 @@ function paintOffer(api, allowFull = false) {
   if (allowFull) {
 
     html += `
-      <div class="card scrollTarget" id="block-characteristics">
-        <div class="sectionTitle">Characteristics</div>
+      <div class="card scrollTarget" id="block-value-triggers">
+        <div class="sectionTitle">Value Triggers</div>
 
         <p>
           <span class="subtitle">${esc(d.O_CHARACTERISTIC_1 || d["{{O_CHARACTERISTIC_1}}"] || "")}</span>
@@ -339,42 +339,6 @@ function paintOffer(api, allowFull = false) {
           ${esc(d.O_FEATURE_5_DESC || d["{{O_FEATURE_5_DESC}}"] || "")}
         </p>
       </div>
-
-
-      <div class="card scrollTarget" id="block-value-triggers">
-        <div class="sectionTitle">Value Triggers</div>
-
-        <p>
-          <span class="subtitle">${esc(d.O_VALUE_1 || d["{{O_VALUE_1}}"] || "")}</span>
-          <br>
-          ${esc(d.O_VALUE_1_DESC || d["{{O_VALUE_1_DESC}}"] || "")}
-        </p>
-
-        <p>
-          <span class="subtitle">${esc(d.O_VALUE_2 || d["{{O_VALUE_2}}"] || "")}</span>
-          <br>
-          ${esc(d.O_VALUE_2_DESC || d["{{O_VALUE_2_DESC}}"] || "")}
-        </p>
-
-        <p>
-          <span class="subtitle">${esc(d.O_VALUE_3 || d["{{O_VALUE_3}}"] || "")}</span>
-          <br>
-          ${esc(d.O_VALUE_3_DESC || d["{{O_VALUE_3_DESC}}"] || "")}
-        </p>
-
-        <p>
-          <span class="subtitle">${esc(d.O_VALUE_4 || d["{{O_VALUE_4}}"] || "")}</span>
-          <br>
-          ${esc(d.O_VALUE_4_DESC || d["{{O_VALUE_4_DESC}}"] || "")}
-        </p>
-
-        <p>
-          <span class="subtitle">${esc(d.O_VALUE_5 || d["{{O_VALUE_5}}"] || "")}</span>
-          <br>
-          ${esc(d.O_VALUE_5_DESC || d["{{O_VALUE_5_DESC}}"] || "")}
-        </p>
-      </div>
-
 
       <div class="card scrollTarget" id="block-retention">
         <div class="sectionTitle">Retention Factors</div>
