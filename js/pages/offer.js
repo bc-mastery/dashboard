@@ -141,7 +141,8 @@ function paintOffer(api, allowFull = false) {
               aria-controls="offerValueTriggersHelpBubble" title="What are Value Triggers?">?</button>
             <div class="gsHelpBubble" id="offerValueTriggersHelpBubble" role="tooltip">
               <button type="button" class="gsHelpCloseBtn" aria-label="Close">&times;</button>
-              <p>Placeholder explanation for Value Triggers.</p>
+              <p>Value Triggers are the qualities that make an offer feel attractive, relevant, and worth choosing to your customers. They reflect what people naturally look for when judging whether a product or service is a good fit — such as reliability, quality, efficiency, exclusivity, measurable results, or personal support.</p>
+              <p>They are not specific features of the offer. Instead, they define what the offer needs to represent and communicate so customers recognize its value. These triggers should influence how the offer is designed, delivered, presented, and eventually sold.</p>
             </div>
           </div>
         </div>
@@ -199,7 +200,8 @@ function paintOffer(api, allowFull = false) {
               aria-controls="offerFeaturesHelpBubble" title="What are Features and Services?">?</button>
             <div class="gsHelpBubble" id="offerFeaturesHelpBubble" role="tooltip">
               <button type="button" class="gsHelpCloseBtn" aria-label="Close">&times;</button>
-              <p>Placeholder explanation for Features and Services.</p>
+              <p>Features & Services are the concrete elements customers actually receive as part of the offer. They translate the broader value your customers expect into specific tools, services, deliverables, processes, support, or experiences.</p>
+              <p>A strong feature should exist for a reason: it should help create one or more of the Value Triggers your customers care about. In simple terms, Value Triggers explain why something matters, while Features & Services define what you actually provide to deliver that value.</p>
             </div>
           </div>
         </div>
@@ -245,7 +247,8 @@ function paintOffer(api, allowFull = false) {
               aria-controls="offerRetentionHelpBubble" title="What are Retention Factors?">?</button>
             <div class="gsHelpBubble" id="offerRetentionHelpBubble" role="tooltip">
               <button type="button" class="gsHelpCloseBtn" aria-label="Close">&times;</button>
-              <p>Placeholder explanation for Retention Factors.</p>
+              <p>Retention Factors are the conditions that make customers want to continue using, renewing, expanding, or returning to your offer after the initial purchase. Winning a customer and keeping a customer are different challenges: long-term loyalty usually depends on continued results, reliability, support, progress, ease of use, or an evolving relationship.</p>
+              <p>These factors help you design the offer so that its value does not end at the point of sale. They show what needs to remain true over time for customers to feel that staying is still worthwhile.</p>
             </div>
           </div>
         </div>
@@ -291,7 +294,8 @@ function paintOffer(api, allowFull = false) {
               aria-controls="offerAppearanceHelpBubble" title="What is Appearance here?">?</button>
             <div class="gsHelpBubble" id="offerAppearanceHelpBubble" role="tooltip">
               <button type="button" class="gsHelpCloseBtn" aria-label="Close">&times;</button>
-              <p>Placeholder explanation for Appearance.</p>
+              <p>Appearance describes how the offer should look, feel, and be presented so customers form the right impression before they fully experience it. This goes beyond graphic design and includes visual style, naming, structure, packaging, presentation, interface, materials, and the overall level of polish surrounding the offer.</p>
+              <p>These signals influence whether customers perceive something as premium or accessible, innovative or established, simple or sophisticated, personal or corporate. The goal is to make the external presentation of the offer reinforce the same expectations created by its actual value and positioning.</p>
             </div>
           </div>
         </div>
@@ -337,7 +341,8 @@ function paintOffer(api, allowFull = false) {
               aria-controls="offerPricingHelpBubble" title="What does Pricing cover?">?</button>
             <div class="gsHelpBubble" id="offerPricingHelpBubble" role="tooltip">
               <button type="button" class="gsHelpCloseBtn" aria-label="Close">&times;</button>
-              <p>Placeholder explanation for Pricing.</p>
+              <p>Pricing covers more than choosing a number. It defines how customers are expected to understand, evaluate, and commit financially to the offer. This includes price positioning, the appropriate price level, package or tier structure, payment logic, and ways to reduce unnecessary purchasing friction.</p>
+              <p>The objective is to make the commercial model consistent with both the value of the offer and the way your customers make decisions. Good pricing makes the value-price relationship easy to understand: customers should see why the offer costs what it does, what they receive in return, and which option makes sense for their situation.</p>
             </div>
           </div>
         </div>
