@@ -13,26 +13,20 @@ import {
 } from "../core/ui.js";
 import { fetchDashboardData } from "../services/api.js";
 
-
 function getSpreadsheetValue(data, columnName) {
   if (!data) return "";
-
   const target = columnName.toLowerCase().trim();
-
   for (const key of Object.keys(data)) {
     const cleanKey = key
       .replace(/[{}]/g, "")
       .toLowerCase()
       .trim();
-
     if (cleanKey === target) {
       return String(data[key] ?? "").trim();
     }
   }
-
   return "";
 }
-
 
 export async function renderOfferTab(forceRefresh = false) {
   setCurrentTab("offer");
@@ -117,174 +111,15 @@ export async function renderOfferTab(forceRefresh = false) {
   }
 }
 
-
-    // ------------------------------------------------------------
-    // BRAND
-    // ------------------------------------------------------------
-
-    const brandEl = document.getElementById("brandName");
-
-    if (brandEl) {
-      const full = String(
-        d.Brand ||
-        d["{{Brand}}"] ||
-        ""
-      );
-
-      brandEl.textContent =
-        full.length > 80
-          ? full.slice(0, 80)
-          : full;
-    }
-
-
-    // ------------------------------------------------------------
-    // OFFER PDF
-    // ------------------------------------------------------------
-
-    const view =
-      d.O_STRATEGY_OUTPUT ||
-      d["{{O_STRATEGY_OUTPUT}}"] ||
-      "";
-
-    if (view) {
-      state.dynamicPdfLinks.offer =
-        toDownloadLink(view);
-
-      updateFloatingCTA("offer");
-    }
-
-
-    // ------------------------------------------------------------
-    // FULL OFFER STRATEGY GATE
-    //
-    // IMPORTANT:
-    // OS_READY controls ONLY the full strategy.
-    // It does NOT control the first Concept section.
-    // ------------------------------------------------------------
-
-    const osReadyValue =
-      getSpreadsheetValue(d, "OS_READY");
-
-    const allowFull =
-      osReadyValue !== "";
-
-    console.log(
-      "🔍 Offer OS_READY:",
-      `"${osReadyValue}"`
-    );
-
-    console.log(
-      "🔍 Offer full strategy available:",
-      allowFull
-    );
-
-
-    // Debug first-section fields
-    console.log(
-      "🔍 Offer O_CHARACTER:",
-      `"${getSpreadsheetValue(d, "O_CHARACTER")}"`
-    );
-
-    console.log(
-      "🔍 Offer O_CHARACTER_DESC:",
-      `"${getSpreadsheetValue(d, "O_CHARACTER_DESC")}"`
-    );
-
-
-    // ------------------------------------------------------------
-    // PAINT OFFER PAGE
-    // ------------------------------------------------------------
-
-    paintOffer(api, allowFull);
-
-
-    // ------------------------------------------------------------
-    // BLOCK TABS
-    // ------------------------------------------------------------
-
-    const blockTabsRow =
-      document.getElementById("blockTabsRow");
-
-    if (blockTabsRow) {
-      blockTabsRow.style.display = "block";
-    }
-
-    populateBlockTabsFromPage();
-    updateFloatingCTA("offer");
-
-
-    // ------------------------------------------------------------
-    // DEMO / UPGRADE MESSAGE
-    //
-    // If OS_READY is empty:
-    // First section remains visible,
-    // but full strategy stays locked.
-    // ------------------------------------------------------------
-
-    maybeInsertUniversalUpgradeBlock({
-      tab: "offer",
-      isPreviewOnly: !allowFull,
-      content: finalBlockContent.offer,
-    });
-
-
-    toggleFloatingCallBtn(
-      state.lastAccess === ACCESS.GS_ONLY
-    );
-
-  } catch (err) {
-    console.error(err);
-
-    contentDiv.innerHTML = `
-      <div class="card">
-        <p class="muted">
-          Error loading data:
-          ${esc(err?.message || err)}
-        </p>
-      </div>
-    `;
-  }
-}
-
-
 function paintOffer(api, allowFull = false) {
-  const contentDiv =
-    document.getElementById("content");
-
+  const contentDiv = document.getElementById("content");
   if (!contentDiv) return;
 
-  const d =
-    (api && api.data) || {};
+  const d = (api && api.data) || {};
+  const areas = parseAreas(d.D_AREA || d["{{D_AREA}}"]);
 
-
-  // ------------------------------------------------------------
-  // DEMAND AREAS
-  // ------------------------------------------------------------
-
-  const areas = parseAreas(
-    d.D_AREA ||
-    d["{{D_AREA}}"]
-  );
-
-
-  // ------------------------------------------------------------
-  // FIRST OFFER SECTION
-  //
-  // These are independent of OS_READY.
-  // If the fields exist in the API response,
-  // they are displayed here.
-  // ------------------------------------------------------------
-
-  const oCharacter =
-    getSpreadsheetValue(d, "O_CHARACTER");
-
-  const oCharacterDesc =
-    getSpreadsheetValue(d, "O_CHARACTER_DESC");
-
-
-  // FIRST BLOCK IS ALWAYS BUILT.
-  // OS_READY has no influence on it.
+  const oCharacter = getSpreadsheetValue(d, "O_CHARACTER");
+  const oCharacterDesc = getSpreadsheetValue(d, "O_CHARACTER_DESC");
 
   let html = buildFirstBlockHTML({
     title: "Concept",
@@ -295,131 +130,79 @@ function paintOffer(api, allowFull = false) {
     page: "offer",
   });
 
-
-  // ------------------------------------------------------------
-  // FULL OFFER STRATEGY
-  //
-  // Everything below this point requires OS_READY.
-  // ------------------------------------------------------------
-
   if (allowFull) {
-
-  html += `
-    <div class="card scrollTarget" id="block-value-triggers">
-      <div class="sectionHeader">
-        <div class="sectionTitle">Value Triggers</div>
-        <div class="gsHelpWrap" id="offerValueTriggersHelpWrap">
-          <button type="button" class="gsHelpBtn" id="offerValueTriggersHelpBtn"
-            aria-label="What are Value Triggers?" aria-expanded="false"
-            aria-controls="offerValueTriggersHelpBubble" title="What are Value Triggers?">?</button>
-          <div class="gsHelpBubble" id="offerValueTriggersHelpBubble" role="tooltip">
-            <button type="button" class="gsHelpCloseBtn" aria-label="Close">&times;</button>
-            <p>Placeholder explanation for Value Triggers.</p>
+    html += `
+      <div class="card scrollTarget" id="block-value-triggers">
+        <div class="sectionHeader">
+          <div class="sectionTitle">Value Triggers</div>
+          <div class="gsHelpWrap" id="offerValueTriggersHelpWrap">
+            <button type="button" class="gsHelpBtn" id="offerValueTriggersHelpBtn"
+              aria-label="What are Value Triggers?" aria-expanded="false"
+              aria-controls="offerValueTriggersHelpBubble" title="What are Value Triggers?">?</button>
+            <div class="gsHelpBubble" id="offerValueTriggersHelpBubble" role="tooltip">
+              <button type="button" class="gsHelpCloseBtn" aria-label="Close">&times;</button>
+              <p>Placeholder explanation for Value Triggers.</p>
+            </div>
           </div>
         </div>
+
+        <p>
+          <span class="subtitle">${esc(d.O_CHARACTERISTIC_1 || d["{{O_CHARACTERISTIC_1}}"] || "")}</span>
+          <br>
+          ${esc(d.O_CHARACTERISTIC_1_DESC || d["{{O_CHARACTERISTIC_1_DESC}}"] || "")}
+        </p>
+
+        <p>
+          <span class="subtitle">${esc(d.O_CHARACTERISTIC_2 || d["{{O_CHARACTERISTIC_2}}"] || "")}</span>
+          <br>
+          ${esc(d.O_CHARACTERISTIC_2_DESC || d["{{O_CHARACTERISTIC_2_DESC}}"] || "")}
+        </p>
+
+        <p>
+          <span class="subtitle">${esc(d.O_CHARACTERISTIC_3 || d["{{O_CHARACTERISTIC_3}}"] || "")}</span>
+          <br>
+          ${esc(d.O_CHARACTERISTIC_3_DESC || d["{{O_CHARACTERISTIC_3_DESC}}"] || "")}
+        </p>
+
+        <p>
+          <span class="subtitle">${esc(d.O_CHARACTERISTIC_4 || d["{{O_CHARACTERISTIC_4}}"] || "")}</span>
+          <br>
+          ${esc(d.O_CHARACTERISTIC_4_DESC || d["{{O_CHARACTERISTIC_4_DESC}}"] || "")}
+        </p>
+
+        <p>
+          <span class="subtitle">${esc(d.O_CHARACTERISTIC_5 || d["{{O_CHARACTERISTIC_5}}"] || "")}</span>
+          <br>
+          ${esc(d.O_CHARACTERISTIC_5_DESC || d["{{O_CHARACTERISTIC_5_DESC}}"] || "")}
+        </p>
+
+        <p>
+          <span class="subtitle">${esc(d.O_CHARACTERISTIC_6 || d["{{O_CHARACTERISTIC_6}}"] || "")}</span>
+          <br>
+          ${esc(d.O_CHARACTERISTIC_6_DESC || d["{{O_CHARACTERISTIC_6_DESC}}"] || "")}
+        </p>
+
+        <p>
+          <span class="subtitle">${esc(d.O_CHARACTERISTIC_7 || d["{{O_CHARACTERISTIC_7}}"] || "")}</span>
+          <br>
+          ${esc(d.O_CHARACTERISTIC_7_DESC || d["{{O_CHARACTERISTIC_7_DESC}}"] || "")}
+        </p>
       </div>
-
-      <p>
-        <span class="subtitle">${esc(d.O_CHARACTERISTIC_1 || d["{{O_CHARACTERISTIC_1}}"] || "")}</span>
-        <br>
-        ${esc(d.O_CHARACTERISTIC_1_DESC || d["{{O_CHARACTERISTIC_1_DESC}}"] || "")}
-      </p>
-      <!-- ... O_CHARACTERISTIC 2 through 7 ... -->
-    </div>
-
-    <div class="card scrollTarget" id="block-features">
-      <div class="sectionHeader">
-        <div class="sectionTitle">Features and Services</div>
-        <div class="gsHelpWrap" id="offerFeaturesHelpWrap">
-          <button type="button" class="gsHelpBtn" id="offerFeaturesHelpBtn"
-            aria-label="What are Features and Services?" aria-expanded="false"
-            aria-controls="offerFeaturesHelpBubble" title="What are Features and Services?">?</button>
-          <div class="gsHelpBubble" id="offerFeaturesHelpBubble" role="tooltip">
-            <button type="button" class="gsHelpCloseBtn" aria-label="Close">&times;</button>
-            <p>Placeholder explanation for Features and Services.</p>
-          </div>
-        </div>
-      </div>
-
-      <p>
-        <span class="subtitle">${esc(d.O_FEATURE_1 || d["{{O_FEATURE_1}}"] || "")}</span>
-        <br>
-        ${esc(d.O_FEATURE_1_DESC || d["{{O_FEATURE_1_DESC}}"] || "")}
-      </p>
-      <!-- ... O_FEATURE 2 through 5 ... -->
-    </div>
-
-    <div class="card scrollTarget" id="block-retention">
-      <div class="sectionHeader">
-        <div class="sectionTitle">Retention Factors</div>
-        <div class="gsHelpWrap" id="offerRetentionHelpWrap">
-          <button type="button" class="gsHelpBtn" id="offerRetentionHelpBtn"
-            aria-label="What are Retention Factors?" aria-expanded="false"
-            aria-controls="offerRetentionHelpBubble" title="What are Retention Factors?">?</button>
-          <div class="gsHelpBubble" id="offerRetentionHelpBubble" role="tooltip">
-            <button type="button" class="gsHelpCloseBtn" aria-label="Close">&times;</button>
-            <p>Placeholder explanation for Retention Factors.</p>
-          </div>
-        </div>
-      </div>
-
-      <p>
-        <span class="subtitle">${esc(d.O_RETENTION_1 || d["{{O_RETENTION_1}}"] || "")}</span>
-        <br>
-        ${esc(d.O_RETENTION_1_DESC || d["{{O_RETENTION_1_DESC}}"] || "")}
-      </p>
-      <!-- ... O_RETENTION 2 through 5 ... -->
-    </div>
-
-    <div class="card scrollTarget" id="block-appearance">
-      <div class="sectionHeader">
-        <div class="sectionTitle">Appearance</div>
-        <div class="gsHelpWrap" id="offerAppearanceHelpWrap">
-          <button type="button" class="gsHelpBtn" id="offerAppearanceHelpBtn"
-            aria-label="What is Appearance here?" aria-expanded="false"
-            aria-controls="offerAppearanceHelpBubble" title="What is Appearance here?">?</button>
-          <div class="gsHelpBubble" id="offerAppearanceHelpBubble" role="tooltip">
-            <button type="button" class="gsHelpCloseBtn" aria-label="Close">&times;</button>
-            <p>Placeholder explanation for Appearance.</p>
-          </div>
-        </div>
-      </div>
-
-      <p>
-        <span class="subtitle">${esc(d.O_APPEARANCE_1 || d["{{O_APPEARANCE_1}}"] || "")}</span>
-        <br>
-        ${esc(d.O_APPEARANCE_1_DESC || d["{{O_APPEARANCE_1_DESC}}"] || "")}
-      </p>
-      <!-- ... O_APPEARANCE 2 through 5 ... -->
-    </div>
-
-    <div class="card scrollTarget" id="block-pricing">
-      <div class="sectionHeader">
-        <div class="sectionTitle">Pricing</div>
-        <div class="gsHelpWrap" id="offerPricingHelpWrap">
-          <button type="button" class="gsHelpBtn" id="offerPricingHelpBtn"
-            aria-label="What does Pricing cover?" aria-expanded="false"
-            aria-controls="offerPricingHelpBubble" title="What does Pricing cover?">?</button>
-          <div class="gsHelpBubble" id="offerPricingHelpBubble" role="tooltip">
-            <button type="button" class="gsHelpCloseBtn" aria-label="Close">&times;</button>
-            <p>Placeholder explanation for Pricing.</p>
-          </div>
-        </div>
-      </div>
-
-      <p>
-        <span class="subtitle">${esc(d.O_PRICING_POSITIONING || d["{{O_PRICING_POSITIONING}}"] || "")}</span>
-        <br>
-        ${esc(d.O_PRICING_POSITIONING_DESC || d["{{O_PRICING_POSITIONING_DESC}}"] || "")}
-      </p>
-      <!-- ... PRICING fields ... -->
-    </div>
-  `;
-}
 
 
       <div class="card scrollTarget" id="block-features">
-        <div class="sectionTitle">Features and Services</div>
+        <div class="sectionHeader">
+          <div class="sectionTitle">Features and Services</div>
+          <div class="gsHelpWrap" id="offerFeaturesHelpWrap">
+            <button type="button" class="gsHelpBtn" id="offerFeaturesHelpBtn"
+              aria-label="What are Features and Services?" aria-expanded="false"
+              aria-controls="offerFeaturesHelpBubble" title="What are Features and Services?">?</button>
+            <div class="gsHelpBubble" id="offerFeaturesHelpBubble" role="tooltip">
+              <button type="button" class="gsHelpCloseBtn" aria-label="Close">&times;</button>
+              <p>Placeholder explanation for Features and Services.</p>
+            </div>
+          </div>
+        </div>
 
         <p>
           <span class="subtitle">${esc(d.O_FEATURE_1 || d["{{O_FEATURE_1}}"] || "")}</span>
@@ -452,8 +235,20 @@ function paintOffer(api, allowFull = false) {
         </p>
       </div>
 
+
       <div class="card scrollTarget" id="block-retention">
-        <div class="sectionTitle">Retention Factors</div>
+        <div class="sectionHeader">
+          <div class="sectionTitle">Retention Factors</div>
+          <div class="gsHelpWrap" id="offerRetentionHelpWrap">
+            <button type="button" class="gsHelpBtn" id="offerRetentionHelpBtn"
+              aria-label="What are Retention Factors?" aria-expanded="false"
+              aria-controls="offerRetentionHelpBubble" title="What are Retention Factors?">?</button>
+            <div class="gsHelpBubble" id="offerRetentionHelpBubble" role="tooltip">
+              <button type="button" class="gsHelpCloseBtn" aria-label="Close">&times;</button>
+              <p>Placeholder explanation for Retention Factors.</p>
+            </div>
+          </div>
+        </div>
 
         <p>
           <span class="subtitle">${esc(d.O_RETENTION_1 || d["{{O_RETENTION_1}}"] || "")}</span>
@@ -488,7 +283,18 @@ function paintOffer(api, allowFull = false) {
 
 
       <div class="card scrollTarget" id="block-appearance">
-        <div class="sectionTitle">Appearance</div>
+        <div class="sectionHeader">
+          <div class="sectionTitle">Appearance</div>
+          <div class="gsHelpWrap" id="offerAppearanceHelpWrap">
+            <button type="button" class="gsHelpBtn" id="offerAppearanceHelpBtn"
+              aria-label="What is Appearance here?" aria-expanded="false"
+              aria-controls="offerAppearanceHelpBubble" title="What is Appearance here?">?</button>
+            <div class="gsHelpBubble" id="offerAppearanceHelpBubble" role="tooltip">
+              <button type="button" class="gsHelpCloseBtn" aria-label="Close">&times;</button>
+              <p>Placeholder explanation for Appearance.</p>
+            </div>
+          </div>
+        </div>
 
         <p>
           <span class="subtitle">${esc(d.O_APPEARANCE_1 || d["{{O_APPEARANCE_1}}"] || "")}</span>
@@ -523,7 +329,18 @@ function paintOffer(api, allowFull = false) {
 
 
       <div class="card scrollTarget" id="block-pricing">
-        <div class="sectionTitle">Pricing</div>
+        <div class="sectionHeader">
+          <div class="sectionTitle">Pricing</div>
+          <div class="gsHelpWrap" id="offerPricingHelpWrap">
+            <button type="button" class="gsHelpBtn" id="offerPricingHelpBtn"
+              aria-label="What does Pricing cover?" aria-expanded="false"
+              aria-controls="offerPricingHelpBubble" title="What does Pricing cover?">?</button>
+            <div class="gsHelpBubble" id="offerPricingHelpBubble" role="tooltip">
+              <button type="button" class="gsHelpCloseBtn" aria-label="Close">&times;</button>
+              <p>Placeholder explanation for Pricing.</p>
+            </div>
+          </div>
+        </div>
 
         <p>
           <span class="subtitle">${esc(d.O_PRICING_POSITIONING || d["{{O_PRICING_POSITIONING}}"] || "")}</span>
@@ -552,18 +369,10 @@ function paintOffer(api, allowFull = false) {
     `;
   }
 
-
-  // ------------------------------------------------------------
-  // RENDER
-  // ------------------------------------------------------------
-
   contentDiv.innerHTML = html;
-
   hydrateABCMaps();
 }
 
-
-// --- 1. Inject Styles ---
 function injectOfferHelpStylesOnce() {
   if (document.getElementById("offer-help-styles")) return;
   const style = document.createElement("style");
@@ -672,7 +481,6 @@ function injectOfferHelpStylesOnce() {
   document.head.appendChild(style);
 }
 
-// --- 2. Initialize Click/Focus Event Listeners ---
 function setupOfferHelpBubbles() {
   let overlay = document.getElementById("gsOverlay");
   if (!overlay) {
