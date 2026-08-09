@@ -418,16 +418,15 @@ function injectOfferHelpStylesOnce() {
     }
     .gsHelpBubble {
       position: absolute;
-      left: 24px;
+      left: 0;
       right: 0;
-      top: calc(100% + 8px);
-      width: auto;
-      max-width: none;
+      top: calc(100% + 16px); /* Positions bubble 16px directly underneath the header row */
+      width: 100%;
       background: #333333;
       border: 1px solid #E5E7EB;
       border-radius: 12px;
-      padding: 12px 14px;
-      box-shadow: 0 10px 20px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.06);
+      padding: 14px 16px;
+      box-shadow: 0 10px 20px rgba(0,0,0,.15);
       z-index: 4002;
       display: none;
     }
@@ -441,16 +440,16 @@ function injectOfferHelpStylesOnce() {
     .gsHelpBubble p:last-child { margin-bottom: 0; }
     .gsHelpWrap.open .gsHelpBubble { display: block; }
     .gsHelpCloseBtn {
-      display: none;
+      display: block;
       position: absolute;
       top: 8px;
       right: 8px;
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       background: transparent;
       border: none;
       color: white;
-      font-size: 24px;
+      font-size: 22px;
       line-height: 1;
       cursor: pointer;
       font-weight: bold;
@@ -465,23 +464,6 @@ function injectOfferHelpStylesOnce() {
       display: none;
     }
     #gsOverlay.show { display: block; }
-
-    @media (max-width: 768px) {
-      .gsHelpBubble {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: calc(100% - 40px);
-        max-width: 400px;
-        max-height: 80vh;
-        overflow-y: auto;
-        padding: 24px;
-      }
-      .gsHelpCloseBtn {
-        display: block;
-      }
-    }
   `;
   document.head.appendChild(style);
 }
