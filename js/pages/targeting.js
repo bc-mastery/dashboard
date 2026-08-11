@@ -17,13 +17,22 @@ import { fetchDashboardData } from "../services/api.js";
 
 function getSpreadsheetValue(data, columnName) {
   if (!data) return "";
-  const target = columnName.toLowerCase().trim();
+
+  const target =
+    columnName.toLowerCase().trim();
+
   for (const key of Object.keys(data)) {
-    const cleanKey = key.replace(/[{}]/g, "").toLowerCase().trim();
+    const cleanKey =
+      key
+        .replace(/[{}]/g, "")
+        .toLowerCase()
+        .trim();
+
     if (cleanKey === target) {
-      return String(data[key]).trim();
+      return String(data[key] ?? "").trim();
     }
   }
+
   return "";
 }
 
@@ -81,9 +90,14 @@ export async function renderTargetingTab(forceRefresh = false) {
 
     /* --- GATE CHECK WITH ACTIVE CONSOLE LOGGING --- */
     const tsReadyValue = getSpreadsheetValue(d, "TS_READY");
-    console.log("🔍 Debug Gate Verification (Targeting): Found raw value for TS_READY =", `"${tsReadyValue}"`);
+
+    console.log(
+      "🔍 Debug Gate Verification (Targeting): Found raw value for TS_READY =",
+      `"${tsReadyValue}"`
+    );
     
-    const allowFull = tsReadyValue !== "";
+    const allowFull =
+      tsReadyValue.toUpperCase() === "TRUE";
 
     paintTargeting(api, allowFull);
 
