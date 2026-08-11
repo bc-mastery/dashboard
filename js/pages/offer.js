@@ -78,7 +78,14 @@ export async function renderOfferTab(forceRefresh = false) {
     }
 
     const osReadyValue = getSpreadsheetValue(d, "OS_READY");
-    const allowFull = osReadyValue !== "";
+
+    console.log(
+      "🔍 Debug Gate Verification (Offer): Found raw value for OS_READY =",
+      `"${osReadyValue}"`
+    );
+    
+    const allowFull =
+      osReadyValue.toUpperCase() === "TRUE";
 
     paintOffer(api, allowFull);
     setupOfferHelpBubbles();
