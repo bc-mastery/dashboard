@@ -437,13 +437,11 @@ function paintMarketing(
         </div>
 
 
-        <p class="preserve">
-          ${esc(
-            d.M_STRATEGY_INTRO ||
-            d["{{M_STRATEGY_INTRO}}"] ||
-            ""
-          )}
-        </p>
+        <p class="preserve">${esc(
+          d.M_STRATEGY_INTRO ||
+          d["{{M_STRATEGY_INTRO}}"] ||
+          ""
+        )}</p>
 
       </div>
     `;
@@ -652,13 +650,11 @@ function paintMarketing(
         </div>
 
 
-        <p class="preserve">
-          ${esc(
-            d.M_DIFFERENTIATION ||
-            d["{{M_DIFFERENTIATION}}"] ||
-            ""
-          )}
-        </p>
+                <p class="preserve">${esc(
+          d.M_DIFFERENTIATION ||
+          d["{{M_DIFFERENTIATION}}"] ||
+          ""
+        )}</p>
 
       </div>
     `;
@@ -1008,13 +1004,11 @@ function paintMarketing(
         </div>
 
 
-        <p class="preserve">
-          ${esc(
-            d.M_TONE_OF_VOICE_DESC ||
-            d["{{M_TONE_OF_VOICE_DESC}}"] ||
-            ""
-          )}
-        </p>
+                <p class="preserve">${esc(
+          d.M_TONE_OF_VOICE_DESC ||
+          d["{{M_TONE_OF_VOICE_DESC}}"] ||
+          ""
+        )}</p>
 
 
         <p>
@@ -1024,13 +1018,11 @@ function paintMarketing(
         </p>
 
 
-        <p class="preserve">
-          ${esc(
-            d.M_TONE_OF_VOICE_DOS ||
-            d["{{M_TONE_OF_VOICE_DOS}}"] ||
-            ""
-          )}
-        </p>
+                <p class="preserve">${esc(
+          d.M_TONE_OF_VOICE_DOS ||
+          d["{{M_TONE_OF_VOICE_DOS}}"] ||
+          ""
+        )}</p>
 
 
         <p>
@@ -1040,13 +1032,11 @@ function paintMarketing(
         </p>
 
 
-        <p class="preserve">
-          ${esc(
-            d.M_TONE_OF_VOICE_DONTS ||
-            d["{{M_TONE_OF_VOICE_DONTS}}"] ||
-            ""
-          )}
-        </p>
+                <p class="preserve">${esc(
+          d.M_TONE_OF_VOICE_DONTS ||
+          d["{{M_TONE_OF_VOICE_DONTS}}"] ||
+          ""
+        )}</p>
 
       </div>
     `;
@@ -1395,13 +1385,11 @@ function paintMarketing(
         </div>
 
 
-        <p class="preserve">
-          ${esc(
-            d.M_LEAD_CONVERSION ||
-            d["{{M_LEAD_CONVERSION}}"] ||
-            ""
-          )}
-        </p>
+                <p class="preserve">${esc(
+          d.M_LEAD_CONVERSION ||
+          d["{{M_LEAD_CONVERSION}}"] ||
+          ""
+        )}</p>
 
       </div>
     `;
