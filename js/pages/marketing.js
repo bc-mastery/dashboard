@@ -422,13 +422,8 @@ function paintMarketing(
                 &times;
               </button>
 
-              <p>
-                Placeholder description for Marketing Foundations.
-              </p>
-
-              <p>
-                This text will later explain how this section should be understood and used.
-              </p>
+<p>Marketing Foundations define the strategic role marketing should play in attracting and influencing your target customers. They connect your Targeting and Offer Strategies with the way your business needs to create awareness, build relevance, establish credibility, and move potential customers toward a buying decision.</p>
+<p>This section provides the strategic foundation for everything that follows. Rather than defining individual campaigns or channels, it establishes what your marketing needs to accomplish and how it should support the broader commercial strategy of the business.</p>
 
             </div>
 
@@ -494,13 +489,8 @@ function paintMarketing(
                 &times;
               </button>
 
-              <p>
-                Placeholder description for Marketing Objectives.
-              </p>
-
-              <p>
-                This text will later explain how these objectives guide the company's marketing activity.
-              </p>
+<p>Marketing Objectives define the specific outcomes your marketing should work toward. They translate the overall Marketing Strategy into clear priorities — such as increasing awareness, strengthening credibility, creating demand, improving consideration, generating qualified opportunities, or supporting customer retention.</p>
+<p>These objectives help prevent marketing from becoming a collection of disconnected activities. They provide direction for deciding what to communicate, where to focus resources, and how different marketing initiatives should contribute to measurable business progress.</p>              </p>
 
             </div>
 
@@ -635,13 +625,8 @@ function paintMarketing(
                 &times;
               </button>
 
-              <p>
-                Placeholder description for Differentiation.
-              </p>
-
-              <p>
-                This text will later explain how differentiation should be expressed through marketing.
-              </p>
+              <p>Differentiation defines how your business should create a meaningful distinction from the alternatives your customers are likely to consider. It identifies the qualities, strengths, perspectives, or forms of value that should make your company easier to recognize, understand, and prefer.</p>
+              <p>Effective differentiation is not simply about being different. It is about emphasizing differences that actually matter to your target customers and consistently reinforcing them through positioning, messaging, proof, content, and the overall experience surrounding your brand.</p>
 
             </div>
 
@@ -707,13 +692,8 @@ function paintMarketing(
                 &times;
               </button>
 
-              <p>
-                Placeholder description for Engagement Triggers.
-              </p>
-
-              <p>
-                This text will later explain how these triggers capture and sustain audience attention.
-              </p>
+              <p>Engagement Triggers are the themes, signals, situations, and ideas most likely to capture the attention of your target customers and make them want to engage further. They reflect what feels immediately relevant because it connects with an active problem, ambition, concern, opportunity, or decision they already care about.</p>
+<p>These triggers help determine what your marketing should lead with. They can shape content topics, campaign angles, headlines, outreach themes, and other attention-building activities so your communication starts from the customer's priorities rather than simply from what the business wants to promote.</p>
 
             </div>
 
@@ -829,13 +809,8 @@ function paintMarketing(
                 &times;
               </button>
 
-              <p>
-                Placeholder description for Messaging Pillars.
-              </p>
-
-              <p>
-                This text will later explain how these themes should shape recurring marketing communication.
-              </p>
+              <p>Messaging Pillars are the core themes your marketing should repeatedly communicate so customers develop the right understanding of your business and its value. Each pillar represents an important idea that should become associated with your brand across different messages, campaigns, content, and customer interactions.</p>
+<p>They are not fixed slogans or individual pieces of copy. Instead, they provide a consistent strategic framework for communication, allowing individual messages to vary while continuing to reinforce the same positioning, customer relevance, value, and reasons to choose your business.</p>
 
             </div>
 
@@ -989,13 +964,8 @@ function paintMarketing(
                 &times;
               </button>
 
-              <p>
-                Placeholder description for Tone of Voice.
-              </p>
-
-              <p>
-                This text will later explain how the brand should sound and communicate consistently.
-              </p>
+              <p>Tone of Voice defines how your business should sound when communicating with its target customers. It translates customer psychology, expectations, positioning, and brand character into practical communication principles — influencing language, confidence, complexity, emotional intensity, formality, and the way ideas should be presented.</p>
+<p>The DOs and DON'Ts provide practical boundaries for applying that voice consistently. They are not rigid writing rules, but guidance for keeping communication recognizable, credible, and appropriate for the way your customers prefer to receive and evaluate information.</p>
 
             </div>
 
@@ -1089,13 +1059,8 @@ function paintMarketing(
                 &times;
               </button>
 
-              <p>
-                Placeholder description for Customer Journey.
-              </p>
-
-              <p>
-                This text will later explain how marketing should support prospects across the stages of the journey.
-              </p>
+              <p>The Customer Journey describes how the role of marketing changes as potential customers move from first becoming aware of the business to considering it, making a decision, and continuing the relationship afterward. At each stage, customers have different questions, expectations, uncertainties, and information needs.</p>
+<p>The strategy therefore defines the audience mindset, marketing's role, and the most suitable content and engagement approaches for each stage. This helps marketing support progression through the buying journey instead of treating every customer interaction as if the audience were equally ready to buy.</p>
 
             </div>
 
@@ -1370,13 +1335,8 @@ function paintMarketing(
                 &times;
               </button>
 
-              <p>
-                Placeholder description for Lead Preparation.
-              </p>
-
-              <p>
-                This text will later explain how Marketing should prepare qualified prospects before they move into Sales.
-              </p>
+              <p>Lead Preparation defines how marketing should prepare potential customers before they enter a direct sales conversation. Its purpose is not simply to generate inquiries, but to create enough understanding, relevance, trust, and perceived value that qualified prospects reach Sales with stronger intent and fewer fundamental uncertainties.</p>
+<p>This section bridges Marketing and Sales by defining what customers should ideally understand, believe, and recognize before conversion. Effective lead preparation makes sales conversations more focused and productive because marketing has already completed part of the educational and confidence-building work.</p>
 
             </div>
 
