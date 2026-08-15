@@ -962,7 +962,7 @@ function renderDecisionFriction_(d) {
       <div class="salesSubsection">
 
         <p>
-          <span class="subtitle">
+          <span class="subtitle salesFrictionTitle">
             ${esc(doubt)}
           </span>
         </p>
@@ -1298,12 +1298,18 @@ function injectSalesHelpStylesOnce() {
 
 
     .salesSubsection {
+      margin-top: 0;
+    }
+
+
+    .salesSubsection +
+    .salesSubsection {
       margin-top: 26px;
     }
 
 
-    .salesSubsection:first-of-type {
-      margin-top: 18px;
+    .salesFrictionTitle {
+      font-size: calc(1em + 2pt);
     }
 
 
