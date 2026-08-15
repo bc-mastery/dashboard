@@ -65,7 +65,7 @@ function paintSales(api, allowFull = false) {
 
   let html = buildFirstBlockHTML({
     title: "Concept",
-    subtitleLabel: "Sales Character",
+    subtitleLabel: "Sales Approach",
     subtitleValue: d.S_APPROACH,
     descText: d.S_APPROACH_DESC,
     areas,
