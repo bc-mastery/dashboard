@@ -352,7 +352,7 @@ function paintMarketing(
         "Concept",
 
       subtitleLabel:
-        "Marketing Character",
+        "Marketing Approach",
 
       subtitleValue:
         mCharacter,
