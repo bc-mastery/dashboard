@@ -67,116 +67,116 @@ function renderStrategyOutline(title, items) {
 const TARGETING_OUTLINE = [
   {
     name: "Behavioral Factors",
-    desc: "Defines the demand context and behavioral characteristics shaping how your ideal customers choose.",
+    desc: "The demand context and behavioral characteristics shaping how your ideal customers choose.",
   },
   {
     name: "Positioning",
-    desc: "Clarifies which market segment to prioritize and how those customers should be framed.",
+    desc: "Which market segment to prioritize and how those customers should be framed.",
   },
   {
     name: "Macro-behavior",
-    desc: "Maps how your customers think, decide, and act across important buying situations.",
+    desc: "How your customers think, decide, and act across important buying situations.",
   },
   {
     name: "Target Persona",
-    desc: "Turns behavioral insights into a practical portrait of the people you should prioritize.",
+    desc: "A practical portrait of the people you should prioritize based on behavioral insights.",
   },
 ];
 
 const OFFER_OUTLINE = [
   {
     name: "Concept",
-    desc: "Defines the core offer character customers should immediately recognize as valuable and relevant.",
+    desc: "The core offer character customers should immediately recognize as valuable and relevant.",
   },
   {
     name: "Value Triggers",
-    desc: "Identifies the qualities your offer must represent to feel attractive and worth choosing.",
+    desc: "The qualities your offer must represent to feel attractive and worth choosing.",
   },
   {
     name: "Features and Services",
-    desc: "Translates expected value into concrete services, deliverables, tools, support, and customer experiences.",
+    desc: "The concrete services, deliverables, tools, support, and experiences that create expected value.",
   },
   {
     name: "Retention Factors",
-    desc: "Defines what must remain valuable over time to drive renewal, expansion, and loyalty.",
+    desc: "What must remain valuable over time to drive renewal, expansion, and loyalty.",
   },
   {
     name: "Appearance",
-    desc: "Aligns presentation, naming, packaging, and visual polish with the offer’s intended perception.",
+    desc: "How presentation, naming, packaging, and visual polish should reinforce the intended perception.",
   },
   {
     name: "Pricing",
-    desc: "Structures price, packages, payment logic, and friction around value and buyer decision-making.",
+    desc: "How price, packages, payment logic, and friction should match value and buyer decisions.",
   },
 ];
 
 const MARKETING_OUTLINE = [
   {
     name: "Concept",
-    desc: "Defines the overall marketing approach needed to match how your customers evaluate value.",
+    desc: "The overall marketing approach needed to match how your customers evaluate value.",
   },
   {
     name: "Marketing Foundations",
-    desc: "Clarifies marketing’s strategic role in creating awareness, relevance, credibility, and buying momentum.",
+    desc: "Marketing’s role in creating awareness, relevance, credibility, and buying momentum.",
   },
   {
     name: "Objectives",
-    desc: "Turns the strategy into clear marketing priorities linked to measurable business progress.",
+    desc: "The marketing priorities that should contribute directly to measurable business progress.",
   },
   {
     name: "Differentiation",
-    desc: "Defines meaningful distinctions that make your business easier to recognize, understand, and prefer.",
+    desc: "The meaningful distinctions that make your business easier to recognize, understand, and prefer.",
   },
   {
     name: "Engagement Triggers",
-    desc: "Identifies themes and signals most likely to capture attention and prompt further engagement.",
+    desc: "The themes and signals most likely to capture attention and prompt further engagement.",
   },
   {
     name: "Messaging Pillars",
-    desc: "Establishes recurring communication themes that reinforce positioning, relevance, value, and customer preference.",
+    desc: "The recurring communication themes that reinforce positioning, relevance, value, and customer preference.",
   },
   {
     name: "Tone of Voice",
-    desc: "Defines how your business should sound to remain credible, recognizable, and audience-aligned.",
+    desc: "How your business should sound to remain credible, recognizable, and audience-aligned.",
   },
   {
     name: "Customer Journey",
-    desc: "Maps marketing’s role as customers progress from awareness through decision and retention.",
+    desc: "How marketing should support customers from awareness through decision and retention.",
   },
   {
     name: "Lead Preparation",
-    desc: "Defines how marketing should nurture, qualify, and prepare prospects before sales engagement begins.",
+    desc: "How marketing should nurture, qualify, and prepare prospects before sales engagement begins.",
   },
 ];
 
 const SALES_OUTLINE = [
   {
     name: "Concept",
-    desc: "Defines the overarching sales approach best aligned with how your customers make decisions.",
+    desc: "The overarching sales approach best aligned with how your customers make decisions.",
   },
   {
     name: "Buying Vision",
-    desc: "Clarifies what prospects must see and believe before moving forward feels right.",
+    desc: "What prospects must see and believe before moving forward feels like the right decision.",
   },
   {
     name: "Sales Cadence",
-    desc: "Structures buyer progression from first engagement to commitment around readiness and confidence.",
+    desc: "How buyers should progress from first engagement to commitment around readiness and confidence.",
   },
   {
     name: "Relationship Building",
-    desc: "Defines how trust and buyer relationships should evolve throughout every sales stage.",
+    desc: "How trust and buyer relationships should evolve throughout every sales stage.",
   },
   {
     name: "Trust Drivers",
-    desc: "Identifies the evidence and signals that increase confidence and reduce perceived buying risk.",
+    desc: "The evidence and signals that increase confidence and reduce perceived buying risk.",
   },
   {
     name: "Decision Friction",
-    desc: "Reveals doubts and risks blocking commitment, then structures how Sales should address them.",
+    desc: "The doubts and risks blocking commitment and how Sales should address them.",
   },
   {
     name: "Sales Assets",
-    desc: "Specifies the materials and tools needed to support consideration and buyer progression.",
+    desc: "The materials and tools needed to support consideration and buyer progression.",
   },
 ];
 
@@ -499,11 +499,10 @@ export async function renderGrowthTab(forceRefresh = false) {
         <div class="sectionTitle">Targeting Scan</div>
         <p class="preserve">${esc(d.GS_T_DESC || "")}</p>
         <div style="height:3px; background:#30BA80; width:100%; border-radius:2px; margin:16px 0 14px;"></div>
-        ${renderStrategyOutline("Inside the full Targeting Strategy:", TARGETING_OUTLINE)}
+        ${renderStrategyOutline("What you must get right in your Targeting Strategy:", TARGETING_OUTLINE)}
         <p style="margin-top:10px;">
           Even if you already have a clear picture of your audience, deeper insights into how they actually think and decide make your targeting sharper and more effective.
-          In the full strategy, we connect these aspects directly to behavioral patterns so you know exactly who to focus on — and how to reach them.
-          Want a preview? → Check the <strong>TARGETING</strong> tab.
+          These factors determine who you should focus on and how accurately the rest of your strategy can align around them.
         </p>
       </section>
 
@@ -511,11 +510,10 @@ export async function renderGrowthTab(forceRefresh = false) {
         <div class="sectionTitle">Offer Scan</div>
         <p class="preserve">${esc(d.GS_O_DESC || "")}</p>
         <div style="height:3px; background:#30BA80; width:100%; border-radius:2px; margin:16px 0 14px;"></div>
-        ${renderStrategyOutline("Inside the full Offer Strategy:", OFFER_OUTLINE)}
+        ${renderStrategyOutline("What you must get right in your Offer Strategy:", OFFER_OUTLINE)}
         <p style="margin-top:10px;">
-          Even if your offer feels well-structured today, a clear strategy makes sure every element consistently reflects your audience’s needs and motivations.
-          In the full strategy, we shape your offer around how your market really thinks and buys.
-          Want a snapshot? → Check the <strong>OFFER</strong> tab.
+          Even if your offer feels well-structured today, each of these factors must consistently reflect your audience’s needs, motivations, and decision logic.
+          Misalignment in any one of them can weaken perceived value, pricing confidence, adoption, or retention.
         </p>
       </section>
 
@@ -523,11 +521,10 @@ export async function renderGrowthTab(forceRefresh = false) {
         <div class="sectionTitle">Marketing Scan</div>
         <p class="preserve">${esc(d.GS_M_DESC || "")}</p>
         <div style="height:3px; background:#30BA80; width:100%; border-radius:2px; margin:16px 0 14px;"></div>
-        ${renderStrategyOutline("Inside the full Marketing Strategy:", MARKETING_OUTLINE)}
+        ${renderStrategyOutline("What you must get right in your Marketing Strategy:", MARKETING_OUTLINE)}
         <p style="margin-top:10px;">
-          Even if your marketing is already performing, a solid strategy ensures your efforts stay consistent, scalable, and in tune with how your audience reacts.
-          In the full strategy, we align each element with your audience’s behavior so your message always lands.
-          Want to see how this looks? → Check the <strong>MARKETING</strong> tab.
+          Even if your marketing is already performing, these factors determine whether it remains relevant, consistent, scalable, and aligned with how your audience reacts.
+          Getting them right ensures your communication attracts attention for the right reasons and supports progression toward a decision.
         </p>
       </section>
 
@@ -535,11 +532,10 @@ export async function renderGrowthTab(forceRefresh = false) {
         <div class="sectionTitle">Sales Scan</div>
         <p class="preserve">${esc(d.GS_S_DESC || "")}</p>
         <div style="height:3px; background:#30BA80; width:100%; border-radius:2px; margin:16px 0 14px;"></div>
-        ${renderStrategyOutline("Inside the full Sales Strategy:", SALES_OUTLINE)}
+        ${renderStrategyOutline("What you must get right in your Sales Strategy:", SALES_OUTLINE)}
         <p style="margin-top:10px;">
-          Even if you already have these elements working well, a clear strategy keeps them consistently aligned with your actual target audience and how they think.
-          In the full strategy, we map each of these directly to behavior so you can sell with precision.
-          Want a preview? → Check the <strong>SALES</strong> tab.
+          Even if your sales process already converts, these factors determine how consistently prospects build confidence and progress toward commitment.
+          Their alignment with buyer behavior directly affects momentum, conversion quality, and long-term commercial outcomes.
         </p>
       </section>
 
