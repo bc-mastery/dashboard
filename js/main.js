@@ -44,10 +44,7 @@ function ensureMethodTabButton() {
   button.dataset.tab = "method";
   button.type = "button";
   button.innerHTML = `
-    <svg aria-hidden="true" viewBox="0 0 24 24" style="width:16px;height:16px;flex:0 0 auto" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="12" cy="12" r="8"></circle>
-      <path d="M12 4v16M4 12h16M6.35 6.35l11.3 11.3M17.65 6.35l-11.3 11.3"></path>
-    </svg>
+    <img src="./assets/icons/Icon_method_green.svg" alt="">
     <span>Method</span>
   `;
   tabs.appendChild(button);
