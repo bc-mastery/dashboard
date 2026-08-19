@@ -13,22 +13,13 @@ import {
 import { state } from "./core/state.js";
 import { token, getParam } from "./core/config.js";
 
-
-// ============================================================
-// PAGE RENDERERS
-// ============================================================
-
 import { renderGrowthTab } from "./pages/growth.js";
 import { renderTargetingTab } from "./pages/targeting.js";
 import { renderOfferTab } from "./pages/offer.js";
 import { renderMarketingTab } from "./pages/marketing.js";
 import { renderSalesTab } from "./pages/sales.js";
+import { renderMethodTab } from "./pages/method.js";
 import { renderKnowledgeTab } from "./pages/knowledge.js";
-
-
-// ============================================================
-// TAB DEFINITIONS
-// ============================================================
 
 const TAB_RENDERERS = {
   growth: renderGrowthTab,
@@ -36,627 +27,164 @@ const TAB_RENDERERS = {
   offer: renderOfferTab,
   marketing: renderMarketingTab,
   sales: renderSalesTab,
+  method: renderMethodTab,
   knowledge: renderKnowledgeTab,
 };
 
-
-// ============================================================
-// PAGE DOM CACHE
-//
-// Each tab is rendered only once during the browser session.
-//
-// We keep the ACTUAL DOM nodes, not just HTML strings.
-// This preserves:
-// - chart DOM
-// - help-button listeners
-// - other page-specific event listeners
-//
-// Hard browser refresh clears this automatically.
-// ============================================================
-
 const pageCache = new Map();
-
-
-// ============================================================
-// ROUTER STATE
-// ============================================================
-
 let activeTab = null;
 let routeInProgress = false;
 
+function ensureMethodTabButton() {
+  const tabs = document.getElementById("tabs");
+  if (!tabs || tabs.querySelector('[data-tab="method"]')) return;
 
-// ============================================================
-// HELPERS
-// ============================================================
+  const button = document.createElement("button");
+  button.className = "tabBtn";
+  button.dataset.tab = "method";
+  button.type = "button";
+  button.innerHTML = `
+    <img src="./assets/icons/Icon_method_green.svg" alt="">
+    <span>Method</span>
+  `;
+  tabs.appendChild(button);
+}
 
 function getTabFromURL() {
-
-  const requested =
-    (
-      getParam("tab") ||
-      "growth"
-    ).toLowerCase();
-
-
-  return TAB_RENDERERS[requested]
-    ? requested
-    : "growth";
+  const requested = (getParam("tab") || "growth").toLowerCase();
+  return TAB_RENDERERS[requested] ? requested : "growth";
 }
-
 
 function setURLTab(tabName) {
-
-  const next =
-    new URL(
-      window.location.href
-    );
-
-
-  next.searchParams.set(
-    "tab",
-    tabName
-  );
-
-
-  // One-time explicit refresh flag should not remain
-  // in the URL after navigation.
-  next.searchParams.delete(
-    "refresh"
-  );
-
-
-  history.replaceState(
-    null,
-    "",
-    next.toString()
-  );
+  const next = new URL(window.location.href);
+  next.searchParams.set("tab", tabName);
+  next.searchParams.delete("refresh");
+  history.replaceState(null, "", next.toString());
 }
-
-
-// ============================================================
-// DETACH CURRENT PAGE
-//
-// Moving nodes into a DocumentFragment removes them from the
-// visible document WITHOUT destroying them.
-//
-// Event listeners remain attached.
-// ============================================================
 
 function cacheCurrentPage() {
+  if (!activeTab) return;
+  const contentDiv = document.getElementById("content");
+  if (!contentDiv) return;
 
-  if (!activeTab) {
-    return;
-  }
+  const fragment = document.createDocumentFragment();
+  while (contentDiv.firstChild) fragment.appendChild(contentDiv.firstChild);
 
+  const upgradeBlock = document.querySelector(".upgradeBlock");
+  if (upgradeBlock?.parentNode) upgradeBlock.parentNode.removeChild(upgradeBlock);
 
-  const contentDiv =
-    document.getElementById(
-      "content"
-    );
-
-
-  if (!contentDiv) {
-    return;
-  }
-
-
-  const fragment =
-    document.createDocumentFragment();
-
-
-  while (
-    contentDiv.firstChild
-  ) {
-
-    fragment.appendChild(
-      contentDiv.firstChild
-    );
-  }
-
-
-  // ----------------------------------------------------------
-  // Upgrade block lives OUTSIDE #content.
-  //
-  // Preserve it together with its owning tab.
-  // ----------------------------------------------------------
-
-  const upgradeBlock =
-    document.querySelector(
-      ".upgradeBlock"
-    );
-
-
-  if (
-    upgradeBlock &&
-    upgradeBlock.parentNode
-  ) {
-
-    upgradeBlock
-      .parentNode
-      .removeChild(
-        upgradeBlock
-      );
-  }
-
-
-  pageCache.set(
-    activeTab,
-    {
-      fragment:
-        fragment,
-
-      upgradeBlock:
-        upgradeBlock || null,
-    }
-  );
+  pageCache.set(activeTab, {
+    fragment,
+    upgradeBlock: upgradeBlock || null,
+  });
 }
 
+function restoreCachedPage(tabName) {
+  const cached = pageCache.get(tabName);
+  if (!cached) return false;
 
-// ============================================================
-// RESTORE CACHED PAGE
-// ============================================================
+  const contentDiv = document.getElementById("content");
+  if (!contentDiv) return false;
 
-function restoreCachedPage(
-  tabName
-) {
-
-  const cached =
-    pageCache.get(
-      tabName
-    );
-
-
-  if (!cached) {
-
-    return false;
-  }
-
-
-  const contentDiv =
-    document.getElementById(
-      "content"
-    );
-
-
-  if (!contentDiv) {
-
-    return false;
-  }
-
-
-  // Remove any currently visible upgrade block.
   clearUpgradeBlock();
+  contentDiv.appendChild(cached.fragment);
+  cached.fragment = document.createDocumentFragment();
 
-
-  // Restore the saved page DOM.
-  contentDiv.appendChild(
-    cached.fragment
-  );
-
-
-  // ----------------------------------------------------------
-  // DocumentFragment becomes empty after appendChild().
-  //
-  // Create a fresh fragment for the NEXT time this tab
-  // is detached.
-  // ----------------------------------------------------------
-
-  cached.fragment =
-    document.createDocumentFragment();
-
-
-  // Restore this tab's upgrade block, if it had one.
-  if (
-    cached.upgradeBlock
-  ) {
-
-    const footer =
-      document.querySelector(
-        ".siteFooter"
-      );
-
-
-    if (
-      footer &&
-      footer.parentNode
-    ) {
-
-      footer.parentNode.insertBefore(
-        cached.upgradeBlock,
-        footer
-      );
-    }
+  if (cached.upgradeBlock) {
+    const footer = document.querySelector(".siteFooter");
+    if (footer?.parentNode) footer.parentNode.insertBefore(cached.upgradeBlock, footer);
   }
-
 
   return true;
 }
 
-
-// ============================================================
-// RENDER A TAB FOR THE FIRST TIME
-// ============================================================
-
-async function renderTabFirstTime(
-  tabName,
-  forceRefresh = false
-) {
-
-  const renderer =
-    TAB_RENDERERS[
-      tabName
-    ];
-
-
-  if (!renderer) {
-
-    throw new Error(
-      `Unknown Dashboard tab: ${tabName}`
-    );
-  }
-
-
-  await renderer(
-    forceRefresh
-  );
+async function renderTabFirstTime(tabName, forceRefresh = false) {
+  const renderer = TAB_RENDERERS[tabName];
+  if (!renderer) throw new Error(`Unknown Dashboard tab: ${tabName}`);
+  await renderer(forceRefresh);
 }
 
-
-// ============================================================
-// REFRESH GLOBAL UI FOR ACTIVE PAGE
-//
-// The page itself stays cached, but these elements belong to
-// the shared Dashboard shell and therefore need to reflect the
-// tab that is currently visible.
-// ============================================================
-
-function refreshActiveTabUI(
-  tabName
-) {
-
-  state.currentTab =
-    tabName;
-
-
-  document.body.setAttribute(
-    "data-current-tab",
-    tabName
-  );
-
-
-  setTitleAndIcon(
-    tabName
-  );
-
-
-  // Rebuild the small secondary navigation chips from the
-  // currently restored page DOM.
+function refreshActiveTabUI(tabName) {
+  state.currentTab = tabName;
+  document.body.setAttribute("data-current-tab", tabName);
+  setTitleAndIcon(tabName);
   populateBlockTabsFromPage();
-
-
-  // Restore the correct PDF/download state.
-  updateFloatingCTA(
-    tabName
-  );
+  updateFloatingCTA(tabName);
 }
 
+async function loadTab(tabName) {
+  if (routeInProgress) return;
 
-// ============================================================
-// MAIN TAB LOADER
-// ============================================================
+  const normalizedTab = TAB_RENDERERS[tabName] ? tabName : "growth";
 
-async function loadTab(
-  tabName
-) {
-
-  if (routeInProgress) {
-
+  if (normalizedTab === activeTab && pageCache.has(normalizedTab)) {
+    window.scrollTo(0, 0);
     return;
   }
 
-
-  const normalizedTab =
-    TAB_RENDERERS[
-      tabName
-    ]
-      ? tabName
-      : "growth";
-
-
-  // Clicking the already-active tab should do nothing.
-  if (
-    normalizedTab ===
-      activeTab &&
-    pageCache.has(
-      normalizedTab
-    )
-  ) {
-
-    window.scrollTo(
-      0,
-      0
-    );
-
-    return;
-  }
-
-
-  routeInProgress =
-    true;
-
+  routeInProgress = true;
 
   try {
+    if (activeTab) cacheCurrentPage();
+    window.scrollTo(0, 0);
 
-    // --------------------------------------------------------
-    // Save current page without destroying it.
-    // --------------------------------------------------------
+    activeTab = normalizedTab;
+    state.currentTab = normalizedTab;
+    document.body.setAttribute("data-current-tab", normalizedTab);
+    setTitleAndIcon(normalizedTab);
 
-    if (activeTab) {
-
-      cacheCurrentPage();
-    }
-
-
-    window.scrollTo(
-      0,
-      0
-    );
-
-
-    activeTab =
-      normalizedTab;
-
-
-    state.currentTab =
-      normalizedTab;
-
-
-    document.body.setAttribute(
-      "data-current-tab",
-      normalizedTab
-    );
-
-
-    setTitleAndIcon(
-      normalizedTab
-    );
-
-
-    // --------------------------------------------------------
-    // If already rendered:
-    //
-    // Restore immediately.
-    // NO renderer.
-    // NO API call.
-    // NO HTML reconstruction.
-    // --------------------------------------------------------
-
-    const restored =
-      restoreCachedPage(
-        normalizedTab
-      );
-
-
-    if (restored) {
-
-      console.log(
-        `⚡ Page Cache Active: Restored ${normalizedTab} instantly.`
-      );
-
-
-      refreshActiveTabUI(
-        normalizedTab
-      );
-
-
-      setURLTab(
-        normalizedTab
-      );
-
-
+    if (restoreCachedPage(normalizedTab)) {
+      console.log(`⚡ Page Cache Active: Restored ${normalizedTab} instantly.`);
+      refreshActiveTabUI(normalizedTab);
+      setURLTab(normalizedTab);
       return;
     }
 
+    console.log(`🧩 First render: ${normalizedTab}`);
+    const forceRefresh = getParam("refresh") === "true";
+    await renderTabFirstTime(normalizedTab, forceRefresh);
 
-    // --------------------------------------------------------
-    // FIRST VISIT TO THIS MODULE
-    // --------------------------------------------------------
-
-    console.log(
-      `🧩 First render: ${normalizedTab}`
-    );
-
-
-    const forceRefresh =
-      getParam(
-        "refresh"
-      ) === "true";
-
-
-    await renderTabFirstTime(
-      normalizedTab,
-      forceRefresh
-    );
-
-
-    // --------------------------------------------------------
-    // IMPORTANT
-    //
-    // We deliberately do NOT detach the newly rendered page
-    // yet. It remains visible.
-    //
-    // It will be moved into pageCache when the user leaves it.
-    // --------------------------------------------------------
-
-    refreshActiveTabUI(
-      normalizedTab
-    );
-
-
-    setURLTab(
-      normalizedTab
-    );
-
-
+    refreshActiveTabUI(normalizedTab);
+    setURLTab(normalizedTab);
   } catch (error) {
-
-    console.error(
-      `Failed to load Dashboard tab "${normalizedTab}":`,
-      error
-    );
-
-
-    const contentDiv =
-      document.getElementById(
-        "content"
-      );
-
-
+    console.error(`Failed to load Dashboard tab "${normalizedTab}":`, error);
+    const contentDiv = document.getElementById("content");
     if (contentDiv) {
-
-      contentDiv.innerHTML = `
-        <div class="card">
-          <p class="muted">
-            Error loading this module.
-          </p>
-        </div>
-      `;
+      contentDiv.innerHTML = `<div class="card"><p class="muted">Error loading this module.</p></div>`;
     }
-
-
   } finally {
-
-    routeInProgress =
-      false;
+    routeInProgress = false;
   }
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+  ensureMethodTabButton();
 
-// ============================================================
-// BOOTSTRAP
-// ============================================================
-
-document.addEventListener(
-  "DOMContentLoaded",
-  () => {
-
-
-    if (!token) {
-
-      const contentDiv =
-        document.getElementById(
-          "content"
-        );
-
-
-      if (contentDiv) {
-
-        contentDiv.innerHTML = `
-          <div class="card">
-            <p class="muted">
-              Token missing in URL. Please check your link.
-            </p>
-          </div>
-        `;
-      }
-
-
-      return;
+  if (!token) {
+    const contentDiv = document.getElementById("content");
+    if (contentDiv) {
+      contentDiv.innerHTML = `<div class="card"><p class="muted">Token missing in URL. Please check your link.</p></div>`;
     }
-
-
-    // ========================================================
-    // PRIMARY TAB NAVIGATION
-    // ========================================================
-
-    const tabsContainer =
-      document.getElementById(
-        "tabs"
-      );
-
-
-    if (tabsContainer) {
-
-      tabsContainer.addEventListener(
-        "click",
-        async (e) => {
-
-
-          const tabBtn =
-            e.target.closest(
-              ".tabBtn"
-            );
-
-
-          if (
-            !tabBtn ||
-            !tabsContainer.contains(
-              tabBtn
-            )
-          ) {
-
-            return;
-          }
-
-
-          e.preventDefault();
-
-
-          const tabName =
-            (
-              tabBtn.dataset.tab ||
-              "growth"
-            ).toLowerCase();
-
-
-          if (
-            !TAB_RENDERERS[
-              tabName
-            ]
-          ) {
-
-            return;
-          }
-
-
-          await loadTab(
-            tabName
-          );
-        }
-      );
-    }
-
-
-    // ========================================================
-    // SHARED UI INITIALIZATION
-    // ========================================================
-
-    initDownloadButtonIsolation();
-
-    initBlockChipDelegation();
-
-
-    // ========================================================
-    // INITIAL PAGE
-    // ========================================================
-
-    const initialTab =
-      getTabFromURL();
-
-
-    activeTab =
-      null;
-
-
-    loadTab(
-      initialTab
-    ).then(
-      () => {
-
-        updateFloatingCTA(
-          initialTab
-        );
-      }
-    );
+    return;
   }
-);
+
+  const tabsContainer = document.getElementById("tabs");
+  if (tabsContainer) {
+    tabsContainer.addEventListener("click", async (event) => {
+      const tabBtn = event.target.closest(".tabBtn");
+      if (!tabBtn || !tabsContainer.contains(tabBtn)) return;
+
+      event.preventDefault();
+      const tabName = (tabBtn.dataset.tab || "growth").toLowerCase();
+      if (!TAB_RENDERERS[tabName]) return;
+      await loadTab(tabName);
+    });
+  }
+
+  initDownloadButtonIsolation();
+  initBlockChipDelegation();
+
+  const initialTab = getTabFromURL();
+  activeTab = null;
+  loadTab(initialTab).then(() => updateFloatingCTA(initialTab));
+});
