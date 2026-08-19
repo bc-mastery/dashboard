@@ -12,6 +12,7 @@ import {
 
 import { state } from "./core/state.js";
 import { token, getParam } from "./core/config.js";
+import "./core/methodTheme.js";
 
 import { renderGrowthTab } from "./pages/growth.js";
 import { renderTargetingTab } from "./pages/targeting.js";
