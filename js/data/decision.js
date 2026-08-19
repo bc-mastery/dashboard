@@ -1,0 +1,38 @@
+export const decision = {
+  "B2B": [
+    {
+      "key": "HIGHLY EMOTIONAL",
+      "description": "Even in the corporate world, emotions play a crucial role in decision-making. Emotion-driven B2B buyers are influenced by personal experiences, relationships, and external opinions rather than purely data-driven evaluations. Trust, reputation, and the feeling of partnership weigh heavily in their choices, often making them loyal to brands or vendors that create strong emotional connections.\n\nThey respond to compelling narratives, engaging brand stories, and companies that align with their values. Their decisions can also be impacted by peer recommendations, industry recognition, or their own professional reputation - choosing solutions that make them feel secure, respected, and aligned with their company’s vision. Personal rapport with sales representatives, the sense of community within a network, and the ability to connect on a human level significantly shape their purchasing behavior."
+    },
+    {
+      "key": "EMOTIONAL",
+      "description": "Even in the corporate world, emotions play a crucial role in decision-making. Emotion-driven B2B buyers are influenced by personal experiences, relationships, and external opinions rather than purely data-driven evaluations. Trust, reputation, and the feeling of partnership weigh heavily in their choices, often making them loyal to brands or vendors that create strong emotional connections.\n\nThey respond to compelling narratives, engaging brand stories, and companies that align with their values. Their decisions can also be impacted by peer recommendations, industry recognition, or their own professional reputation - choosing solutions that make them feel secure, respected, and aligned with their company’s vision. Personal rapport with sales representatives, the sense of community within a network, and the ability to connect on a human level significantly shape their purchasing behavior."
+    },
+    {
+      "key": "RATIONAL",
+      "description": "Rational customers rely on logic, data, and strategic evaluation when making purchasing decisions. They focus on usefulness, value, and long-term impact of a solution, carefully weighing its benefits against costs and risks. Rather than being swayed by emotions or relationships, they prioritize facts, performance metrics, and measurable ROI to ensure their investment aligns with their company’s goals and operational needs.\n\nThese customers conduct thorough research, compare alternatives, and seek detailed justifications before committing. They value quality, reliability, and a strong track record, often considering industry standards, case studies, and technical specifications. Their decision-making process is deliberate, structured, and based on their own internal assessments, ensuring that each choice is rational, data-backed, and strategically sound."
+    },
+    {
+      "key": "HIGHLY RATIONAL",
+      "description": "Rational customers rely on logic, data, and strategic evaluation when making purchasing decisions. They focus on usefulness, value, and long-term impact of a solution, carefully weighing its benefits against costs and risks. Rather than being swayed by emotions or relationships, they prioritize facts, performance metrics, and measurable ROI to ensure their investment aligns with their company’s goals and operational needs.\n\nThese customers conduct thorough research, compare alternatives, and seek detailed justifications before committing. They value quality, reliability, and a strong track record, often considering industry standards, case studies, and technical specifications. Their decision-making process is deliberate, structured, and based on their own internal assessments, ensuring that each choice is rational, data-backed, and strategically sound."
+    }
+  ],
+  "B2C": [
+    {
+      "key": "HIGHLY EMOTIONAL",
+      "description": "Consumers driven by emotions make purchasing decisions based on feelings, experiences, and social influences rather than logical comparisons. They seek products that enhance their lifestyle, create memorable moments, or align with their personal identity. Their choices are heavily influenced by impulse, mood, and external validation, making them more responsive to emotional storytelling, aspirational branding, and community-driven marketing.\n\nSocial proof, recommendations, and the perceived popularity of a product play a significant role in their decision-making process. They are drawn to brands that evoke strong emotions - whether excitement, nostalgia, confidence, or belonging. Their purchasing behavior is often spontaneous, triggered by compelling ads, influencer endorsements, or personal connections, making emotional engagement a key driver in their buying journey."
+    },
+    {
+      "key": "EMOTIONAL",
+      "description": "Consumers driven by emotions make purchasing decisions based on feelings, experiences, and social influences rather than logical comparisons. They seek products that enhance their lifestyle, create memorable moments, or align with their personal identity. Their choices are heavily influenced by impulse, mood, and external validation, making them more responsive to emotional storytelling, aspirational branding, and community-driven marketing.\n\nSocial proof, recommendations, and the perceived popularity of a product play a significant role in their decision-making process. They are drawn to brands that evoke strong emotions - whether excitement, nostalgia, confidence, or belonging. Their purchasing behavior is often spontaneous, triggered by compelling ads, influencer endorsements, or personal connections, making emotional engagement a key driver in their buying journey."
+    },
+    {
+      "key": "RATIONAL",
+      "description": "Consumers with a rational approach prioritize functionality, long-term value, and practical benefits when making purchases. Rather than being driven by impulse or emotions, they carefully analyze products based on features, quality, and cost-effectiveness to determine the best option for their needs. Their decisions are guided by facts, logic, and their own well-reasoned considerations, ensuring they choose the most efficient and reliable solution.\n\nThey conduct research, compare specifications, and seek detailed information before buying. Reviews, expert opinions, and proven results weigh heavily in their choices, as they prefer products with a strong reputation and demonstrable value. Their buying behavior is deliberate, calculated, and focused on long-term satisfaction, making them less susceptible to trends, social influence, or emotional triggers."
+    },
+    {
+      "key": "HIGHLY RATIONAL",
+      "description": "Consumers with a rational approach prioritize functionality, long-term value, and practical benefits when making purchases. Rather than being driven by impulse or emotions, they carefully analyze products based on features, quality, and cost-effectiveness to determine the best option for their needs. Their decisions are guided by facts, logic, and their own well-reasoned considerations, ensuring they choose the most efficient and reliable solution.\n\nThey conduct research, compare specifications, and seek detailed information before buying. Reviews, expert opinions, and proven results weigh heavily in their choices, as they prefer products with a strong reputation and demonstrable value. Their buying behavior is deliberate, calculated, and focused on long-term satisfaction, making them less susceptible to trends, social influence, or emotional triggers."
+    }
+  ]
+};
