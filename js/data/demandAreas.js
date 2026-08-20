@@ -1,18 +1,6 @@
 export const demandAreas = {
   "B2B": [
     {
-      "key": "ORGANIZATIONAL DEVELOPMENT",
-      "short": "ORG",
-      "effect": "ORGANIZATION",
-      "description": "The impact on organizational development should be aimed at fostering a more structured, agile, and scalable organization. Your solution must align with the overarching goal of improving the organization's structure, culture, and adaptability, ensuring long-term stability and growth."
-    },
-    {
-      "key": "MARKETING",
-      "short": "MAR",
-      "effect": "PRESENCE",
-      "description": "Marketing efforts must promise an enhanced presence. This means your solution should significantly improve visibility, brand recognition, and audience engagement. Your offer should be built around expanding reach and ensuring that your brand remains top of mind in your target market."
-    },
-    {
       "key": "SALES",
       "short": "SAL",
       "effect": "PRESENCE",
@@ -47,21 +35,21 @@ export const demandAreas = {
       "short": "ORG",
       "effect": "ORGANIZATION",
       "description": "The impact on organizational operation should reflect a more coordinated and cohesive organization. Your solution must ensure that all departments and processes are aligned with strategic goals, and the organization as a whole operates smoothly, driving overall efficiency and organizational effectiveness."
+    },
+    {
+      "key": "ORGANIZATIONAL DEVELOPMENT",
+      "short": "ORG",
+      "effect": "ORGANIZATION",
+      "description": "The impact on organizational development should be aimed at fostering a more structured, agile, and scalable organization. Your solution must align with the overarching goal of improving the organization's structure, culture, and adaptability, ensuring long-term stability and growth."
+    },
+    {
+      "key": "MARKETING",
+      "short": "MAR",
+      "effect": "PRESENCE",
+      "description": "Marketing efforts must promise an enhanced presence. This means your solution should significantly improve visibility, brand recognition, and audience engagement. Your offer should be built around expanding reach and ensuring that your brand remains top of mind in your target market."
     }
   ],
   "B2C": [
-    {
-      "key": "UNWINDING",
-      "short": "UNW",
-      "effect": "SATISFACTION",
-      "description": "When your audience seeks to unwind, the impact should promise enjoyable and uplifting experiences. Your solution should help people relax, have fun, and recharge. It’s not just about entertainment but about creating experiences that leave them feeling good, ready to face their routine with renewed energy."
-    },
-    {
-      "key": "FULFILLMENT",
-      "short": "FUL",
-      "effect": "SELF-FULFILLMENT",
-      "description": "Fulfillment must align with self-fulfillment on a personal level. Your solution should empower individuals to reach their potential, offering paths to personal growth and achievement. The focus should be on helping them realize their own capabilities and aspirations, providing tools for improvement."
-    },
     {
       "key": "HIGH LIVING",
       "short": "HIG",
@@ -97,6 +85,18 @@ export const demandAreas = {
       "short": "BAS",
       "effect": "SATISFACTION",
       "description": "For basic needs, the impact must revolve around satisfaction at a fundamental level. Your solution should be designed to meet these basic needs reliably and effectively, providing comfort, security, and peace of mind, ensuring that your audience feels stable and content in these essential areas."
+    },
+    {
+      "key": "UNWINDING",
+      "short": "UNW",
+      "effect": "SATISFACTION",
+      "description": "When your audience seeks to unwind, the impact should promise enjoyable and uplifting experiences. Your solution should help people relax, have fun, and recharge. It’s not just about entertainment but about creating experiences that leave them feeling good, ready to face their routine with renewed energy."
+    },
+    {
+      "key": "FULFILLMENT",
+      "short": "FUL",
+      "effect": "SELF-FULFILLMENT",
+      "description": "Fulfillment must align with self-fulfillment on a personal level. Your solution should empower individuals to reach their potential, offering paths to personal growth and achievement. The focus should be on helping them realize their own capabilities and aspirations, providing tools for improvement."
     }
   ]
 };
