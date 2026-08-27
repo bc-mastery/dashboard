@@ -36,6 +36,18 @@ function getSpreadsheetValue(data, columnName) {
   return "";
 }
 
+function renderInterpretationBlock(value, brand, className = "preserve") {
+  const interpretation = String(value || "").trim();
+  const brandName = String(brand || "").trim();
+
+  if (!interpretation || !brandName) return "";
+
+  return `
+    <p class="${className}"><strong>What it means for ${esc(brandName)}:</strong></p>
+    <p class="${className}">${esc(interpretation)}</p>
+  `;
+}
+
 function injectTargetingStylesOnce() {
   if (document.getElementById("targeting-styles")) return;
   const style = document.createElement("style");
@@ -127,9 +139,19 @@ function paintTargeting(api, allowFull = false) {
   const areas = parseAreas(d.D_AREA || d["{{D_AREA}}"]);
   const mode = detectMode(areas);
 
+  const brand = d.Brand || d["{{Brand}}"] || "";
+
+  const dArea = d.D_AREA || d["{{D_AREA}}"] || "";
+
+  const dEffect = d.D_EFFECT || d["{{D_EFFECT}}"] || "";
+  const dEffectDesc = d.D_EFFECT_DESC || d["{{D_EFFECT_DESC}}"] || "";
+  const tEffectInterpretation =
+    d.T_EFFECT_INTERPRETATION || d["{{T_EFFECT_INTERPRETATION}}"] || "";
+
   const dDriver = d.D_DRIVER || d["{{D_DRIVER}}"] || "";
   const dDriverDesc = d.D_DRIVER_DESC || d["{{D_DRIVER_DESC}}"] || "";
-  const dArea = d.D_AREA || d["{{D_AREA}}"] || "";
+  const tDriverInterpretation =
+    d.T_DRIVER_INTERPRETATION || d["{{T_DRIVER_INTERPRETATION}}"] || "";
 
   let html = `
     <div class="card scrollTarget" id="block-behavioral">
@@ -137,8 +159,12 @@ function paintTargeting(api, allowFull = false) {
         <div class="bfText">
           <div class="bfTitle">Behavioral Factors</div>
           ${dArea ? `<p><span class="bfSub">Demand Area(s):</span> ${esc(dArea)}</p>` : ""}
+          ${dEffect ? `<p><span class="bfSub">Expected Effect:</span> ${esc(dEffect)}</p>` : ""}
+          ${dEffectDesc ? `<p class="bfDesc preserve">${esc(dEffectDesc)}</p>` : ""}
+          ${allowFull ? renderInterpretationBlock(tEffectInterpretation, brand, "bfDesc preserve") : ""}
           ${dDriver ? `<p><span class="bfSub">Driver(s):</span> ${esc(dDriver)}</p>` : ""}
           ${dDriverDesc ? `<p class="bfDesc preserve">${esc(dDriverDesc)}</p>` : ""}
+          ${allowFull ? renderInterpretationBlock(tDriverInterpretation, brand, "bfDesc preserve") : ""}
         </div>
         <div class="bfMap">
           <div class="abc-wrap" data-mode="${esc(mode)}" data-areas="${areas.map(String).map(esc).join("|")}" data-overlay="${esc(IMAGES.abcFrame)}">
@@ -153,32 +179,50 @@ function paintTargeting(api, allowFull = false) {
   if (allowFull) {
     const dSegment = d.D_SEGMENT || d["{{D_SEGMENT}}"] || "";
     const dSegmentDesc = d.D_SEGMENT_DESC || d["{{D_SEGMENT_DESC}}"] || "";
+    const tSegmentInterpretation =
+      d.T_SEGMENT_INTERPRETATION || d["{{T_SEGMENT_INTERPRETATION}}"] || "";
+
     const tCharacter = d.T_CHARACTER || d["{{T_CHARACTER}}"] || "";
     const tCharacterDesc = d.T_CHARACTER_DESC || d["{{T_CHARACTER_DESC}}"] || "";
+    const tCharacterInterpretation =
+      d.T_CHARACTER_INTERPRETATION || d["{{T_CHARACTER_INTERPRETATION}}"] || "";
 
     const tDecision = d.T_DECISION || d["{{T_DECISION}}"] || "";
     const tDecisionDesc = d.T_DECISION_DESC || d["{{T_DECISION_DESC}}"] || "";
+    const tDecisionInterpretation =
+      d.T_DECISION_INTERPRETATION || d["{{T_DECISION_INTERPRETATION}}"] || "";
+
     const tAction = d.T_ACTION || d["{{T_ACTION}}"] || "";
     const tActionDesc = d.T_ACTION_DESC || d["{{T_ACTION_DESC}}"] || "";
+    const tActionInterpretation =
+      d.T_ACTION_INTERPRETATION || d["{{T_ACTION_INTERPRETATION}}"] || "";
+
     const tApproach = d.T_APPROACH || d["{{T_APPROACH}}"] || "";
     const tApproachDesc = d.T_APPROACH_DESC || d["{{T_APPROACH_DESC}}"] || "";
+    const tApproachInterpretation =
+      d.T_APPROACH_INTERPRETATION || d["{{T_APPROACH_INTERPRETATION}}"] || "";
 
     html += `
       <div class="card scrollTarget" id="block-positioning">
         <div class="sectionTitle">Positioning</div>
         ${dSegment ? `<p><span class="subtitle">Target Segment:</span> ${esc(dSegment)}</p>` : ""}
         ${dSegmentDesc ? `<p class="preserve">${esc(dSegmentDesc)}</p>` : ""}
+        ${renderInterpretationBlock(tSegmentInterpretation, brand)}
         ${tCharacter ? `<p><span class="subtitle">Customer Label:</span> ${esc(tCharacter)}</p>` : ""}
         ${tCharacterDesc ? `<p class="preserve">${esc(tCharacterDesc)}</p>` : ""}
+        ${renderInterpretationBlock(tCharacterInterpretation, brand)}
       </div>
       <div class="card scrollTarget" id="block-macro">
         <div class="sectionTitle">Macro-behavior</div>
         ${tDecision ? `<p><span class="subtitle">Decision-making of your customers:</span> ${esc(tDecision)}</p>` : ""}
         ${tDecisionDesc ? `<p class="preserve">${esc(tDecisionDesc)}</p>` : ""}
+        ${renderInterpretationBlock(tDecisionInterpretation, brand)}
         ${tAction ? `<p><span class="subtitle">Action pattern of your customers:</span> ${esc(tAction)}</p>` : ""}
         ${tActionDesc ? `<p class="preserve">${esc(tActionDesc)}</p>` : ""}
+        ${renderInterpretationBlock(tActionInterpretation, brand)}
         ${tApproach ? `<p><span class="subtitle">Mindset of your customers:</span> ${esc(tApproach)}</p>` : ""}
         ${tApproachDesc ? `<p class="preserve">${esc(tApproachDesc)}</p>` : ""}
+        ${renderInterpretationBlock(tApproachInterpretation, brand)}
       </div>
       <div class="card scrollTarget" id="block-persona">
         <div class="sectionTitle">Target Persona</div>
