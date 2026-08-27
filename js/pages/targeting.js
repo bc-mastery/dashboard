@@ -143,11 +143,6 @@ function paintTargeting(api, allowFull = false) {
 
   const dArea = d.D_AREA || d["{{D_AREA}}"] || "";
 
-  const dEffect = d.D_EFFECT || d["{{D_EFFECT}}"] || "";
-  const dEffectDesc = d.D_EFFECT_DESC || d["{{D_EFFECT_DESC}}"] || "";
-  const tEffectInterpretation =
-    d.T_EFFECT_INTERPRETATION || d["{{T_EFFECT_INTERPRETATION}}"] || "";
-
   const dDriver = d.D_DRIVER || d["{{D_DRIVER}}"] || "";
   const dDriverDesc = d.D_DRIVER_DESC || d["{{D_DRIVER_DESC}}"] || "";
   const tDriverInterpretation =
@@ -159,9 +154,6 @@ function paintTargeting(api, allowFull = false) {
         <div class="bfText">
           <div class="bfTitle">Behavioral Factors</div>
           ${dArea ? `<p><span class="bfSub">Demand Area(s):</span> ${esc(dArea)}</p>` : ""}
-          ${dEffect ? `<p><span class="bfSub">Expected Effect:</span> ${esc(dEffect)}</p>` : ""}
-          ${dEffectDesc ? `<p class="bfDesc preserve">${esc(dEffectDesc)}</p>` : ""}
-          ${allowFull ? renderInterpretationBlock(tEffectInterpretation, brand, "bfDesc preserve") : ""}
           ${dDriver ? `<p><span class="bfSub">Driver(s):</span> ${esc(dDriver)}</p>` : ""}
           ${dDriverDesc ? `<p class="bfDesc preserve">${esc(dDriverDesc)}</p>` : ""}
           ${allowFull ? renderInterpretationBlock(tDriverInterpretation, brand, "bfDesc preserve") : ""}
