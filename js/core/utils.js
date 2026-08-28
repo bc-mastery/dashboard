@@ -100,11 +100,18 @@ export function truthyFlag(v) {
 
 /* ---------- access inference ---------- */
 export function inferAccess(d = {}) {
+  // Current source of truth for Accelerator enrollment.
+  // This must take precedence over legacy ACCESS values or old payment flags.
+  if (truthyFlag(d["4PAP_PAID"]) || truthyFlag(d["{{4PAP_PAID}}"])) {
+    return ACCESS.FULL_4PBS;
+  }
+
   const direct = String(d.ACCESS || "").toUpperCase();
   if ([ACCESS.FULL_4PBS, ACCESS.TARGETING_ONLY, ACCESS.GS_ONLY].includes(direct)) {
     return direct;
   }
-  // Heuristics / legacy flags
+
+  // Heuristics / legacy flags retained for backwards compatibility.
   if (truthyFlag(d.PAID_4PBS) || truthyFlag(d.STRIPE_4PBS) || truthyFlag(d.FULL_4PBS) || truthyFlag(d["4PBS_PAID"])) {
     return ACCESS.FULL_4PBS;
   }
