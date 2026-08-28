@@ -565,8 +565,8 @@ export async function renderGrowthTab(forceRefresh = false) {
     drawDonut(
       "gsDonut",
       [
-        { label: "Your utilized business potential", value: util, color: "#30BA80" },
-        { label: "Your untapped business potential", value: untapped, color: "#FF0040" },
+        { label: "Audience Alignment", value: util, color: "#30BA80" },
+        { label: "Alignment Gap", value: untapped, color: "#FF0040" },
       ],
       { pieHole: 0.62, legendPosition: "none" }
     );
