@@ -503,10 +503,11 @@ export async function renderGrowthTab(forceRefresh = false) {
         <div class="sectionTitle">Targeting Scan</div>
         <p class="preserve">${esc(d.GS_T_DESC || "")}</p>
         <div style="height:3px; background:#30BA80; width:100%; border-radius:2px; margin:16px 0 14px;"></div>
-        ${renderStrategyOutline("What you must get right in your Targeting Strategy:", TARGETING_OUTLINE)}
+        ${renderStrategyOutline("Core Targeting elements to understand about your Audience:", TARGETING_OUTLINE)}
         <p style="margin-top:10px;">
-          Even if you already have a clear picture of your audience, deeper insights into how they actually think and decide make your targeting sharper and more effective.
-          These factors determine who you should focus on and how accurately the rest of your strategy can align around them.
+          Strong targeting starts with understanding not only who your audience is, but how they think, decide, and respond within the context your business serves.
+          These factors help identify where your current assumptions are aligned with your audience and where greater behavioral clarity could sharpen the rest of your strategy.
+          The more precisely Targeting reflects the audience, the easier it becomes to align the Offer, Marketing, and Sales around them.
         </p>
       </section>
 
@@ -514,10 +515,11 @@ export async function renderGrowthTab(forceRefresh = false) {
         <div class="sectionTitle">Offer Scan</div>
         <p class="preserve">${esc(d.GS_O_DESC || "")}</p>
         <div style="height:3px; background:#30BA80; width:100%; border-radius:2px; margin:16px 0 14px;"></div>
-        ${renderStrategyOutline("What you must get right in your Offer Strategy:", OFFER_OUTLINE)}
+        ${renderStrategyOutline("Core Offer elements to align with your Audience:", OFFER_OUTLINE)}
         <p style="margin-top:10px;">
-          Even if your offer feels well-structured today, each of these factors must consistently reflect your audience’s needs, motivations, and decision logic.
-          Misalignment in any one of them can weaken perceived value, pricing confidence, adoption, or retention.
+          A strong offer is not defined only by what you provide, but by how its different elements fit the priorities, expectations, and decision logic of the audience.
+          These factors help reveal whether the way the offer is structured, presented, and priced supports the value customers are most likely to recognize.
+          Greater alignment across them can strengthen relevance, perceived value, and confidence in the buying decision.
         </p>
       </section>
 
@@ -525,10 +527,11 @@ export async function renderGrowthTab(forceRefresh = false) {
         <div class="sectionTitle">Marketing Scan</div>
         <p class="preserve">${esc(d.GS_M_DESC || "")}</p>
         <div style="height:3px; background:#30BA80; width:100%; border-radius:2px; margin:16px 0 14px;"></div>
-        ${renderStrategyOutline("What you must get right in your Marketing Strategy:", MARKETING_OUTLINE)}
+        ${renderStrategyOutline("Core Marketing elements to align with your Audience:", MARKETING_OUTLINE)}
         <p style="margin-top:10px;">
-          Even if your marketing is already performing, these factors determine whether it remains relevant, consistent, scalable, and aligned with how your audience reacts.
-          Getting them right ensures your communication attracts attention for the right reasons and supports progression toward a decision.
+          Effective marketing depends on more than individual channels or campaigns.
+          These factors shape how consistently your business communicates its relevance, captures attention, builds credibility, and supports customers as they move toward a decision.
+          Their alignment with audience behavior helps ensure that marketing speaks to the right priorities and creates the kind of engagement your target customers are most likely to respond to.
         </p>
       </section>
 
@@ -536,10 +539,11 @@ export async function renderGrowthTab(forceRefresh = false) {
         <div class="sectionTitle">Sales Scan</div>
         <p class="preserve">${esc(d.GS_S_DESC || "")}</p>
         <div style="height:3px; background:#30BA80; width:100%; border-radius:2px; margin:16px 0 14px;"></div>
-        ${renderStrategyOutline("What you must get right in your Sales Strategy:", SALES_OUTLINE)}
+        ${renderStrategyOutline("Core Sales elements to align with your Audience:", SALES_OUTLINE)}
         <p style="margin-top:10px;">
-          Even if your sales process already converts, these factors determine how consistently prospects build confidence and progress toward commitment.
-          Their alignment with buyer behavior directly affects momentum, conversion quality, and long-term commercial outcomes.
+          Sales effectiveness depends heavily on how well the process matches the way prospects build confidence and make decisions.
+          These factors shape how relationships develop, what reassurance buyers need, where hesitation may emerge, and how they can progress toward commitment.
+          Aligning them with buyer behavior can make the sales experience more relevant, coherent, and supportive of the customer’s decision process.
         </p>
       </section>
 
