@@ -1,5 +1,5 @@
 // /js/core/ui.js
-import { TAB_TITLES, TAB_ICONS, UI_ICONS } from "./config.js";
+import { ACCESS, TAB_TITLES, TAB_ICONS, UI_ICONS } from "./config.js";
 import { getMinTabsRequiredForDownload, toDownloadLink } from "./utils.js";
 import { state } from "./state.js";
 
@@ -93,7 +93,7 @@ export function clearUpgradeBlock() {
 }
 
 export function maybeInsertUniversalUpgradeBlock({ tab, isPreviewOnly, content }) {
-  // Always wipe clean old upgrade overlays first
+  // Always wipe clean old locked-state blocks first
   clearUpgradeBlock();
 
   // If page access rules allow full content, stop immediately
@@ -108,24 +108,45 @@ export function maybeInsertUniversalUpgradeBlock({ tab, isPreviewOnly, content }
 
   const node = tpl.content.cloneNode(true);
 
-  // Global button setups
-  const a4pbs = node.querySelector("#cta-4pbs");
-  const acall = node.querySelector("#cta-call");
+  // FULL_4PBS = active Accelerator client.
+  // GS_ONLY and legacy TARGETING_ONLY access receive the Growth Scan / program-module state.
+  const variant =
+    state.lastAccess === ACCESS.FULL_4PBS
+      ? content?.accelerator
+      : content?.growthScan;
 
-  if (a4pbs) {
-    a4pbs.textContent = "Unlock your 4-Pillar Strategy";
-    a4pbs.setAttribute("href", "mailto:bc@businesscanvas.io");
-  }
-  
-  if (acall) {
-    acall.textContent = "Book a call";
-    acall.setAttribute("href", "https://calendly.com/bc-businesscanvas/30min");
+  if (!variant) return;
+
+  const titleEl =
+    node.querySelector(".upgradeTitle") ||
+    node.querySelector("#upgradeBlockTitle");
+
+  const textEl =
+    node.querySelector(".upgradeText");
+
+  if (titleEl && variant.title) {
+    titleEl.textContent = variant.title;
   }
 
-  const titleEl = node.querySelector(".upgradeTitle") || node.querySelector("#upgradeBlockTitle");
-  const textEl = node.querySelector(".upgradeText") || node.querySelector(".upgradeBlock p.muted");
-  if (titleEl && content?.title) titleEl.textContent = content.title;
-  if (textEl && content?.text)   textEl.textContent  = content.text;
+  if (textEl) {
+    textEl.innerHTML = "";
+
+    (variant.paragraphs || []).forEach((paragraph) => {
+      const p = document.createElement("p");
+      p.className = "muted";
+      p.textContent = paragraph;
+      textEl.appendChild(p);
+    });
+
+    if (variant.emphasis) {
+      const p = document.createElement("p");
+      p.className = "muted";
+      const strong = document.createElement("strong");
+      strong.textContent = variant.emphasis;
+      p.appendChild(strong);
+      textEl.appendChild(p);
+    }
+  }
 
   footer.parentNode.insertBefore(node, footer);
 }
