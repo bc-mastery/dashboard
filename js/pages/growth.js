@@ -482,11 +482,11 @@ export async function renderGrowthTab(forceRefresh = false) {
 
             <div class="gsHelpBubble" id="gsPillarHelpBubble" role="tooltip">
               <button type="button" class="gsHelpCloseBtn" aria-label="Close">&times;</button>
-              <p><strong>0–60%:</strong> You don’t have an established strategy in the given area. You plan and execute based on intuition and experience — which may have gotten you this far, but to break through, you need a stable strategy and the right tactics.</p>
-              <p><strong>61–80%:</strong> You have an established strategy in the given area. You know how to catch the right customers and build a prosperous business. However, you have plenty of room to improve — and with the right resources, you can multiply your outcomes.</p>
-              <p><strong>81–100%:</strong> You’ve mastered the given area with a well-built strategy. If you’ve plateaued and want to level up, you need a strategic shift in this or other areas so you can break out of your current limitations.</p>
+              <p><strong>0–60%:</strong> Your current approach in this area has limited alignment with your target audience. Some of the assumptions, messages, or tactics you rely on may not match what matters most to them or how they make decisions. This usually means there is significant room to improve how this pillar connects with your audience.</p>
+              <p><strong>61–80%:</strong> Your current approach is reasonably well aligned with your target audience. Many elements already fit how they think and decide, but there are still meaningful gaps. Refining those areas can make this pillar more relevant, consistent, and effective.</p>
+              <p><strong>81–100%:</strong> Your current approach is strongly aligned with your target audience. Most of what you are doing in this area reflects how they think, what they value, and how they make decisions. Further improvement is likely to come from refinement rather than fundamental change.</p>
               <p style="margin-top:16px; color:#B4FDE5; font-weight:700;">
-                <strong>Scroll down to see how to improve your Targeting, Offer, Marketing, and Sales!</strong>
+                <strong>Scroll down to see where the strongest opportunities lie within your Targeting, Offer, Marketing, and Sales.</strong>
               </p>
             </div>
           </div>
