@@ -78,6 +78,8 @@ export async function renderOfferTab(forceRefresh = false) {
     }
 
     const osReadyValue = getSpreadsheetValue(d, "OS_READY");
+    const isAcceleratorClient =
+      getSpreadsheetValue(d, "4PAP_PAID").toUpperCase() === "TRUE";
 
     console.log(
       "🔍 Debug Gate Verification (Offer): Found raw value for OS_READY =",
@@ -102,6 +104,7 @@ export async function renderOfferTab(forceRefresh = false) {
       tab: "offer",
       isPreviewOnly: !allowFull,
       content: finalBlockContent.offer,
+      isAcceleratorClient,
     });
 
     toggleFloatingCallBtn(state.lastAccess === ACCESS.GS_ONLY);
