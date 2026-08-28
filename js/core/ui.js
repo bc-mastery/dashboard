@@ -92,7 +92,7 @@ export function clearUpgradeBlock() {
   if (existing) existing.remove();
 }
 
-export function maybeInsertUniversalUpgradeBlock({ tab, isPreviewOnly, content }) {
+export function maybeInsertUniversalUpgradeBlock({ tab, isPreviewOnly, content, isAcceleratorClient = false }) {
   // Always wipe clean old locked-state blocks first
   clearUpgradeBlock();
 
@@ -108,10 +108,9 @@ export function maybeInsertUniversalUpgradeBlock({ tab, isPreviewOnly, content }
 
   const node = tpl.content.cloneNode(true);
 
-  // FULL_4PBS = active Accelerator client.
-  // GS_ONLY and legacy TARGETING_ONLY access receive the Growth Scan / program-module state.
+  // Locked-state copy is controlled explicitly by 4PAP_PAID on the current client row.
   const variant =
-    state.lastAccess === ACCESS.FULL_4PBS
+    isAcceleratorClient
       ? content?.accelerator
       : content?.growthScan;
 
@@ -123,6 +122,15 @@ export function maybeInsertUniversalUpgradeBlock({ tab, isPreviewOnly, content }
 
   const textEl =
     node.querySelector(".upgradeText");
+
+  // Defensive cleanup for older cached HTML templates:
+  // keep only the title + message container and remove any legacy sales copy / CTA buttons.
+  const sectionEl = node.querySelector(".upgradeBlock");
+  if (sectionEl) {
+    Array.from(sectionEl.children).forEach((child) => {
+      if (child !== titleEl && child !== textEl) child.remove();
+    });
+  }
 
   if (titleEl && variant.title) {
     titleEl.textContent = variant.title;
