@@ -17,10 +17,11 @@ export const finalBlockContent = {
     accelerator: {
       title: "Targeting Strategy — Upcoming Module",
       paragraphs: [
-        "Your Accelerator is intentionally sequenced so each strategic layer can build on the decisions and insights developed before it.",
-        "Your Accelerator begins with Targeting. For now, your focus should remain on reviewing your Growth Scan and the foundations established during kickoff. At the same time, we use those insights, together with your workshop inputs, to prepare your Targeting Strategy.",
+        "This module is part of your 4-Pillar Accelerator Program and will become available later in the program sequence.",
+        "The Accelerator is intentionally paced so you have time to absorb and work through the strategies already delivered, while we prepare the remaining strategic layers using the foundations developed so far, together with your Growth Scan and workshop inputs.",
+      
       ],
-      emphasis: "Once the next strategic layer is ready, this module will unlock automatically.",
+      emphasis: "This module will unlock automatically once it reaches its place in your Accelerator sequence and the strategy is ready.",
     },
   },
 
@@ -36,10 +37,11 @@ export const finalBlockContent = {
     accelerator: {
       title: "Offer Strategy — Upcoming Module",
       paragraphs: [
-        "Your Accelerator is intentionally sequenced so each strategic layer can build on the decisions and insights developed before it.",
-        "For now, your focus should remain on understanding and working through your current Targeting Strategy. At the same time, we use those foundations, together with your Growth Scan and workshop inputs, to prepare your Offer Strategy.",
+        "This module is part of your 4-Pillar Accelerator Program and will become available later in the program sequence.",
+        "The Accelerator is intentionally paced so you have time to absorb and work through the strategies already delivered, while we prepare the remaining strategic layers using the foundations developed so far, together with your Growth Scan and workshop inputs.",
+      
       ],
-      emphasis: "Once the next strategic layer is ready, this module will unlock automatically.",
+      emphasis: "This module will unlock automatically once it reaches its place in your Accelerator sequence and the strategy is ready.",
     },
   },
 
@@ -55,10 +57,11 @@ export const finalBlockContent = {
     accelerator: {
       title: "Marketing Strategy — Upcoming Module",
       paragraphs: [
-        "Your Accelerator is intentionally sequenced so each strategic layer can build on the decisions and insights developed before it.",
-        "For now, your focus should remain on understanding and working through your current Offer Strategy. At the same time, we use the strategic foundations developed so far to prepare your Marketing Strategy.",
+        "This module is part of your 4-Pillar Accelerator Program and will become available later in the program sequence.",
+        "The Accelerator is intentionally paced so you have time to absorb and work through the strategies already delivered, while we prepare the remaining strategic layers using the foundations developed so far, together with your Growth Scan and workshop inputs.",
+      
       ],
-      emphasis: "Once the next strategic layer is ready, this module will unlock automatically.",
+      emphasis: "This module will unlock automatically once it reaches its place in your Accelerator sequence and the strategy is ready.",
     },
   },
 
@@ -74,10 +77,11 @@ export const finalBlockContent = {
     accelerator: {
       title: "Sales Strategy — Upcoming Module",
       paragraphs: [
-        "Your Accelerator is intentionally sequenced so each strategic layer can build on the decisions and insights developed before it.",
-        "For now, your focus should remain on understanding and working through your current Marketing Strategy. At the same time, we use the strategic foundations developed so far to prepare your Sales Strategy.",
+        "This module is part of your 4-Pillar Accelerator Program and will become available later in the program sequence.",
+        "The Accelerator is intentionally paced so you have time to absorb and work through the strategies already delivered, while we prepare the remaining strategic layers using the foundations developed so far, together with your Growth Scan and workshop inputs.",
+      
       ],
-      emphasis: "Once the next strategic layer is ready, this module will unlock automatically.",
+      emphasis: "This module will unlock automatically once it reaches its place in your Accelerator sequence and the strategy is ready.",
     },
   },
 };
