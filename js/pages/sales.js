@@ -207,6 +207,12 @@ export async function renderSalesTab(
         "SS_READY"
       );
 
+    const isAcceleratorClient =
+      getSpreadsheetValue(
+        d,
+        "4PAP_PAID"
+      ).toUpperCase() === "TRUE";
+
 
     console.log(
       "🔍 Debug Gate Verification (Sales): Found raw value for SS_READY =",
@@ -267,6 +273,7 @@ export async function renderSalesTab(
       isPreviewOnly: !allowFull,
       content:
         finalBlockContent.sales,
+      isAcceleratorClient,
     });
 
 
