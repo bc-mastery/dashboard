@@ -102,6 +102,8 @@ export async function renderTargetingTab(forceRefresh = false) {
 
     /* --- GATE CHECK WITH ACTIVE CONSOLE LOGGING --- */
     const tsReadyValue = getSpreadsheetValue(d, "TS_READY");
+    const isAcceleratorClient =
+      getSpreadsheetValue(d, "4PAP_PAID").toUpperCase() === "TRUE";
 
     console.log(
       "🔍 Debug Gate Verification (Targeting): Found raw value for TS_READY =",
@@ -122,6 +124,7 @@ export async function renderTargetingTab(forceRefresh = false) {
       tab: "targeting",
       isPreviewOnly: !allowFull,
       content: finalBlockContent.targeting,
+      isAcceleratorClient,
     });
 
     toggleFloatingCallBtn(state.lastAccess === ACCESS.GS_ONLY);
