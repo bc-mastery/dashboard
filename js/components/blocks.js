@@ -6,36 +6,79 @@ import { detectMode, setABCMap } from "../core/abcMap.js";
 /* --------------------------- Contextual upgrade copy --------------------------- */
 export const finalBlockContent = {
   targeting: {
-    title: "Your Audience Map — Only Partially Revealed",
-    text: `Right now, you’re seeing the first layer of your Audience profile.
-In full form, your Audience Map connects behavioral drivers, decision triggers, and segmentation patterns — the factors that make your strategy resonate with the right people.
-Without these insights, your targeting may rely on assumptions rather than behavioral alignment — often the difference between interest and conversion.
-
-You get full access to all modules within the 4-Pillar Accelerator Program in a timed release sequence. If you haven't applied for the Program yet, send us an email or book a quick strategic review call to discuss your next steps.`,
+    growthScan: {
+      title: "Targeting Strategy — Accelerator Module",
+      paragraphs: [
+        "Your Growth Scan provides an initial view of how your current Targeting, Offer, Marketing, and Sales align with your target audience.",
+        "The 4-Pillar Accelerator Program takes these insights further by developing each area into a tailored strategy. The program is intentionally sequenced: Targeting establishes the foundation, followed by Offer, Marketing, and Sales, with each strategic layer building on the decisions developed before it.",
+      ],
+      emphasis: "This module is part of the Accelerator Program and is not included in the Growth Scan.",
+    },
+    accelerator: {
+      title: "Targeting Strategy — Upcoming Module",
+      paragraphs: [
+        "Your Accelerator is intentionally sequenced so each strategic layer can build on the decisions and insights developed before it.",
+        "Your Accelerator begins with Targeting. For now, your focus should remain on reviewing your Growth Scan and the foundations established during kickoff. At the same time, we use those insights, together with your workshop inputs, to prepare your Targeting Strategy.",
+      ],
+      emphasis: "Once the next strategic layer is ready, this module will unlock automatically.",
+    },
   },
+
   offer: {
-    title: "Your Offer’s Strategic Blueprint — Only the First Piece",
-    text: `You’re seeing the first strategic layer of your Offer.
-The complete blueprint defines value positioning, retention levers, emotional anchors, and pricing psychology — the combination that makes an offer irresistible to your ideal audience.
-Without these details, your offer may be clear, but not compelling enough to outshine alternatives.
-
-You get full access to all modules within the 4-Pillar Accelerator Program in a timed release sequence. If you haven't applied for the Program yet, send us an email or book a quick strategic review call to discuss your next steps.`,
+    growthScan: {
+      title: "Offer Strategy — Accelerator Module",
+      paragraphs: [
+        "Your Growth Scan provides an initial view of how your current Targeting, Offer, Marketing, and Sales align with your target audience.",
+        "The 4-Pillar Accelerator Program takes these insights further by developing each area into a tailored strategy. The program is intentionally sequenced: Targeting establishes the foundation, followed by Offer, Marketing, and Sales, with each strategic layer building on the decisions developed before it.",
+      ],
+      emphasis: "This module is part of the Accelerator Program and is not included in the Growth Scan.",
+    },
+    accelerator: {
+      title: "Offer Strategy — Upcoming Module",
+      paragraphs: [
+        "Your Accelerator is intentionally sequenced so each strategic layer can build on the decisions and insights developed before it.",
+        "For now, your focus should remain on understanding and working through your current Targeting Strategy. At the same time, we use those foundations, together with your Growth Scan and workshop inputs, to prepare your Offer Strategy.",
+      ],
+      emphasis: "Once the next strategic layer is ready, this module will unlock automatically.",
+    },
   },
+
   marketing: {
-    title: "Your Marketing Framework — Just the Starting Point",
-    text: `This is the foundation of your Marketing Strategy.
-The complete framework reveals channel prioritization, content triggers, campaign timing, and message sequencing — a precision map for getting the right message to the right people at the right time.
-Without it, your marketing may reach people — but miss the critical moments when they’re most ready to engage.
-
-You get full access to all modules within the 4-Pillar Accelerator Program in a timed release sequence. If you haven't applied for the Program yet, send us an email or book a quick strategic review call to discuss your next steps.`,
+    growthScan: {
+      title: "Marketing Strategy — Accelerator Module",
+      paragraphs: [
+        "Your Growth Scan provides an initial view of how your current Targeting, Offer, Marketing, and Sales align with your target audience.",
+        "The 4-Pillar Accelerator Program takes these insights further by developing each area into a tailored strategy. The program is intentionally sequenced: Targeting establishes the foundation, followed by Offer, Marketing, and Sales, with each strategic layer building on the decisions developed before it.",
+      ],
+      emphasis: "This module is part of the Accelerator Program and is not included in the Growth Scan.",
+    },
+    accelerator: {
+      title: "Marketing Strategy — Upcoming Module",
+      paragraphs: [
+        "Your Accelerator is intentionally sequenced so each strategic layer can build on the decisions and insights developed before it.",
+        "For now, your focus should remain on understanding and working through your current Offer Strategy. At the same time, we use the strategic foundations developed so far to prepare your Marketing Strategy.",
+      ],
+      emphasis: "Once the next strategic layer is ready, this module will unlock automatically.",
+    },
   },
-  sales: {
-    title: "Your Sales Strategy — First Step in the Journey",
-    text: `You’re seeing the opening layer of your Sales Strategy.
-The complete view includes objection handling, relationship progression, persuasion timing, and follow-up psychology — the tools to move prospects from interested to committed.
-Without these, sales conversations risk stalling before they reach a decision point.
 
-You get full access to all modules within the 4-Pillar Accelerator Program in a timed release sequence. If you haven't applied for the Program yet, send us an email or book a quick strategic review call to discuss your next steps.`,
+  sales: {
+    growthScan: {
+      title: "Sales Strategy — Accelerator Module",
+      paragraphs: [
+        "Your Growth Scan provides an initial view of how your current Targeting, Offer, Marketing, and Sales align with your target audience.",
+        "The 4-Pillar Accelerator Program takes these insights further by developing each area into a tailored strategy. The program is intentionally sequenced: Targeting establishes the foundation, followed by Offer, Marketing, and Sales, with each strategic layer building on the decisions developed before it.",
+      ],
+      emphasis: "This module is part of the Accelerator Program and is not included in the Growth Scan.",
+    },
+    accelerator: {
+      title: "Sales Strategy — Upcoming Module",
+      paragraphs: [
+        "Your Accelerator is intentionally sequenced so each strategic layer can build on the decisions and insights developed before it.",
+        "For now, your focus should remain on understanding and working through your current Marketing Strategy. At the same time, we use the strategic foundations developed so far to prepare your Sales Strategy.",
+      ],
+      emphasis: "Once the next strategic layer is ready, this module will unlock automatically.",
+    },
   },
 };
 
