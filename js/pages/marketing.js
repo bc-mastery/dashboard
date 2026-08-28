@@ -207,6 +207,12 @@ export async function renderMarketingTab(
         "MS_READY"
       );
 
+    const isAcceleratorClient =
+      getSpreadsheetValue(
+        d,
+        "4PAP_PAID"
+      ).toUpperCase() === "TRUE";
+
 
     console.log(
       "🔍 Debug Gate Verification (Marketing): Found raw value for MS_READY =",
@@ -267,6 +273,7 @@ export async function renderMarketingTab(
       isPreviewOnly: !allowFull,
       content:
         finalBlockContent.marketing,
+      isAcceleratorClient,
     });
 
 
