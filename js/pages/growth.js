@@ -430,36 +430,40 @@ export async function renderGrowthTab(forceRefresh = false) {
 
           <div class="bfText">
             <p style="margin:0; color:#333333;">
-              Currently utilized business potential:
+              Overall alignment with your target audience:
               <strong style="color:#30BA80;">${esc(pctLabel(util))}</strong>
             </p>
 
             <p>
-              That means your business still has another
-              <strong style="color:#FF0040;">${esc(pctLabel(untapped))} of untapped business potential.</strong>
+              This score reflects how closely your current approach across <strong>Targeting, Offer, Marketing, and Sales</strong>
+              aligns with how your target audience is likely to think, evaluate, and make decisions.
             </p>
-
-            <p style="margin-bottom:0;">Your utilization rate depends on how well you know…</p>
-            <ul style="margin:0; padding-left:18px; list-style-position:outside;">
-              <li style="margin:0;">Who you sell to;</li>
-              <li style="margin:0;">What you sell to them;</li>
-              <li style="margin:0;">How you attract them;</li>
-              <li style="margin:0;">And how you sell to them.</li>
-            </ul>
 
             <p>
-              But right now, you’re leaving money on the table and limiting your ability to break through.
-              With only a few strategic changes, you could achieve
-              <strong style="color:#30BA80">${esc(growthPotentialLabel)}</strong>
-              growth.
+              The remaining <strong style="color:#FF0040;">${esc(pctLabel(untapped))}</strong> represents potential alignment gaps —
+              areas where your current assumptions, positioning, communication, or approach may differ from what resonates most strongly with your audience.
             </p>
 
+            <p style="margin-bottom:0;">The Growth Scan looks at four fundamental questions:</p>
+            <ul style="margin:0; padding-left:18px; list-style-position:outside;">
+              <li style="margin:0;">Who you focus on;</li>
+              <li style="margin:0;">What you offer them and how you frame its value;</li>
+              <li style="margin:0;">How you attract and engage them;</li>
+              <li style="margin:0;">How you support their buying decision.</li>
+            </ul>
+
             <p style="color:#FF0040; font-weight:700;">
-              Right now, your biggest blocker is ${esc(d.GS_BLOCKER || "")}.
+              Your largest alignment gap currently appears in ${esc(d.GS_BLOCKER || "")}.
+            </p>
+
+            <p>
+              This does not necessarily mean your ${esc(d.GS_BLOCKER || "strategy")} is weak or ineffective.
+              It means that, compared with the other pillars, this is where the Scan identifies the greatest difference
+              between your current approach and the behavioral characteristics of your target audience.
             </p>
 
             <p class="muted">
-              Besides that, below you can see how your business performs in the most critical strategic areas — a.k.a. pillars.
+              Below, you can see how this alignment differs across all four pillars.
             </p>
           </div>
         </div>
